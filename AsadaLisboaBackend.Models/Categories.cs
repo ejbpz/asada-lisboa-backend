@@ -5,7 +5,7 @@ namespace AsadaLisboaBackend.Models
     public class Categories
     {
         [Key]
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         [Required]
         [StringLength(5)]
