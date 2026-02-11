@@ -1,9 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36930.0 d17.14
+VisualStudioVersion = 17.14.36930.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend", "AsadaLisboaBackend\AsadaLisboaBackend.csproj", "{F68F6187-DB05-4BEA-B726-598B2D61CC07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.Models", "AsadaLisboaBackend.Models\AsadaLisboaBackend.Models.csproj", "{177C3AAF-52F9-4B68-8747-B5D1E316AE96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.ServicesContracts", "AsadaLisboaBackend.ServicesContracts\AsadaLisboaBackend.ServicesContracts.csproj", "{066E931C-7196-447E-9A58-AFB1DA17057E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.Services", "AsadaLisboaBackend.Services\AsadaLisboaBackend.Services.csproj", "{B29C6A92-7326-4F2B-928B-04A944B42F78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.RepositoriesContracts", "AsadaLisboaBackend.RepositoriesContracts\AsadaLisboaBackend.RepositoriesContracts.csproj", "{4D7EFE6B-822A-4A07-A2C8-BD3B74C326F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.Repositories", "AsadaLisboaBackend.Repositories\AsadaLisboaBackend.Repositories.csproj", "{B46D4CA3-5054-4CEE-BF7A-A59A7A71C83A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.Tests", "AsadaLisboaBackend.Tests\AsadaLisboaBackend.Tests.csproj", "{6B087D9F-9180-4BF2-AB15-E9847F16ADDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +27,30 @@ Global
 		{F68F6187-DB05-4BEA-B726-598B2D61CC07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F68F6187-DB05-4BEA-B726-598B2D61CC07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F68F6187-DB05-4BEA-B726-598B2D61CC07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{177C3AAF-52F9-4B68-8747-B5D1E316AE96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{177C3AAF-52F9-4B68-8747-B5D1E316AE96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{177C3AAF-52F9-4B68-8747-B5D1E316AE96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{177C3AAF-52F9-4B68-8747-B5D1E316AE96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{066E931C-7196-447E-9A58-AFB1DA17057E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{066E931C-7196-447E-9A58-AFB1DA17057E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{066E931C-7196-447E-9A58-AFB1DA17057E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{066E931C-7196-447E-9A58-AFB1DA17057E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B29C6A92-7326-4F2B-928B-04A944B42F78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B29C6A92-7326-4F2B-928B-04A944B42F78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B29C6A92-7326-4F2B-928B-04A944B42F78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B29C6A92-7326-4F2B-928B-04A944B42F78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D7EFE6B-822A-4A07-A2C8-BD3B74C326F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D7EFE6B-822A-4A07-A2C8-BD3B74C326F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D7EFE6B-822A-4A07-A2C8-BD3B74C326F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D7EFE6B-822A-4A07-A2C8-BD3B74C326F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B46D4CA3-5054-4CEE-BF7A-A59A7A71C83A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B46D4CA3-5054-4CEE-BF7A-A59A7A71C83A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B46D4CA3-5054-4CEE-BF7A-A59A7A71C83A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B46D4CA3-5054-4CEE-BF7A-A59A7A71C83A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B087D9F-9180-4BF2-AB15-E9847F16ADDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B087D9F-9180-4BF2-AB15-E9847F16ADDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B087D9F-9180-4BF2-AB15-E9847F16ADDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B087D9F-9180-4BF2-AB15-E9847F16ADDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
