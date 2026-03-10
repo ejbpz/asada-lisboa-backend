@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.ServiceC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.Tests", "AsadaLisboaBackend.Tests\AsadaLisboaBackend.Tests.csproj", "{D003431A-6B42-4303-BBCA-E74A3AF459DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsadaLisboaBackend.Utils", "AsadaLisboaBackend.Utils\AsadaLisboaBackend.Utils.csproj", "{99C50A6F-9787-45C5-860B-89CB5AA6BC8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{D003431A-6B42-4303-BBCA-E74A3AF459DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D003431A-6B42-4303-BBCA-E74A3AF459DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D003431A-6B42-4303-BBCA-E74A3AF459DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C50A6F-9787-45C5-860B-89CB5AA6BC8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C50A6F-9787-45C5-860B-89CB5AA6BC8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C50A6F-9787-45C5-860B-89CB5AA6BC8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C50A6F-9787-45C5-860B-89CB5AA6BC8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

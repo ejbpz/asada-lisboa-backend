@@ -8,8 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.24" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.24" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.25" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.24">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,10 +18,16 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Resend" Version="0.2.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AsadaLisboaBackend.Models\AsadaLisboaBackend.Models.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.Repositories\AsadaLisboaBackend.Repositories.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.RepositoryContracts\AsadaLisboaBackend.RepositoryContracts.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.ServiceContracts\AsadaLisboaBackend.ServiceContracts.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.Services\AsadaLisboaBackend.Services.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.Utils\AsadaLisboaBackend.Utils.csproj" />
   </ItemGroup>
 
 </Project>
