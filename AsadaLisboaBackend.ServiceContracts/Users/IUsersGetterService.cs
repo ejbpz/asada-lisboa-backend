@@ -6,5 +6,6 @@ namespace AsadaLisboaBackend.ServiceContracts.Users
     {
         public Task<List<UserResponseDTO>?> GetUsers(int page);
         public Task<UserDetailResponseDTO?> GetUser(Guid id);
+        public Task<bool> UserExists(Guid id);
     }
 }

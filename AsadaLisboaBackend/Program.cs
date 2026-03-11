@@ -25,7 +25,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddTransient<IUsersGetterRepository, UsersGetterRepository>();
+builder.Services.AddTransient<IUsersUpdaterRepository, UsersUpdaterRepository>();
 
+builder.Services.AddTransient<IUsersUpdaterService, UsersUpdaterService>();
 builder.Services.AddTransient<IUsersGetterService, UsersGetterService>();
 builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 builder.Services.AddTransient<IResetPasswordService, ResetPasswordService>();

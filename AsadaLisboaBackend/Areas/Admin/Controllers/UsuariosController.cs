@@ -10,10 +10,12 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IUsersGetterService _usersGetterService;
+        private readonly IUsersUpdaterService _usersUpdaterService;
 
-        public UsuariosController(IUsersGetterService usersGetterService)
+        public UsuariosController(IUsersGetterService usersGetterService, IUsersUpdaterService usersUpdaterService)
         {
             _usersGetterService = usersGetterService;
+            _usersUpdaterService = usersUpdaterService;
         }
 
         [HttpGet("")]
@@ -31,6 +33,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
                 return NotFound();
 
             return Ok(user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] UserUpdateRequestDTO userUpdateRequestDTO)
+        {
+            await _usersUpdaterService.UpdateUser(id, userUpdateRequestDTO);
+
+            return NoContent();
         }
     }
 }

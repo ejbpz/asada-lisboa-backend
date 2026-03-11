@@ -6,6 +6,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Users
     public class UserDetailResponseDTO
     {
         public Guid Id { get; set; }
+        public string Email { get; set; } = string.Empty;
         public string Charge { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
@@ -21,6 +22,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Users
             return user => new UserDetailResponseDTO
             {
                 Id = user.Id,
+                Email = user.Email!,
                 ImageUrl = user.ImageUrl,
                 Charge = user.Charge!.Name,
                 FirstName = user.FirstName,
