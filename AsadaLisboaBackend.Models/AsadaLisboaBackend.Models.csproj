@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AsadaLisboaBackend.Utils\AsadaLisboaBackend.Utils.csproj" />
+  </ItemGroup>
+
 </Project>

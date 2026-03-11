@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models.DTOs;
 using AsadaLisboaBackend.ServiceContracts.Account;
 
@@ -19,25 +18,13 @@ namespace AsadaLisboaBackend.Controllers
         [HttpPost("olvidar-contrasena")]
         public async Task<IActionResult> OlvidarContrasena([FromBody] ForgotPasswordRequestDTO resetPasswordDTO)
         {
-            string email = resetPasswordDTO.Email.Trim();
-
-            var validEmail = Constants.EMAIL_REGEX.Match(email).Success;
-            if (!validEmail) return BadRequest("No corresponde a un formato de correo electrónico.");
-
-            return Ok(await _resetPasswordService.ForgotPassword(email));
+            return Ok(await _resetPasswordService.ForgotPassword(resetPasswordDTO.Email));
         }
 
         [HttpPost("restaurar-contrasena")]
-        public async Task<IActionResult> RestaurarContrasena([FromQuery] string token, [FromQuery] string email, [FromBody] ResetPasswordRequestDTO resetPasswordRequestDTO)
+        public async Task<IActionResult> RestaurarContrasena([FromBody] ResetPasswordRequestDTO resetPasswordRequestDTO)
         {
-            email = email.Trim();
-
-            var validEmail = Constants.EMAIL_REGEX.Match(email).Success;
-            if (!validEmail) return BadRequest("No corresponde a un formato de correo electrónico.");
-
-            if (!resetPasswordRequestDTO.Password.Equals(resetPasswordRequestDTO.ConfirmPassword)) return BadRequest("Ambas contraseñas deben coincidir.");
-
-            var result = await _resetPasswordService.ResetPassword(email, token, resetPasswordRequestDTO.Password);
+            var result = await _resetPasswordService.ResetPassword(resetPasswordRequestDTO.Email, resetPasswordRequestDTO.Token, resetPasswordRequestDTO.Password);
 
             if(!result.Succeeded)
             {
