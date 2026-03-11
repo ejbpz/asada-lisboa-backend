@@ -16,9 +16,14 @@ namespace AsadaLisboaBackend.Services.Users
 
         public async Task<List<UserResponseDTO>?> GetUsers(int page)
         {
-            int offset = (page - 1) * Constants.PAGINATION_SIZE;
+            int offset = (Math.Max(page, 1) - 1) * Constants.PAGINATION_SIZE;
 
             return await _usersGetterRepository.GetUsers(offset, Constants.PAGINATION_SIZE);
+        }
+
+        public async Task<UserDetailResponseDTO?> GetUser(Guid id)
+        {
+            return await _usersGetterRepository.GetUser(id);
         }
     }
 }

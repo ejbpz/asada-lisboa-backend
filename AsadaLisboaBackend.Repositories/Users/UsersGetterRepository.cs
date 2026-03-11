@@ -14,15 +14,24 @@ namespace AsadaLisboaBackend.Repositories.Users
             _context = context;
         }
 
-        public async Task<List<UserResponseDTO>> GetUsers(int offset, int take)
+        public async Task<List<UserResponseDTO>?> GetUsers(int offset, int take)
         {
             return await _context.Users
                 .AsNoTracking()
                 .OrderBy(u => u.Id)
                 .Skip(offset)
                 .Take(take)
-                .Select(UserExtensions.Map())
+                .Select(UserExtensions.MapUserResponseDTO())
                 .ToListAsync();
+        }
+
+        public async Task<UserDetailResponseDTO?> GetUser(Guid id)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == id)
+                .Select(UserExtensions.MapUserDetailResponseDTO())
+                .FirstOrDefaultAsync();
         }
     }
 }

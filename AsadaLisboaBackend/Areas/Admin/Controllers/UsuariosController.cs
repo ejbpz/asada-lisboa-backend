@@ -17,9 +17,20 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         }
 
         [HttpGet("")]
-        public async Task<ActionResult<List<UserResponseDTO>>> GetUsers([FromQuery] int page = 1)
+        public async Task<ActionResult<List<UserResponseDTO>?>> GetUsers([FromQuery] int page = 1)
         {
             return Ok(await _usersGetterService.GetUsers(page));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserDetailResponseDTO>> GetUser([FromRoute] Guid id)
+        {
+            var user = await _usersGetterService.GetUser(id);
+
+            if (user is null)
+                return NotFound();
+
+            return Ok(user);
         }
     }
 }

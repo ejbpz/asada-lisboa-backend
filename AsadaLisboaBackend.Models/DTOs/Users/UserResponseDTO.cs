@@ -11,9 +11,9 @@ namespace AsadaLisboaBackend.Models.DTOs.Users
         public string ImageUrl { get; set; } = string.Empty;
     }
 
-    public static class UserExtensions
+    public static partial class UserExtensions
     {
-        public static Expression<Func<ApplicationUser, UserResponseDTO>> Map()
+        public static Expression<Func<ApplicationUser, UserResponseDTO>> MapUserResponseDTO()
         {
             return user => new UserResponseDTO
             {
