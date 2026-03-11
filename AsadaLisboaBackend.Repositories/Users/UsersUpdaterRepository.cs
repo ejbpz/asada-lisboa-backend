@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models.IdentityModels;
+﻿using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Users;
 
@@ -16,21 +15,20 @@ namespace AsadaLisboaBackend.Repositories.Users
 
         public async Task UpdateUser(ApplicationUser updateUser)
         {
-            _context.Entry(updateUser).Property(x => x.FirstName).IsModified = true;
-            _context.Entry(updateUser).Property(x => x.FirstLastName).IsModified = true;
-            _context.Entry(updateUser).Property(x => x.SecondLastName).IsModified = true;
-            _context.Entry(updateUser).Property(x => x.PhoneNumber).IsModified = true;
-            _context.Entry(updateUser).Property(x => x.ImageUrl).IsModified = true;
-            _context.Entry(updateUser).Property(x => x.ChargeId).IsModified = true;
+            _context.Attach(updateUser);
+            var entry = _context.Entry(updateUser);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw new ArgumentException("The user was modified by another process.");
-            }
+            entry.Property(x => x.ChargeId).IsModified = true;
+            entry.Property(x => x.ImageUrl).IsModified = true;
+            entry.Property(x => x.FirstName).IsModified = true;
+            entry.Property(x => x.PhoneNumber).IsModified = true;
+            entry.Property(x => x.FirstLastName).IsModified = true;
+            entry.Property(x => x.SecondLastName).IsModified = true;
+
+            var affectedRows = await _context.SaveChangesAsync();
+
+            if (affectedRows == 0)
+                throw new ArgumentException("Usuario no existente");
         }
     }
 }

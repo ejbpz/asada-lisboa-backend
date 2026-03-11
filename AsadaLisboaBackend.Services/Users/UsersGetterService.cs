@@ -25,10 +25,5 @@ namespace AsadaLisboaBackend.Services.Users
         {
             return await _usersGetterRepository.GetUser(id);
         }
-
-        public async Task<bool> UserExists(Guid id)
-        {
-            return await _usersGetterRepository.UserExists(id);
-        }
     }
 }

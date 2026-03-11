@@ -11,11 +11,13 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     {
         private readonly IUsersGetterService _usersGetterService;
         private readonly IUsersUpdaterService _usersUpdaterService;
+        private readonly IUsersDeleterService _usersDeleterService;
 
-        public UsuariosController(IUsersGetterService usersGetterService, IUsersUpdaterService usersUpdaterService)
+        public UsuariosController(IUsersGetterService usersGetterService, IUsersUpdaterService usersUpdaterService, IUsersDeleterService usersDeleterService)
         {
             _usersGetterService = usersGetterService;
             _usersUpdaterService = usersUpdaterService;
+            _usersDeleterService = usersDeleterService;
         }
 
         [HttpGet("")]
@@ -39,7 +41,13 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] UserUpdateRequestDTO userUpdateRequestDTO)
         {
             await _usersUpdaterService.UpdateUser(id, userUpdateRequestDTO);
+            return NoContent();
+        }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
+        {
+            await _usersDeleterService.DeleteUser(id);
             return NoContent();
         }
     }

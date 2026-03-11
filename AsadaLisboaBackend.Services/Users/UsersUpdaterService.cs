@@ -18,11 +18,6 @@ namespace AsadaLisboaBackend.Services.Users
 
         public async Task UpdateUser(Guid id, UserUpdateRequestDTO userUpdateRequestDTO)
         {
-            var userExists = await _usersGetterService.UserExists(id);
-
-            if (!userExists)
-                throw new ArgumentException("Usuario no existente");
-
             var user = new ApplicationUser()
             {
                 Id = id,

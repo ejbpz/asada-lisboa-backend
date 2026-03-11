@@ -1,5 +1,5 @@
-﻿using AsadaLisboaBackend.Utils;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Models.DTOs.Users
 {

@@ -33,10 +33,5 @@ namespace AsadaLisboaBackend.Repositories.Users
                 .Select(UserExtensions.MapUserDetailResponseDTO())
                 .FirstOrDefaultAsync();
         }
-
-        public async Task<bool> UserExists(Guid id)
-        {
-            return await _context.Users.AnyAsync(u => u.Id == id);
-        }
     }
 }
