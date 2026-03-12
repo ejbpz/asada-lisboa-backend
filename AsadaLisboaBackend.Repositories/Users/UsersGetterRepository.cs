@@ -30,7 +30,7 @@ namespace AsadaLisboaBackend.Repositories.Users
                 query = searchSortRequestDTO.FilterBy switch
                 {
                     "Charge" => query.Where(u => u.Charge != null && u.Charge.Name.ToLower().Contains(search)),
-                    _ => query.Where(u => u.UserName != null && u.UserName.ToLower().Contains(search)),
+                    _ => query.Where(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName) != null && (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName).ToLower().Contains(search)),
                 };
             }
 
@@ -39,8 +39,8 @@ namespace AsadaLisboaBackend.Repositories.Users
             {
                 ("charge", "desc") => query.OrderByDescending(u => u.Charge!.Name),
                 ("charge", _) => query.OrderBy(u => u.Charge!.Name),
-                ("name", "desc") => query.OrderByDescending(u => u.UserName),
-                _ => query.OrderBy(u => u.UserName),
+                ("name", "desc") => query.OrderByDescending(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName)),
+                _ => query.OrderBy(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName)),
             };
 
             return new PageResponseDTO<UserResponseDTO>()
