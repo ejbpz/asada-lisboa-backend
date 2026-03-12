@@ -1,7 +1,7 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Users;
+﻿using Microsoft.AspNetCore.Identity;
+using AsadaLisboaBackend.Models.DTOs.Users;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace AsadaLisboaBackend.Services.Users
 {
@@ -30,6 +30,7 @@ namespace AsadaLisboaBackend.Services.Users
 
             var result = await _userManager.UpdateAsync(user);
 
+            // TODO: Add errors.
             if (!result.Succeeded)
                 throw new ArgumentNullException("Error al actualizar usuario.");
         }

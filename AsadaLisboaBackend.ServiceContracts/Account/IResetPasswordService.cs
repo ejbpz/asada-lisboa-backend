@@ -5,6 +5,6 @@ namespace AsadaLisboaBackend.ServiceContracts.Account
     public interface IResetPasswordService
     {
         public Task<bool> ForgotPassword(string email);
-        public Task<IdentityResult> ResetPassword(string email, string token, string password);
+        public Task ResetPassword(string email, string token, string password);
     }
 }

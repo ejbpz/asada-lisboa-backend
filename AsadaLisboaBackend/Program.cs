@@ -27,6 +27,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddTransient<IUsersGetterRepository, UsersGetterRepository>();
 
+builder.Services.AddTransient<ILoginService, LoginService>();
 builder.Services.AddTransient<IUsersGetterService, UsersGetterService>();
 builder.Services.AddTransient<IUsersUpdaterService, UsersUpdaterService>();
 builder.Services.AddTransient<IUsersDeleterService, UsersDeleterService>();

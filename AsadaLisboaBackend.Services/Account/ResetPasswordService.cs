@@ -29,7 +29,7 @@ namespace AsadaLisboaBackend.Services.Account
             return await _emailSenderService.SendResetPasswordToken(user.FirstName, email, resetToken);
         }
 
-        public async Task<IdentityResult> ResetPassword(string email, string token, string password)
+        public async Task ResetPassword(string email, string token, string password)
         {
             token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
 
@@ -37,7 +37,11 @@ namespace AsadaLisboaBackend.Services.Account
             if (user is null) 
                 throw new ArgumentNullException("No existe un usuario con este correo electrónico.");
 
-            return await _userManager.ResetPasswordAsync(user, token, password);
+            var result = await _userManager.ResetPasswordAsync(user, token, password);
+
+            // TODO: Add errors.
+            if (!result.Succeeded)
+                throw new ArgumentNullException("Error al restaurar contraseña.");
         }
     }
 }
