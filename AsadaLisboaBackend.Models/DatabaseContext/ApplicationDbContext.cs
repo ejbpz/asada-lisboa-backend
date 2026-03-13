@@ -18,7 +18,7 @@ namespace AsadaLisboaBackend.Models.DatabaseContext
         public DbSet<Status> Images { get; set; }
         public DbSet<New> News { get; set; }
         public DbSet<Charge> Charges { get; set; }
-
+        public DbSet<Register> Register { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
