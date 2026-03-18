@@ -13,12 +13,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         private readonly IContactsAdderService _contactsAdderService;
         private readonly IContactsGetterService _contactsGetterService;
         private readonly IContactsUpdaterService _contactsUpdaterService;
+        private readonly IContactsDeleterService _contactsDeleterService;
 
-        public ContactoController(IContactsGetterService contactsGetterService, IContactsAdderService contactsAdderService, IContactsUpdaterService contactsUpdaterService)
+        public ContactoController(IContactsGetterService contactsGetterService, IContactsAdderService contactsAdderService, IContactsUpdaterService contactsUpdaterService, IContactsDeleterService contactsDeleterService)
         {
             _contactsAdderService = contactsAdderService;
             _contactsGetterService = contactsGetterService;
             _contactsUpdaterService = contactsUpdaterService;
+            _contactsDeleterService = contactsDeleterService;
         }
 
         [HttpGet("")]
@@ -34,9 +36,16 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ContactResponseDTO>> UpdateContact([FromQuery] Guid id, [FromBody] ContactRequestDTO contactRequestDTO)
+        public async Task<ActionResult<ContactResponseDTO>> UpdateContact([FromRoute] Guid id, [FromBody] ContactRequestDTO contactRequestDTO)
         {
             return Ok(await _contactsUpdaterService.UpdateContact(id, contactRequestDTO));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ContactResponseDTO>> DeleteContact([FromRoute] Guid id)
+        {
+            await _contactsDeleterService.UpdateContact(id);
+            return NoContent();
         }
     }
 }

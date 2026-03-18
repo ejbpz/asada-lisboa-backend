@@ -62,6 +62,7 @@ builder.Services.AddScoped<IUsersGetterRepository, UsersGetterRepository>();
 builder.Services.AddScoped<IContactsAdderRepository, ContactsAdderRepository>();
 builder.Services.AddScoped<IContactsGetterRepository, ContactsGetterRepository>();
 builder.Services.AddScoped<IContactsUpdaterRepository, ContactsUpdaterRepository>();
+builder.Services.AddScoped<IContactsDeleterRepository, ContactsDeleterRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
@@ -74,6 +75,7 @@ builder.Services.AddScoped<IUsersDeleterService, UsersDeleterService>();
 builder.Services.AddScoped<IContactsAdderService, ContactsAdderService>();
 builder.Services.AddScoped<IContactsGetterService, ContactsGetterService>();
 builder.Services.AddScoped<IContactsUpdaterService, ContactsUpdaterService>();
+builder.Services.AddScoped<IContactsDeleterService, ContactsDeleterService>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
