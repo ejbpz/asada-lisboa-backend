@@ -42,5 +42,13 @@ namespace AsadaLisboaBackend.Controllers
             return Ok("Código enviado correctamente.");
         }
 
+        [HttpPost("confirmar-correo")]
+        public async Task<IActionResult> VerifyEmaill([FromBody] VerificationCodeRequestDTO request)
+        {
+            var result = await _verificationCodeService.ConfirmEmailAsync(request.Email, request.Token);
+            if (!result) return BadRequest("Token inválido o expirado.");
+            return Ok("Correo confirmado correctamente.");
+
+        }
     }
 }
