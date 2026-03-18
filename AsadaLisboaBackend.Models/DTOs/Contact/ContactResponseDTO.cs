@@ -22,5 +22,16 @@ namespace AsadaLisboaBackend.Models.DTOs.Contact
                 ContactType = contact.ContactType,
             };
         }
+
+        public static ContactResponseDTO ToContactResponseDTO(this Models.Contact contact)
+        {
+            return new ContactResponseDTO()
+            {
+                Id = contact.Id,
+                Order = contact.Order,
+                Value = contact.Value,
+                ContactType = contact.ContactType,
+            };
+        }
     }
 }

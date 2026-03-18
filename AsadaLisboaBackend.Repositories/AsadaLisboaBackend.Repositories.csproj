@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AsadaLisboaBackend.Models\AsadaLisboaBackend.Models.csproj" />
     <ProjectReference Include="..\AsadaLisboaBackend.RepositoryContracts\AsadaLisboaBackend.RepositoryContracts.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.Services\AsadaLisboaBackend.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -56,14 +56,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.Configure<RefreshJwtOptions>(builder.Configuration.GetSection(nameof(RefreshJwtOptions)));
 
-builder.Services.AddTransient<IContactsGetterRepository, ContactsGetterRepository>();
 builder.Services.AddTransient<IUsersGetterRepository, UsersGetterRepository>();
+builder.Services.AddTransient<IContactsAdderRepository, ContactsAdderRepository>();
+builder.Services.AddTransient<IContactsGetterRepository, ContactsGetterRepository>();
 
 builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<ILoginService, LoginService>();
 builder.Services.AddTransient<IUsersGetterService, UsersGetterService>();
 builder.Services.AddTransient<IUsersUpdaterService, UsersUpdaterService>();
 builder.Services.AddTransient<IUsersDeleterService, UsersDeleterService>();
+builder.Services.AddTransient<IContactsAdderService, ContactsAdderService>();
 builder.Services.AddTransient<IContactsGetterService, ContactsGetterService>();
 
 builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
