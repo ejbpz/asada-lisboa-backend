@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using AsadaLisboaBackend.Models.DTOs.Users;
+using AsadaLisboaBackend.Models.DTOs.User;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.ServiceContracts.Users;
 

@@ -1,4 +1,4 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Users;
+﻿using AsadaLisboaBackend.Models.DTOs.User;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 
 namespace AsadaLisboaBackend.ServiceContracts.Users

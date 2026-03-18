@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AsadaLisboaBackend.Utils;
 
-namespace AsadaLisboaBackend.Models.DTOs.Users
+namespace AsadaLisboaBackend.Models.DTOs.User
 {
     public class UserUpdateRequestDTO
     {

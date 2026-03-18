@@ -1,6 +1,6 @@
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -13,15 +13,19 @@ using AsadaLisboaBackend.ErrorHandling;
 using AsadaLisboaBackend.Services.Email;
 using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Services.Account;
+using AsadaLisboaBackend.Services.Contacts;
 using AsadaLisboaBackend.Repositories.Users;
-using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.Jwt;
+using AsadaLisboaBackend.Utils.OptionsPattern;
+using AsadaLisboaBackend.Repositories.Contacts;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Email;
-using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Users;
+using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Account;
 using AsadaLisboaBackend.RepositoryContracts.Users;
+using AsadaLisboaBackend.ServiceContracts.Contacts;
+using AsadaLisboaBackend.RepositoryContracts.Contacts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +56,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.Configure<RefreshJwtOptions>(builder.Configuration.GetSection(nameof(RefreshJwtOptions)));
 
+builder.Services.AddTransient<IContactsGetterRepository, ContactsGetterRepository>();
 builder.Services.AddTransient<IUsersGetterRepository, UsersGetterRepository>();
 
 builder.Services.AddTransient<IJwtService, JwtService>();
@@ -59,6 +64,7 @@ builder.Services.AddTransient<ILoginService, LoginService>();
 builder.Services.AddTransient<IUsersGetterService, UsersGetterService>();
 builder.Services.AddTransient<IUsersUpdaterService, UsersUpdaterService>();
 builder.Services.AddTransient<IUsersDeleterService, UsersDeleterService>();
+builder.Services.AddTransient<IContactsGetterService, ContactsGetterService>();
 
 builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 builder.Services.AddTransient<IResetPasswordService, ResetPasswordService>();

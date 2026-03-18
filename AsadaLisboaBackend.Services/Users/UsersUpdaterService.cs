@@ -1,5 +1,5 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Error;
-using AsadaLisboaBackend.Models.DTOs.Users;
+using AsadaLisboaBackend.Models.DTOs.User;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.Services.Exceptions;

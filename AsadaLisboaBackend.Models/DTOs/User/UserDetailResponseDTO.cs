@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using AsadaLisboaBackend.Models.IdentityModels;
 
-namespace AsadaLisboaBackend.Models.DTOs.Users
+namespace AsadaLisboaBackend.Models.DTOs.User
 {
     public class UserDetailResponseDTO
     {

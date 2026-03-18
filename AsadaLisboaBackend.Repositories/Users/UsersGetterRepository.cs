@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models.DTOs.Users;
+using AsadaLisboaBackend.Models.DTOs.User;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.Models.DatabaseContext;
