@@ -8,13 +8,13 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     [ApiController]
     [Area("Admin")]
     [Route("api/[area]/[controller]")]
-    public class UsuariosController : ControllerBase
+    public class UsuarioController : ControllerBase
     {
         private readonly IUsersGetterService _usersGetterService;
         private readonly IUsersUpdaterService _usersUpdaterService;
         private readonly IUsersDeleterService _usersDeleterService;
 
-        public UsuariosController(IUsersGetterService usersGetterService, IUsersUpdaterService usersUpdaterService, IUsersDeleterService usersDeleterService)
+        public UsuarioController(IUsersGetterService usersGetterService, IUsersUpdaterService usersUpdaterService, IUsersDeleterService usersDeleterService)
         {
             _usersGetterService = usersGetterService;
             _usersUpdaterService = usersUpdaterService;
