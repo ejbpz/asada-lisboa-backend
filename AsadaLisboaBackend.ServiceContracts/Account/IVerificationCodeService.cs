@@ -11,5 +11,7 @@ namespace AsadaLisboaBackend.ServiceContracts.Account
     public  interface IVerificationCodeService
     {
         public Task<bool> GenerateCode(string email);
+
+        public Task<bool> ConfirmEmailAsync(string email, string token);
     }
 }
