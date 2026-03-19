@@ -21,6 +21,8 @@ using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.Account;
 using AsadaLisboaBackend.RepositoryContracts.Users;
+using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.Services.Image;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +54,8 @@ builder.Services.AddTransient<IUsersDeleterService, UsersDeleterService>();
 
 builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 builder.Services.AddTransient<IResetPasswordService, ResetPasswordService>();
+
+builder.Services.AddTransient<IImageService, ImageService>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
