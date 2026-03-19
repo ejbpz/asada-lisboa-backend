@@ -55,5 +55,10 @@ namespace AsadaLisboaBackend.Services.Image
 
         }
 
+        public async Task<ImageResponseDTO> UpdateImage(ImageUpdateRequestDTO imageUpdateRequestDTO)
+        {
+
+        }
+
     }
 }

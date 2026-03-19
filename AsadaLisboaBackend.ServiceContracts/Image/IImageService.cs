@@ -10,5 +10,7 @@ namespace AsadaLisboaBackend.ServiceContracts.Image
     public interface IImageService
     {
         public Task<ImageResponseDTO> CreateImage(ImageRequestDTO imageRequestDTO);
+
+        public Task<ImageResponseDTO> UpdateImage(ImageUpdateRequestDTO imageUpdateRequestDTO);
     }
 }
