@@ -10,6 +10,7 @@ using Resend;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Services.Jwt;
 using AsadaLisboaBackend.ErrorHandling;
+using AsadaLisboaBackend.Services.Image;
 using AsadaLisboaBackend.Services.Email;
 using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Services.Account;
@@ -19,6 +20,7 @@ using AsadaLisboaBackend.ServiceContracts.Jwt;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Repositories.Contacts;
 using AsadaLisboaBackend.Models.IdentityModels;
+using AsadaLisboaBackend.ServiceContracts.Image;
 using AsadaLisboaBackend.ServiceContracts.Email;
 using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.Models.DatabaseContext;
@@ -108,6 +110,8 @@ builder.Services.AddScoped<IAboutUsSectionsUpdaterService, AboutUsSectionsUpdate
 builder.Services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDeleterService>();
 
 builder.Services.AddTransient<IRegisterUserService, RegisterUserService>();
+
+builder.Services.AddTransient<IImageService, ImageService>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
