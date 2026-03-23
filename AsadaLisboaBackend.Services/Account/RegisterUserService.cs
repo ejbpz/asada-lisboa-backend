@@ -18,7 +18,6 @@ namespace AsadaLisboaBackend.Services.Account
             _verificationCodeService = verificationCodeService;
         }
 
-
         public async Task RegisterUser(RegisterRequestDTO registerRequestDTO)
         {
             //Verify if email exists

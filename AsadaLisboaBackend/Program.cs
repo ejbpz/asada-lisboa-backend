@@ -70,8 +70,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
-builder.Services.Configure<RefreshJwtOptions>(builder.Configuration.GetSection(nameof(RefreshJwtOptions)));
 builder.Services.Configure<ReCaptchaOptions>(builder.Configuration.GetSection(nameof(ReCaptchaOptions)));
+builder.Services.Configure<RefreshJwtOptions>(builder.Configuration.GetSection(nameof(RefreshJwtOptions)));
+builder.Services.Configure<ContactEmailOptions>(builder.Configuration.GetSection(nameof(ContactEmailOptions)));
 
 builder.Services.AddScoped<IContactsAdderRepository, ContactsAdderRepository>();
 builder.Services.AddScoped<IContactsGetterRepository, ContactsGetterRepository>();
@@ -113,9 +114,11 @@ builder.Services.AddScoped<IAboutUsSectionsGetterService, AboutUsSectionsGetterS
 builder.Services.AddScoped<IAboutUsSectionsUpdaterService, AboutUsSectionsUpdaterService>();
 builder.Services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDeleterService>();
 
-builder.Services.AddTransient<IImageService, ImageService>();
-builder.Services.AddTransient<IReCaptchaService, ReCaptchaService>();
-builder.Services.AddTransient<IRegisterUserService, RegisterUserService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IReCaptchaService, ReCaptchaService>();
+builder.Services.AddScoped<IVerificationCodeSendService, VerificationCodeSendService>();
+builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+builder.Services.AddScoped<IRegisterUserService, RegisterUserService>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {

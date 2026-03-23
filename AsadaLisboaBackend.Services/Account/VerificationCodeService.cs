@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.AspNetCore.Identity;
-using AsadaLisboaBackend.Services.Email;
+using Microsoft.AspNetCore.WebUtilities;
 using AsadaLisboaBackend.Models.IdentityModels;
+using AsadaLisboaBackend.ServiceContracts.Email;
 using AsadaLisboaBackend.ServiceContracts.Account;
 
 namespace AsadaLisboaBackend.Services.Account
@@ -10,9 +10,9 @@ namespace AsadaLisboaBackend.Services.Account
     public class VerificationCodeService : IVerificationCodeService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly VerificationCodeSendService _verificationCodeSendService;
+        private readonly IVerificationCodeSendService _verificationCodeSendService;
 
-        public VerificationCodeService(UserManager<ApplicationUser> userManager, VerificationCodeSendService verificationCodeSendService)
+        public VerificationCodeService(UserManager<ApplicationUser> userManager, IVerificationCodeSendService verificationCodeSendService)
         {
             _userManager = userManager;
             _verificationCodeSendService = verificationCodeSendService;

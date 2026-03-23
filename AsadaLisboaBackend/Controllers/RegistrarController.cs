@@ -31,7 +31,7 @@ namespace AsadaLisboaBackend.Controllers
         }
 
         [HttpPost("confirmar-correo")]
-        public async Task<IActionResult> VerifyEmaill([FromBody] VerificationCodeRequestDTO request)
+        public async Task<IActionResult> VerifyEmaill([FromQuery] VerificationCodeRequestDTO request)
         {
             var result = await _verificationCodeService.ConfirmEmailAsync(request.Email, request.Token);
             if (!result) return BadRequest("Token inválido o expirado.");
