@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AsadaLisboaBackend.Models.DTOs.Image;
+using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.Image;
 
@@ -10,17 +11,30 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     [Route("api/[area]/[controller]")]
     public class ImagenController : ControllerBase
     {
-        private readonly IImageService _imageService;
         private readonly IWebHostEnvironment _env;
+        private readonly IImageService _imageService;
+        private readonly IImagesGetterService _imagesGetterService;
 
-        public ImagenController(IImageService imageService, IWebHostEnvironment env)
+        public ImagenController(IImageService imageService, IWebHostEnvironment env, IImagesGetterService imagesGetterService)
         {
-            _imageService = imageService;
             _env = env;
+            _imageService = imageService;
+            _imagesGetterService = imagesGetterService;
         }
 
-        [HttpPost]
-        [Route("")]
+        [HttpGet("")]
+        public async Task<ActionResult<PageResponseDTO<ImageResponseDTO>>> GetImages([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
+        {
+            return Ok(await _imagesGetterService.GetImages(searchSortRequestDTO));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PageResponseDTO<ImageResponseDTO>>> GetImage([FromRoute] Guid id)
+        {
+            return Ok(await _imagesGetterService.GetImage(id));
+        }
+
+        [HttpPost("")]
         public async Task<IActionResult> CreateImage([FromForm] ImageRequestDTO imageRequestDTO)
         {
             var options = new FileStorageOptions
@@ -33,8 +47,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
-        [Route("")]
+        [HttpPut("")]
         public async Task<IActionResult> EditImage([FromForm] ImageUpdateRequestDTO ImageUpdateRequestDTO)
         {
             var options = new FileStorageOptions
@@ -54,8 +67,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
             }
         }
 
-        [HttpDelete]
-        [Route("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteImage(Guid id)
         {
             try

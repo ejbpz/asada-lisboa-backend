@@ -29,8 +29,11 @@ namespace AsadaLisboaBackend.Repositories.Users
 
                 query = searchSortRequestDTO.FilterBy switch
                 {
-                    "Charge" => query.Where(u => u.Charge != null && u.Charge.Name.ToLower().Contains(search)),
-                    _ => query.Where(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName) != null && (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName).ToLower().Contains(search)),
+                    "charge" => query.Where(u =>
+                        EF.Functions.Like(u.Charge!.Name ?? "", $"%{search}%")),
+
+                    _ => query.Where(u =>
+                        EF.Functions.Like((u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName), $"%{search}%")),
                 };
             }
 
@@ -47,8 +50,6 @@ namespace AsadaLisboaBackend.Repositories.Users
             {
                 Total = await query.CountAsync(),
                 Data = await query
-                    .AsNoTracking()
-                    .OrderBy(u => u.Id)
                     .Skip(searchSortRequestDTO.Offset)
                     .Take(searchSortRequestDTO.Take)
                     .Select(UserExtensions.MapUserResponseDTO())

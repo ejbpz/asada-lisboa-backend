@@ -18,6 +18,7 @@ using AsadaLisboaBackend.Services.Account;
 using AsadaLisboaBackend.Services.Contacts;
 using AsadaLisboaBackend.Services.ReCaptcha;
 using AsadaLisboaBackend.Repositories.Users;
+using AsadaLisboaBackend.Repositories.Images;
 using AsadaLisboaBackend.ServiceContracts.Jwt;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Repositories.Contacts;
@@ -32,6 +33,7 @@ using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.ReCaptcha;
+using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.Repositories.Configurations;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
@@ -89,6 +91,8 @@ builder.Services.AddScoped<IConfigurationsGetterRepository, ConfigurationsGetter
 builder.Services.AddScoped<IConfigurationsUpdaterRepository, ConfigurationsUpdaterRepository>();
 builder.Services.AddScoped<IConfigurationsDeleterRepository, ConfigurationsDeleterRepository>();
 
+builder.Services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
+
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
@@ -114,11 +118,13 @@ builder.Services.AddScoped<IAboutUsSectionsGetterService, AboutUsSectionsGetterS
 builder.Services.AddScoped<IAboutUsSectionsUpdaterService, AboutUsSectionsUpdaterService>();
 builder.Services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDeleterService>();
 
+builder.Services.AddScoped<IImagesGetterService, ImagesGetterService>();
+
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IReCaptchaService, ReCaptchaService>();
-builder.Services.AddScoped<IVerificationCodeSendService, VerificationCodeSendService>();
-builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<IRegisterUserService, RegisterUserService>();
+builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+builder.Services.AddScoped<IVerificationCodeSendService, VerificationCodeSendService>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {

@@ -26,7 +26,8 @@ namespace AsadaLisboaBackend.Repositories.Contacts
             {
                 string search = searchSortRequestDTO.Search.ToLower();
 
-                query = query.Where(c => (c.ContactType).ToLower().Contains(search));
+                query = query.Where(c =>
+                        EF.Functions.Like(c.ContactType, $"%{search}%"));
             }
 
             // Sort
@@ -42,8 +43,6 @@ namespace AsadaLisboaBackend.Repositories.Contacts
             {
                 Total = await query.CountAsync(),
                 Data = await query
-                    .AsNoTracking()
-                    .OrderBy(u => u.Id)
                     .Skip(searchSortRequestDTO.Offset)
                     .Take(searchSortRequestDTO.Take)
                     .Select(ContactExtensions.MapContactResponseDTO())
