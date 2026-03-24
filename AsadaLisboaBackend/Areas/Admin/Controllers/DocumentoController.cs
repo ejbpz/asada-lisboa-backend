@@ -48,5 +48,13 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
             var result = await _documentService.UpdateImage(id, DocumentUpdateRequestDTO, options);
             return Ok(result);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDocument(Guid id)
+        {
+            await _documentService.DeleteImage(id);
+            return NoContent();
+        }
+
     }
 }
