@@ -34,5 +34,19 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
             var result = await _documentService.CreateDocument(documentRequestDTO, options);
             return Ok(result);
         }
+
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditDocument([FromRoute] Guid id, [FromForm] DocumentUpdateRequestDTO documentUpdateRequestDTO)
+        {
+            var options = new FileStorageOptions
+            {
+                BasePath = Path.Combine(_env.WebRootPath, "uploads"),
+                BaseUrl = "/uploads"
+            };
+
+            var result = await _documentService.UpdateImage(id, DocumentUpdateRequestDTO, options);
+            return Ok(result);
+        }
     }
 }
