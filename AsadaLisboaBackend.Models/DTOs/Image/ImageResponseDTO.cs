@@ -9,6 +9,8 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
         public string Url { get; set; } = string.Empty;
         public string Slug { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
         public long FileSize { get; set; }
@@ -24,12 +26,14 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
             return image => new ImageResponseDTO
             {
                 Id = image.Id,
-                PublicationDate = image.PublicationDate,
                 Url = image.Url,
                 Slug = image.Slug,
                 Title = image.Title,
-                Description = image.Description,
+                FilePath = image.FilePath,
+                FileName = image.FileName,
                 FileSize = image.FileSize,
+                Description = image.Description,
+                PublicationDate = image.PublicationDate,
                 StatusName = image.Status!.Name ?? "Pendiente",
                 Categories = image.Categories
                     .Select(c => c.Name)
@@ -42,12 +46,14 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
             return new ImageResponseDTO()
             {
                 Id = image.Id,
-                PublicationDate = image.PublicationDate,
                 Url = image.Url,
                 Slug = image.Slug,
                 Title = image.Title,
-                Description = image.Description,
+                FilePath = image.FilePath,
+                FileName = image.FileName,
                 FileSize = image.FileSize,
+                Description = image.Description,
+                PublicationDate = image.PublicationDate,
                 StatusName = image.Status!.Name ?? "Pendiente",
                 Categories = image.Categories
                     .Select(c => c.Name)
