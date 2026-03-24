@@ -103,7 +103,7 @@ namespace AsadaLisboaBackend.Services.Document
             document.Categories = categories;
 
             if (documentUpdateRequestDTO.File is null || documentUpdateRequestDTO.File.Length <= 0)
-                throw new NotFoundException("Imagen no encontrada.");
+                throw new NotFoundException("Documento no encontrada.");
 
             var extension = Path.GetExtension(documentUpdateRequestDTO.File.FileName).ToLowerInvariant();
             var newFileName = $"{document.Id}{extension}";
@@ -141,6 +141,24 @@ namespace AsadaLisboaBackend.Services.Document
         }
 
 
+        public async Task<bool> DeleteImage(Guid id)
+        {
+            var document = await _applicationDbContext.Documents
+                .FirstOrDefaultAsync(i => i.Id == id);
 
+            if (document is null)
+                throw new NotFoundException("Documento no encontrada.");
+
+            if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
+                File.Delete(document.FilePath);
+
+            _applicationDbContext.Documents.Remove(document);
+            var affectedRows = await _applicationDbContext.SaveChangesAsync();
+
+            if (affectedRows < 1)
+                throw new NotFoundException("Documento no encontrada.");
+
+            return true;
+        }
     }
 }
