@@ -20,7 +20,7 @@ namespace AsadaLisboaBackend.Services.Account
             _userManager = userManager; 
         }
 
-        public async Task<bool> ForgotPassword(string email)
+        public async Task ForgotPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null || !user.EmailConfirmed)
@@ -28,7 +28,7 @@ namespace AsadaLisboaBackend.Services.Account
 
             string resetToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(await _userManager.GeneratePasswordResetTokenAsync(user)));
 
-            return await _emailSenderService.SendResetPasswordToken(user.FirstName, email, resetToken);
+            await _emailSenderService.SendResetPasswordToken(user.FirstName, email, resetToken);
         }
 
         public async Task ResetPassword(string email, string token, string password)

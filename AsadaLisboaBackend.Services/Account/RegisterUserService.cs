@@ -21,15 +21,14 @@ namespace AsadaLisboaBackend.Services.Account
         public async Task RegisterUser(RegisterRequestDTO registerRequestDTO)
         {
             //Verify if email exists
-            var existinguser = await _userManager.FindByEmailAsync(registerRequestDTO.Email);
+            var existingUser = await _userManager.FindByEmailAsync(registerRequestDTO.Email);
 
-            if (existinguser != null)
+            if (existingUser != null)
                 throw new NotFoundException("El correo electrónico ya esta registrado.");
 
             //Register new user
             var user = new ApplicationUser
             {
-
                 UserName = registerRequestDTO.UserName,
                 Email = registerRequestDTO.Email
             };
@@ -37,12 +36,12 @@ namespace AsadaLisboaBackend.Services.Account
             var result = await _userManager.CreateAsync(user, registerRequestDTO.Password);
 
             if (!result.Succeeded)
-                throw new Exception("Error al registrar usuario.");
+                throw new RegisterUserException("Error al registrar usuario.");
 
             var emailSent = await _verificationCodeService.GenerateCode(user.Email);
 
             if (!emailSent)
-                throw new Exception("Error al enviar el correo de confirmación.");
+                throw new SendEmailException("Error al enviar el correo de confirmación.");
         }
     }
 }

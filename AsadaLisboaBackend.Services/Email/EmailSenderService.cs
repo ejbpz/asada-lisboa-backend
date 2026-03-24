@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Resend;
 using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.Email;
 using AsadaLisboaBackend.Models.DTOs.InformationMessage;
@@ -18,7 +19,7 @@ namespace AsadaLisboaBackend.Services.Email
             _contactEmailOptions = options.Value;
         }
 
-        public async Task<bool> SendResetPasswordToken(string name, string email, string token)
+        public async Task SendResetPasswordToken(string name, string email, string token)
         {
             string url = $"{Constants.DOMAIN_HOST}/api/cuenta/restaurar-contrasena/?token={token}&email={email}";
 
@@ -43,7 +44,8 @@ namespace AsadaLisboaBackend.Services.Email
                 }
             );
 
-            return response.Success;
+            if (!response.Success)
+                throw new SendEmailException("Error al enviar el token.");
         }
 
         public async Task SendContactMessage(SendEmailRequestDTO sendEmailRequestDTO)
@@ -71,7 +73,7 @@ namespace AsadaLisboaBackend.Services.Email
             );
 
             if (!response.Success)
-                throw new Exception("Error al enviar el mensaje de contacto.");
+                throw new SendEmailException("Error al enviar el mensaje de contacto.");
         }
     }
 }

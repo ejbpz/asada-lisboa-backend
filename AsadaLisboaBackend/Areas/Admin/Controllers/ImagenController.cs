@@ -56,29 +56,15 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
                 BaseUrl = "/uploads"
             };
 
-            try
-            {
-                var result = await _imageService.UpdateImage(ImageUpdateRequestDTO, options);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _imageService.UpdateImage(ImageUpdateRequestDTO, options);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteImage(Guid id)
         {
-            try
-            {
-                var result = await _imageService.DeleteImage(id);
-                return Ok(new { success = result, message = "Imagen eliminada correctamente" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            await _imageService.DeleteImage(id);
+            return NoContent();
         }
 
     }

@@ -1,7 +1,7 @@
 ﻿using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using Resend;
 
 namespace AsadaLisboaBackend.Repositories.AboutUsSections
 {
@@ -20,7 +20,7 @@ namespace AsadaLisboaBackend.Repositories.AboutUsSections
             var affectedRows = await _context.SaveChangesAsync();
 
             if (affectedRows < 1)
-                throw new Exception("Error al crear la sección."); // TODO: Create custom exception.
+                throw new NotFoundException("Error al crear la sección.");
 
             return aboutUsSection;
         }

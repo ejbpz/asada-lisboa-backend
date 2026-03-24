@@ -30,10 +30,10 @@ namespace AsadaLisboaBackend.Controllers
         public async Task<bool> GetReCaptcha(string reCaptchaResponse)
         {
             if (string.IsNullOrEmpty(reCaptchaResponse) && string.IsNullOrWhiteSpace(reCaptchaResponse))
-                throw new Exception(""); // TODO: Custom errors.
+                throw new ArgumentNullException("El reCaptcha ha sido nulo.");
 
             if (string.IsNullOrEmpty(_reCaptchaOptions.SECRET_KEY) && string.IsNullOrWhiteSpace(_reCaptchaOptions.SECRET_KEY))
-                throw new Exception(""); // TODO: Custom errors.
+                throw new ArgumentNullException("Error con el proveedor del correos.");
 
             return await _reCaptchaService.ReCaptchaValidation(reCaptchaResponse, _reCaptchaOptions.SECRET_KEY);
         }

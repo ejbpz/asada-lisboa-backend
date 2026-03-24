@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AsadaLisboaBackend.Models.DTOs.Image;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.Models.DatabaseContext;
@@ -18,13 +19,12 @@ namespace AsadaLisboaBackend.Services.Image
 
         public async Task<ImageResponseDTO> CreateImage(ImageRequestDTO imageRequestDTO, FileStorageOptions fileStorageOptions)
         {
-            if (imageRequestDTO.File == null || imageRequestDTO.File.Length == 0)
-                throw new ArgumentException("Archivo inválido");
+            if (imageRequestDTO.File is null || imageRequestDTO.File.Length == 0)
+                throw new ArgumentException("Archivo inválido.");
 
             var imageId = Guid.NewGuid();
             var extension = Path.GetExtension(imageRequestDTO.File.FileName).ToLowerInvariant();
 
-            // Guardar archivo físico
             var fileName = $"{imageId}{extension}";
             var filePath = Path.Combine(fileStorageOptions.BasePath, fileName);
 
@@ -60,26 +60,19 @@ namespace AsadaLisboaBackend.Services.Image
                 };
 
                 _applicationDbContext.Images.Add(image);
-                await _applicationDbContext.SaveChangesAsync();
+                var affectedRows = await _applicationDbContext.SaveChangesAsync();
 
-                return new ImageResponseDTO
-                {
-                    Id = image.Id,
-                    Slug = image.Slug,
-                    Title = image.Title,
-                    FileSize = image.FileSize,
-                    Description = image.Description,
-                    PublicationDate = image.PublicationDate,
-                    StatusName = image.Status?.Name ?? string.Empty,
-                    Categories = image.Categories.Select(c => c.Name).ToList()
-                };
+                if (affectedRows < 1)
+                    throw new NotFoundException("Imagen no encontrada.");
+
+                return image.ToImageResponseDTO();
             }
             catch
             {
                 if (File.Exists(filePath))
                     File.Delete(filePath);
 
-                throw new Exception("");
+                throw new CreateObjectException("Error al crear la imagen.");
             }
         }
 
@@ -89,10 +82,9 @@ namespace AsadaLisboaBackend.Services.Image
                 .Include(i => i.Categories)
                 .FirstOrDefaultAsync(i => i.Id == imageUpdateRequestDTO.Id);
 
-            if (image == null)
-                throw new Exception("Imagen no encontrada");
+            if (image is null)
+                throw new NotFoundException("Imagen no encontrada.");
 
-             //Actualizar datos y generar nuevo Slug
             image.Title = imageUpdateRequestDTO.Title;
             image.StatusId = imageUpdateRequestDTO.StatusId;
             image.Description = imageUpdateRequestDTO.Description;
@@ -106,58 +98,42 @@ namespace AsadaLisboaBackend.Services.Image
             image.Categories.Clear();
             image.Categories = categories;
 
-            // Si hay nueva imagen, reemplazar archivo
-            if (imageUpdateRequestDTO.File != null && imageUpdateRequestDTO.File.Length > 0)
+            if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
+                throw new NotFoundException("Imagen no encontrada.");
+
+            var extension = Path.GetExtension(imageUpdateRequestDTO.File.FileName).ToLowerInvariant();
+            var newFileName = $"{image.Id}{extension}";
+            var newFilePath = Path.Combine(fileStorageOptions.BasePath, newFileName);
+
+            try
             {
-                var extension = Path.GetExtension(imageUpdateRequestDTO.File.FileName).ToLowerInvariant();
-                var newFileName = $"{image.Id}{extension}";
-                var newFilePath = Path.Combine(fileStorageOptions.BasePath, newFileName);
-
-                try
+                using (var stream = new FileStream(newFilePath, FileMode.Create))
                 {
-                    // Guardar nueva imagen
-                    using (var stream = new FileStream(newFilePath, FileMode.Create))
-                    {
-                        await imageUpdateRequestDTO.File.CopyToAsync(stream);
-                    }
-
-                    // Eliminar anterior (si existe y es distinto)
-                    if (!string.IsNullOrEmpty(image.FilePath) &&
-                        File.Exists(image.FilePath) &&
-                        image.FilePath != newFilePath)
-                    {
-                        File.Delete(image.FilePath);
-                    }
-
-                    // Actualizar metadata
-                    image.FileName = newFileName;
-                    image.FilePath = newFilePath;
-                    image.Url = $"{fileStorageOptions.BaseUrl}{newFileName}";
-                    image.FileSize = imageUpdateRequestDTO.File.Length;
+                    await imageUpdateRequestDTO.File.CopyToAsync(stream);
                 }
-                catch
-                {
-                    // rollback si falla
-                    if (File.Exists(newFilePath))
-                        File.Delete(newFilePath);
 
-                    throw new Exception("");
-                }
+                if (!string.IsNullOrEmpty(image.FilePath) && File.Exists(image.FilePath) && image.FilePath != newFilePath)
+                    File.Delete(image.FilePath);
+
+                image.FileName = newFileName;
+                image.FilePath = newFilePath;
+                image.Url = $"{fileStorageOptions.BaseUrl}{newFileName}";
+                image.FileSize = imageUpdateRequestDTO.File.Length;
+            }
+            catch
+            {
+                if (File.Exists(newFilePath))
+                    File.Delete(newFilePath);
+
+                throw new UpdateObjectException("Error al actualizar la imagen.");
             }
 
-            await _applicationDbContext.SaveChangesAsync();
+            var affectedRows = await _applicationDbContext.SaveChangesAsync();
 
-            return new ImageResponseDTO
-            {
-                Id = image.Id,
-                Slug = image.Slug,
-                Title = image.Title,
-                FileSize = image.FileSize,
-                Description = image.Description,
-                StatusName = image.Status?.Name ?? "",
-                PublicationDate = image.PublicationDate,
-                Categories = image.Categories.Select(c => c.Name).ToList()
-            };
+            if (affectedRows < 1)
+                throw new NotFoundException("Imagen no encontrada.");
+
+            return image.ToImageResponseDTO();
         }
 
         public async Task<bool> DeleteImage(Guid id)
@@ -165,25 +141,19 @@ namespace AsadaLisboaBackend.Services.Image
             var image = await _applicationDbContext.Images
                 .FirstOrDefaultAsync(i => i.Id == id);
 
-            if (image == null)
-                throw new Exception("Imagen no encontrada");
+            if (image is null)
+                throw new NotFoundException("Imagen no encontrada.");
 
-            try
-            {
-                // Eliminar archivo físico directamente
-                if (!string.IsNullOrEmpty(image.FilePath) && File.Exists(image.FilePath))
-                    File.Delete(image.FilePath);
+            if (!string.IsNullOrEmpty(image.FilePath) && File.Exists(image.FilePath))
+                File.Delete(image.FilePath);
 
-                // Eliminar BD
-                _applicationDbContext.Images.Remove(image);
-                await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Images.Remove(image);
+            var affectedRows = await _applicationDbContext.SaveChangesAsync();
 
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            if (affectedRows < 1)
+                throw new NotFoundException("Imagen no encontrada.");
+
+            return true;
         }
     }
 }

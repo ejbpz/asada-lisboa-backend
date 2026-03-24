@@ -46,7 +46,8 @@ namespace AsadaLisboaBackend.Controllers
         [HttpPost("olvidar-contrasena")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO resetPasswordDTO)
         {
-            return Ok(await _resetPasswordService.ForgotPassword(resetPasswordDTO.Email));
+            await _resetPasswordService.ForgotPassword(resetPasswordDTO.Email);
+            return NoContent();
         }
 
         [HttpPost("restaurar-contrasena")]
