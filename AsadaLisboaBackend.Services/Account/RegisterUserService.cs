@@ -29,8 +29,13 @@ namespace AsadaLisboaBackend.Services.Account
             //Register new user
             var user = new ApplicationUser
             {
-                UserName = registerRequestDTO.UserName,
-                Email = registerRequestDTO.Email
+                Email = registerRequestDTO.Email,
+                UserName = registerRequestDTO.Email,
+                ChargeId = registerRequestDTO.ChargeId,
+                FirstName = registerRequestDTO.FirstName,
+                PhoneNumber = registerRequestDTO.PhoneNumber,
+                FirstLastName = registerRequestDTO.FirstLastName,
+                SecondLastName = registerRequestDTO.SecondLastName,
             };
 
             var result = await _userManager.CreateAsync(user, registerRequestDTO.Password);

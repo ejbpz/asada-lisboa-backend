@@ -24,7 +24,7 @@ namespace AsadaLisboaBackend.Controllers
         }
 
         [HttpPost("iniciar-sesion")]
-        public async Task<ActionResult<AuthenticationResponseDTO>> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginRequestDTO loginRequestDTO)
         {
             return Ok(await _loginService.Login(loginRequestDTO));
         }

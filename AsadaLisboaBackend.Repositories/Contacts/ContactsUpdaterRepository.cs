@@ -26,7 +26,7 @@ namespace AsadaLisboaBackend.Repositories.Contacts
                     .SetProperty(c => c.Order, contactRequestDTO.Order));
 
             if (affectedRows < 1)
-                throw new NotFoundException("Error al modificar el contacto.");
+                throw new UpdateObjectException("Error al modificar el contacto.");
 
             return new Contact()
             {

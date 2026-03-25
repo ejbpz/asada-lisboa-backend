@@ -34,7 +34,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
                 FileSize = image.FileSize,
                 Description = image.Description,
                 PublicationDate = image.PublicationDate,
-                StatusName = image.Status!.Name ?? "Pendiente",
+                StatusName = image.Status!.Name ?? "Pending",
                 Categories = image.Categories
                     .Select(c => c.Name)
                     .ToList(),
@@ -54,7 +54,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
                 FileSize = image.FileSize,
                 Description = image.Description,
                 PublicationDate = image.PublicationDate,
-                StatusName = image.Status!.Name ?? "Pendiente",
+                StatusName = image.Status?.Name ?? "Pending",
                 Categories = image.Categories
                     .Select(c => c.Name)
                     .ToList(),

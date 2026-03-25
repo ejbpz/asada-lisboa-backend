@@ -11,17 +11,20 @@ using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Middlewares;
 using AsadaLisboaBackend.Services.Jwt;
 using AsadaLisboaBackend.ErrorHandling;
+using AsadaLisboaBackend.Services.News;
 using AsadaLisboaBackend.Services.Image;
 using AsadaLisboaBackend.Services.Email;
 using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Services.Account;
 using AsadaLisboaBackend.Services.Contacts;
+using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.ReCaptcha;
 using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.Images;
 using AsadaLisboaBackend.ServiceContracts.Jwt;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Repositories.Contacts;
+using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Image;
 using AsadaLisboaBackend.ServiceContracts.Email;
@@ -30,6 +33,7 @@ using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.Services.Configurations;
 using AsadaLisboaBackend.ServiceContracts.Account;
 using AsadaLisboaBackend.Services.AboutUsSections;
+using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.ReCaptcha;
@@ -98,6 +102,14 @@ builder.Services.AddScoped<IConfigurationsUpdaterRepository, ConfigurationsUpdat
 builder.Services.AddScoped<IConfigurationsDeleterRepository, ConfigurationsDeleterRepository>();
 
 builder.Services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
+
+builder.Services.AddScoped<INewsAdderRepository, NewsAdderRepository>();
+builder.Services.AddScoped<INewsUpdaterRepository, NewsUpdaterRepository>();
+builder.Services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
+
+builder.Services.AddScoped<INewsAdderService, NewsAdderService>();
+builder.Services.AddScoped<INewsUpdaterService, NewsUpdaterService>();
+builder.Services.AddScoped<INewsDeleterService, NewsDeleterService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ILoginService, LoginService>();

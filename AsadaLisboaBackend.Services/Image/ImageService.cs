@@ -38,8 +38,10 @@ namespace AsadaLisboaBackend.Services.Image
                     await imageRequestDTO.File.CopyToAsync(stream);
                 }
 
-                var fileUrl = $"{fileStorageOptions.BaseUrl}{fileName}";
+                var fileUrl = $"{fileStorageOptions.BaseUrl}/{fileName}";
                 var slug = GenerateSlug.New(imageRequestDTO.Title, imageId);
+                var status = await _applicationDbContext.Statuses
+                    .FirstOrDefaultAsync(c => c.Id == imageRequestDTO.StatusId);
                 var categories = await _applicationDbContext.Categories
                     .Where(c => imageRequestDTO.CategoryIds.Contains(c.Id))
                     .ToListAsync();
@@ -49,6 +51,7 @@ namespace AsadaLisboaBackend.Services.Image
                     Id = imageId,
                     Slug = slug,          
                     Url = fileUrl,
+                    Status = status,
                     FilePath = filePath,
                     FileName = fileName,
                     Categories = categories,

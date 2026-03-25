@@ -7,16 +7,16 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
     public class ImageRequestDTO
     {
         [Required(ErrorMessage = "El titulo es requerido")]  
-        [StringLength(50)]
+        [StringLength(200)]
         public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La descripción es requerido")]
-        [StringLength(100)]
+        [StringLength(500)]
         public string Description { get; set; } = string.Empty;
 
         
-        [AllowedExtensions(new string[] { ".jpg", ".jpeg", ".png" })]
-        [MaxFileSize(5)] // Límite de 5 MB
+        [MaxFileSize(5, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")] // Límite de 5 MB
+        [AllowedExtensions(new string[] { ".jpg", ".jpeg", ".png" }, ErrorMessage = "La extensión de la imagen no es válida.")]
         public IFormFile File { get; set; } = null!;
 
 
