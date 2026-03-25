@@ -36,6 +36,8 @@ using AsadaLisboaBackend.ServiceContracts.Configurations;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Configurations;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
+using AsadaLisboaBackend.ServiceContracts.Document;
+using AsadaLisboaBackend.Services.Document;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,6 +114,8 @@ builder.Services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDelete
 builder.Services.AddTransient<IRegisterUserService, RegisterUserService>();
 
 builder.Services.AddTransient<IImageService, ImageService>();
+
+builder.Services.AddTransient<IDocumentService, DocumentService>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
