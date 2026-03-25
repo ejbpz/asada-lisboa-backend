@@ -82,7 +82,7 @@ namespace AsadaLisboaBackend.Services.Document
         {
 
 
-            var document = await _applicationDbContext.Document
+            var document = await _applicationDbContext.Documents
                 .Include(i => i.Categories)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -141,7 +141,7 @@ namespace AsadaLisboaBackend.Services.Document
         }
 
 
-        public async Task<bool> DeleteImage(Guid id)
+        public async Task<bool> DeleteDocument(Guid id)
         {
             var document = await _applicationDbContext.Documents
                 .FirstOrDefaultAsync(i => i.Id == id);
