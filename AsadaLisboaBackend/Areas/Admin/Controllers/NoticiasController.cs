@@ -2,6 +2,7 @@
 using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.News;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -23,13 +24,16 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
             _newsDeleterService = newsDeleterService;
         }
 
+        [AllowAnonymous]
         [HttpPost("")]
-        public async Task<ActionResult<NewResponseDTO>> CreateNew([FromBody] NewRequestDTO newRequestDTO)
+        public async Task<ActionResult<NewResponseDTO>> CreateNew([FromForm] NewRequestDTO newRequestDTO)
         {
-            var options = new FileStorageOptions
+            var options = new FileChangeStorageOptions
             {
-                BasePath = Path.Combine(_env.WebRootPath, "news"),
-                BaseUrl = "/news"
+                NewBasePath = Path.Combine(_env.WebRootPath, "news"),
+                BasePath = Path.Combine(_env.WebRootPath, "temp"),
+                NewBaseUrl = "/news",
+                BaseUrl = "/temp"
             };
 
             return Created("~/api/admin/noticias", await _newsAdderService.CreateNew(newRequestDTO, options));

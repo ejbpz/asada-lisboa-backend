@@ -5,6 +5,6 @@ namespace AsadaLisboaBackend.ServiceContracts.News
 {
     public interface INewsAdderService
     {
-        public Task<NewResponseDTO> CreateNew(NewRequestDTO newRequestDTO, FileStorageOptions fileStorageOptions);
+        public Task<NewResponseDTO> CreateNew(NewRequestDTO newRequestDTO, FileChangeStorageOptions options);
     }
 }

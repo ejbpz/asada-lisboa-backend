@@ -26,7 +26,7 @@ namespace AsadaLisboaBackend.Repositories.News
                     .SetProperty(n => n.FileName, newModel.FileName)
                     .SetProperty(n => n.FilePath, newModel.FilePath)
                     .SetProperty(n => n.StatusId, newModel.StatusId)
-                    .SetProperty(n => n.Categories, newModel.Categories)
+                    //.SetProperty(n => n.Categories, newModel.Categories)
                     .SetProperty(n => n.Description, newModel.Description)
                     .SetProperty(n => n.LastEditionDate, newModel.LastEditionDate));
 

@@ -15,6 +15,7 @@ using AsadaLisboaBackend.Services.News;
 using AsadaLisboaBackend.Services.Image;
 using AsadaLisboaBackend.Services.Email;
 using AsadaLisboaBackend.Services.Users;
+using AsadaLisboaBackend.Services.Editor;
 using AsadaLisboaBackend.Services.Account;
 using AsadaLisboaBackend.Services.Contacts;
 using AsadaLisboaBackend.Repositories.News;
@@ -30,6 +31,7 @@ using AsadaLisboaBackend.ServiceContracts.Image;
 using AsadaLisboaBackend.ServiceContracts.Email;
 using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.Models.DatabaseContext;
+using AsadaLisboaBackend.ServiceContracts.Editor;
 using AsadaLisboaBackend.Services.Configurations;
 using AsadaLisboaBackend.ServiceContracts.Account;
 using AsadaLisboaBackend.Services.AboutUsSections;
@@ -100,6 +102,8 @@ builder.Services.AddScoped<IConfigurationsAdderRepository, ConfigurationsAdderRe
 builder.Services.AddScoped<IConfigurationsGetterRepository, ConfigurationsGetterRepository>();
 builder.Services.AddScoped<IConfigurationsUpdaterRepository, ConfigurationsUpdaterRepository>();
 builder.Services.AddScoped<IConfigurationsDeleterRepository, ConfigurationsDeleterRepository>();
+
+builder.Services.AddScoped<IEditorAdderService, EditorAdderService>();
 
 builder.Services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
 
@@ -198,6 +202,8 @@ var app = builder.Build();
 app.UseRateLimiter();
 
 app.UseExceptionHandler();
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
