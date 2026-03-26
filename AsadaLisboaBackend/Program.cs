@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Resend;
 using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.FileSystem;
 using AsadaLisboaBackend.Middlewares;
 using AsadaLisboaBackend.Services.Jwt;
 using AsadaLisboaBackend.ErrorHandling;
@@ -41,6 +42,7 @@ using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.ReCaptcha;
 using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.Repositories.Configurations;
+using AsadaLisboaBackend.ServiceContracts.FileSystem;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
@@ -104,6 +106,8 @@ builder.Services.AddScoped<IConfigurationsUpdaterRepository, ConfigurationsUpdat
 builder.Services.AddScoped<IConfigurationsDeleterRepository, ConfigurationsDeleterRepository>();
 
 builder.Services.AddScoped<IEditorAdderService, EditorAdderService>();
+
+builder.Services.AddScoped<IFileSystemManager, FileSystemManager>();
 
 builder.Services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
 

@@ -1,30 +1,23 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Editor;
-using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.Editor;
+using AsadaLisboaBackend.ServiceContracts.FileSystem;
 
 namespace AsadaLisboaBackend.Services.Editor
 {
     public class EditorAdderService : IEditorAdderService
     {
-        public async Task<EditorResponseDTO> CreateTemporalImage(EditorRequestDTO editorRequestDTO, FileStorageOptions options)
+        private IFileSystemManager _fileSystemManager;
+
+        public EditorAdderService(IFileSystemManager fileSystemManager)
         {
-            if (editorRequestDTO.File is null || editorRequestDTO.File.Length == 0)
-                throw new ArgumentException("Archivo inválido.");
+            _fileSystemManager = fileSystemManager;
+        }
 
-            if(!Directory.Exists(options.BasePath))
-                Directory.CreateDirectory(options.BasePath);
+        public async Task<EditorResponseDTO> CreateTemporalImage(EditorRequestDTO editorRequestDTO)
+        {
+            var url = await _fileSystemManager.SaveAsync(editorRequestDTO.File, "temp");
 
-            var extension = Path.GetExtension(editorRequestDTO.File.FileName);
-            var fileName = $"{Guid.NewGuid().ToString()}{extension}";
-            var fileNameWithPath = Path.Combine(options.BasePath, fileName);
-
-            using var stream = new FileStream(fileNameWithPath, FileMode.Create);
-            await editorRequestDTO.File.CopyToAsync(stream);
-
-            return new EditorResponseDTO()
-            {
-                Url = $"{options.BaseUrl}/{fileName}"
-            };
+            return new EditorResponseDTO() { Url = url };
         }
     }
 }

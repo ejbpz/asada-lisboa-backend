@@ -2,70 +2,66 @@
 using HtmlAgilityPack;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
-using AsadaLisboaBackend.Models.DTOs.Image;
-using AsadaLisboaBackend.Utils.OptionsPattern;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Image;
 using AsadaLisboaBackend.RepositoryContracts.News;
+using AsadaLisboaBackend.ServiceContracts.FileSystem;
 
 namespace AsadaLisboaBackend.Services.News
 {
     public class NewsAdderService : INewsAdderService
     {
-        private readonly IImageService _imageService;
         private readonly ApplicationDbContext _context;
+        private readonly IFileSystemManager _fileSystem;
         private readonly INewsAdderRepository _newsAdderRepository;
-        private readonly INewsUpdaterRepository _newsUpdaterRepository;
 
-        public NewsAdderService(IImageService imageService, INewsAdderRepository newsAdderRepository, INewsUpdaterRepository newsUpdaterRepository, ApplicationDbContext context)
+        public NewsAdderService(INewsAdderRepository newsAdderRepository, ApplicationDbContext context, IFileSystemManager fileSystem)
         {
             _context = context;
-            _imageService = imageService;
+            _fileSystem = fileSystem;
             _newsAdderRepository = newsAdderRepository;
-            _newsUpdaterRepository = newsUpdaterRepository;
         }
 
-        public async Task<NewResponseDTO> CreateNew(NewRequestDTO newRequestDTO, FileChangeStorageOptions options)
+        public async Task<NewResponseDTO> CreateNew(NewRequestDTO newRequestDTO)
         {
             var id = Guid.NewGuid();
 
-            var principalImage = await CreateNewPrincipalImage(newRequestDTO, options);
+            var imageUrl = await _fileSystem.SaveAsync(newRequestDTO.File, "news");
+            var fileName = Path.GetFileName(imageUrl);
 
-            var slug = GenerateSlug.New(newRequestDTO.Title, id);
+            var content = ChangeImages(newRequestDTO.Description);
+
             var categories = await _context.Categories
                 .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))
                 .ToListAsync();
-            var filePath = principalImage.FilePath;
-            var fileName = principalImage.FileName;
-            var imageUrl = principalImage.Url;
 
             var newModel = new New()
             {
                 Id = id,
-                Slug = slug,
                 FileName = fileName,
-                FilePath = filePath,
                 ImageUrl = imageUrl,
                 Categories = categories,
                 Title = newRequestDTO.Title,
+                FilePath = $"news/{fileName}",
                 StatusId = newRequestDTO.StatusId,
                 PublicationDate = DateTime.UtcNow,
                 LastEditionDate = DateTime.UtcNow,
+                Slug = GenerateSlug.New(newRequestDTO.Title, id),
                 Description = newRequestDTO.Description.ToString(),
             };
 
-            var newCreated = await _newsAdderRepository.CreateNew(newModel);
+            var created = await _newsAdderRepository.CreateNew(newModel);
 
-            var content = ChangeImages(newRequestDTO.Description, options);
-            newCreated.Description = content.ToString();
+            if (created is null)
+                throw new CreateObjectException("Error al crear la noticia.");
 
-            return (await _newsUpdaterRepository.UpdateNew(id, newCreated))
-                .ToNewResponseDTO();
+            return created.ToNewResponseDTO();
         }
 
-        private string ChangeImages(string html, FileChangeStorageOptions storageOptions)
+        private async Task<string> ChangeImages(string html)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -85,41 +81,12 @@ namespace AsadaLisboaBackend.Services.News
 
                 var fileName = Path.GetFileName(src);
 
-                var sourcePath = Path.Combine(storageOptions.BasePath, fileName);
-                var destinationPath = Path.Combine(storageOptions.NewBasePath, fileName);
+                await _fileSystem.MoveAsync(fileName, "temp", "news");
 
-                if (File.Exists(sourcePath))
-                {
-                    if (File.Exists(destinationPath))
-                        File.Delete(destinationPath);
-
-                    File.Move(sourcePath, destinationPath);
-                }
-
-                var newSrc = $"{storageOptions.NewBaseUrl}/{fileName}";
-                node.SetAttributeValue("src", newSrc);
+                node.SetAttributeValue("src", $"/news/{fileName}");
             }
 
             return doc.DocumentNode.OuterHtml;
-        }
-
-        private async Task<ImageResponseDTO> CreateNewPrincipalImage(NewRequestDTO newRequestDTO, FileChangeStorageOptions fileChangeStorageOptions)
-        {
-            var image = new ImageRequestDTO()
-            {
-                File = newRequestDTO.File,
-                Title = newRequestDTO.Title,
-                StatusId = newRequestDTO.StatusId,
-                Description = newRequestDTO.Title,
-            };
-
-            var options = new FileStorageOptions()
-            {
-                BasePath = fileChangeStorageOptions.NewBasePath,
-                BaseUrl = fileChangeStorageOptions.NewBaseUrl,
-            };
-
-            return await _imageService.CreateImage(image, options);
         }
     }
 }
