@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AsadaLisboaBackend.Models.DTOs.New;
+using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.ServiceContracts.News;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
@@ -10,14 +11,28 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     public class NoticiasController : ControllerBase
     {
         private readonly INewsAdderService _newsAdderService;
+        private readonly INewsGetterService _newsGetterService;
         private readonly INewsUpdaterService _newsUpdaterService;
         private readonly INewsDeleterService _newsDeleterService;
 
-        public NoticiasController(INewsAdderService newsAdderService, INewsUpdaterService newsUpdaterService, INewsDeleterService newsDeleterService)
+        public NoticiasController(INewsAdderService newsAdderService, INewsUpdaterService newsUpdaterService, INewsDeleterService newsDeleterService, INewsGetterService newsGetterService)
         {
             _newsAdderService = newsAdderService;
+            _newsGetterService = newsGetterService;
             _newsUpdaterService = newsUpdaterService;
             _newsDeleterService = newsDeleterService;
+        }
+
+        [HttpGet("")]
+        public async Task<ActionResult<PageResponseDTO<NewResponseDTO>>> GetNews([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
+        {
+            return Ok(await _newsGetterService.GetNews(searchSortRequestDTO));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PageResponseDTO<NewResponseDTO>>> GetNew([FromRoute] Guid id)
+        {
+            return Ok(await _newsGetterService.GetNew(id));
         }
 
         [HttpPost("")]
