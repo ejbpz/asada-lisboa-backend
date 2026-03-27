@@ -1,5 +1,4 @@
-﻿using AsadaLisboaBackend.Models.DTOs.New;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace AsadaLisboaBackend.Models.DTOs.Status
 {

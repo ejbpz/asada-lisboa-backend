@@ -17,6 +17,7 @@ using AsadaLisboaBackend.Services.Image;
 using AsadaLisboaBackend.Services.Email;
 using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Services.Editor;
+using AsadaLisboaBackend.Services.Charges;
 using AsadaLisboaBackend.Services.Account;
 using AsadaLisboaBackend.Services.Statuses;
 using AsadaLisboaBackend.Services.Contacts;
@@ -25,6 +26,7 @@ using AsadaLisboaBackend.Services.ReCaptcha;
 using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.Images;
 using AsadaLisboaBackend.ServiceContracts.Jwt;
+using AsadaLisboaBackend.Repositories.Charges;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Repositories.Statuses;
 using AsadaLisboaBackend.Repositories.Contacts;
@@ -36,6 +38,7 @@ using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Editor;
 using AsadaLisboaBackend.Services.Configurations;
+using AsadaLisboaBackend.ServiceContracts.Charges;
 using AsadaLisboaBackend.ServiceContracts.Account;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.News;
@@ -45,6 +48,7 @@ using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.ReCaptcha;
 using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.Repositories.Configurations;
+using AsadaLisboaBackend.RepositoryContracts.Charges;
 using AsadaLisboaBackend.ServiceContracts.FileSystem;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
@@ -119,10 +123,16 @@ builder.Services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
 builder.Services.AddScoped<IStatusesGetterRepository, StatusesGetterRepository>();
 builder.Services.AddScoped<IStatusesUpdaterRepository, StatusesUpdaterRepository>();
 
+builder.Services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
+builder.Services.AddScoped<IChargesUpdaterRepository, ChargesUpdaterRepository>();
+
 builder.Services.AddScoped<IFileSystemManager, FileSystemManager>();
 
 builder.Services.AddScoped<IStatusesGetterService, StatusesGetterService>();
 builder.Services.AddScoped<IStatusesUpdaterService, StatusesUpdaterService>();
+
+builder.Services.AddScoped<IChargesGetterService, ChargesGetterService>();
+builder.Services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
 
 builder.Services.AddScoped<IEditorAdderService, EditorAdderService>();
 builder.Services.AddScoped<IEditorUpdaterService, EditorUpdaterService>();

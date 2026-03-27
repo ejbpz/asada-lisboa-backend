@@ -18,6 +18,7 @@ namespace AsadaLisboaBackend.Repositories.Statuses
         public async Task<List<StatusResponseDTO>> GetStatuses()
         {
             return await _context.Statuses
+                .AsNoTracking()
                 .Select(StatusExtensions.MapStatusResponseDTO())
                 .ToListAsync();
         }
@@ -25,6 +26,7 @@ namespace AsadaLisboaBackend.Repositories.Statuses
         public async Task<StatusResponseDTO> GetStatus(Guid id)
         {
             var status = await _context.Statuses
+                .AsNoTracking()
                 .Select(StatusExtensions.MapStatusResponseDTO())
                 .FirstOrDefaultAsync(s => s.Id == id);
 
