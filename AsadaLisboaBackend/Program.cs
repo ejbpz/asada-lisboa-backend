@@ -119,6 +119,7 @@ builder.Services.AddScoped<INewsUpdaterRepository, NewsUpdaterRepository>();
 builder.Services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
 
 builder.Services.AddScoped<INewsAdderService, NewsAdderService>();
+builder.Services.AddScoped<INewsGetterService, NewsGetterService>();
 builder.Services.AddScoped<INewsUpdaterService, NewsUpdaterService>();
 builder.Services.AddScoped<INewsDeleterService, NewsDeleterService>();
 
