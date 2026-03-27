@@ -5,15 +5,18 @@ using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.ServiceContracts.FileSystem;
 
 namespace AsadaLisboaBackend.Services.Image
 {
     public class ImageService : IImageService
     {
+        private readonly IFileSystemManager _fileSystem;
         private readonly ApplicationDbContext _applicationDbContext;
 
-        public ImageService(ApplicationDbContext applicationDbContext)
+        public ImageService(ApplicationDbContext applicationDbContext, IFileSystemManager fileSystem)
         {
+            _fileSystem = fileSystem;
             _applicationDbContext = applicationDbContext;
         }
 
@@ -23,25 +26,21 @@ namespace AsadaLisboaBackend.Services.Image
                 throw new ArgumentException("Archivo inválido.");
 
             var imageId = Guid.NewGuid();
-            var extension = Path.GetExtension(imageRequestDTO.File.FileName).ToLowerInvariant();
 
-            var fileName = $"{imageId}{extension}";
-            var filePath = Path.Combine(fileStorageOptions.BasePath, fileName);
-
-            if (!Directory.Exists(fileStorageOptions.BasePath))
-                Directory.CreateDirectory(fileStorageOptions.BasePath);
+            string? url = string.Empty;
 
             try
             {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageRequestDTO.File.CopyToAsync(stream);
-                }
+                url = await _fileSystem.SaveAsync(imageRequestDTO.File, "images");
 
-                var fileUrl = $"{fileStorageOptions.BaseUrl}/{fileName}";
+                var fileName = Path.GetFileName(url);
+                var filePath = $"images/{fileName}";
+
                 var slug = GenerateSlug.New(imageRequestDTO.Title, imageId);
+
                 var status = await _applicationDbContext.Statuses
                     .FirstOrDefaultAsync(c => c.Id == imageRequestDTO.StatusId);
+
                 var categories = await _applicationDbContext.Categories
                     .Where(c => imageRequestDTO.CategoryIds.Contains(c.Id))
                     .ToListAsync();
@@ -49,8 +48,8 @@ namespace AsadaLisboaBackend.Services.Image
                 var image = new Models.Image()
                 { 
                     Id = imageId,
+                    Url = url,
                     Slug = slug,          
-                    Url = fileUrl,
                     Status = status,
                     FilePath = filePath,
                     FileName = fileName,
@@ -63,17 +62,17 @@ namespace AsadaLisboaBackend.Services.Image
                 };
 
                 _applicationDbContext.Images.Add(image);
-                var affectedRows = await _applicationDbContext.SaveChangesAsync();
-
-                if (affectedRows < 1)
-                    throw new NotFoundException("Imagen no encontrada.");
+                await _applicationDbContext.SaveChangesAsync();
 
                 return image.ToImageResponseDTO();
             }
             catch
             {
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
+                if (!string.IsNullOrEmpty(url))
+                {
+                    var fileName = Path.GetFileName(url);
+                    await _fileSystem.DeleteAsync(fileName, "images");
+                }
 
                 throw new CreateObjectException("Error al crear la imagen.");
             }
@@ -82,6 +81,7 @@ namespace AsadaLisboaBackend.Services.Image
         public async Task<ImageResponseDTO> UpdateImage(Guid id, ImageUpdateRequestDTO imageUpdateRequestDTO, FileStorageOptions fileStorageOptions)
         {
             var image = await _applicationDbContext.Images
+                .Include(i => i.Status)
                 .Include(i => i.Categories)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -102,40 +102,36 @@ namespace AsadaLisboaBackend.Services.Image
             image.Categories = categories;
 
             if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
-                throw new NotFoundException("Imagen no encontrada.");
+                throw new ArgumentNullException("Error al actualizar la imagen principal.");
 
-            var extension = Path.GetExtension(imageUpdateRequestDTO.File.FileName).ToLowerInvariant();
-            var newFileName = $"{image.Id}{extension}";
-            var newFilePath = Path.Combine(fileStorageOptions.BasePath, newFileName);
+            string? newUrl = string.Empty;
 
             try
             {
-                using (var stream = new FileStream(newFilePath, FileMode.Create))
-                {
-                    await imageUpdateRequestDTO.File.CopyToAsync(stream);
-                }
+                newUrl = await _fileSystem.SaveAsync(imageUpdateRequestDTO.File, "images");
 
-                if (!string.IsNullOrEmpty(image.FilePath) && File.Exists(image.FilePath) && image.FilePath != newFilePath)
-                    File.Delete(image.FilePath);
+                var newFileName = Path.GetFileName(newUrl);
 
+                if(!string.IsNullOrEmpty(image.FileName))
+                    await _fileSystem.DeleteAsync(image.FileName, "images");
+
+                image.Url = newUrl;
                 image.FileName = newFileName;
-                image.FilePath = newFilePath;
-                image.Url = $"{fileStorageOptions.BaseUrl}{newFileName}";
+                image.FilePath = $"images/{newFileName}";
                 image.FileSize = imageUpdateRequestDTO.File.Length;
             }
             catch
             {
-                if (File.Exists(newFilePath))
-                    File.Delete(newFilePath);
+                if (!string.IsNullOrEmpty(newUrl))
+                {
+                    var fileName = Path.GetFileName(newUrl);
+                    await _fileSystem.DeleteAsync(fileName, "images");
+                }
 
-                throw new UpdateObjectException("Error al actualizar la imagen.");
+                throw new CreateObjectException("Error al actualizar la imagen.");
             }
 
-            var affectedRows = await _applicationDbContext.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Imagen no encontrada.");
-
+            await _applicationDbContext.SaveChangesAsync();
             return image.ToImageResponseDTO();
         }
 
@@ -147,14 +143,11 @@ namespace AsadaLisboaBackend.Services.Image
             if (image is null)
                 throw new NotFoundException("Imagen no encontrada.");
 
-            if (!string.IsNullOrEmpty(image.FilePath) && File.Exists(image.FilePath))
-                File.Delete(image.FilePath);
+            if (!string.IsNullOrEmpty(image.FileName))
+                await _fileSystem.DeleteAsync(image.FileName, "images");
 
             _applicationDbContext.Images.Remove(image);
-            var affectedRows = await _applicationDbContext.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Imagen no encontrada.");
+            await _applicationDbContext.SaveChangesAsync();
 
             return true;
         }
