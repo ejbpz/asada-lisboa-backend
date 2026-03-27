@@ -10,7 +10,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
         [StringLength(50)]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "La descripción es requerido")]
+        [Required(ErrorMessage = "La descripción es requerida")]
         [StringLength(100)]
         public string Description { get; set; } = string.Empty;
 

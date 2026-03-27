@@ -65,7 +65,7 @@ namespace AsadaLisboaBackend.Services.Document
                 var affectedRows = await _applicationDbContext.SaveChangesAsync();
 
                 if (affectedRows < 1)
-                    throw new NotFoundException("Imagen no encontrada.");
+                    throw new NotFoundException("Documento no encontrado.");
 
                 return newDocument.ToDocumentResponseDTO();
             }
@@ -74,7 +74,7 @@ namespace AsadaLisboaBackend.Services.Document
                 if (File.Exists(filePath))
                     File.Delete(filePath);
 
-                throw new CreateObjectException("Error al crear la imagen.");
+                throw new CreateObjectException("Error al crear el documento.");
             }
         }
 
@@ -87,7 +87,7 @@ namespace AsadaLisboaBackend.Services.Document
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (document is null)
-                throw new NotFoundException("Documento no encontrada.");
+                throw new NotFoundException("Documento no encontrado.");
 
             document.Title = documentUpdateRequestDTO.Title;
             document.StatusId = documentUpdateRequestDTO.StatusId;
@@ -103,7 +103,7 @@ namespace AsadaLisboaBackend.Services.Document
             document.Categories = categories;
 
             if (documentUpdateRequestDTO.File is null || documentUpdateRequestDTO.File.Length <= 0)
-                throw new NotFoundException("Documento no encontrada.");
+                throw new NotFoundException("Documento no encontrado.");
 
             var extension = Path.GetExtension(documentUpdateRequestDTO.File.FileName).ToLowerInvariant();
             var newFileName = $"{document.Id}{extension}";
@@ -128,13 +128,13 @@ namespace AsadaLisboaBackend.Services.Document
                 if (File.Exists(newFilePath))
                     File.Delete(newFilePath);
 
-                throw new UpdateObjectException("Error al actualizar el document.");
+                throw new UpdateObjectException("Error al actualizar el documento.");
             }
 
             var affectedRows = await _applicationDbContext.SaveChangesAsync();
 
             if (affectedRows < 1)
-                throw new NotFoundException("Document no encontrada.");
+                throw new NotFoundException("Documento no encontrado.");
 
             return document.ToDocumentResponseDTO();
 
@@ -147,7 +147,7 @@ namespace AsadaLisboaBackend.Services.Document
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (document is null)
-                throw new NotFoundException("Documento no encontrada.");
+                throw new NotFoundException("Documento no encontrado.");
 
             if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
                 File.Delete(document.FilePath);
@@ -156,7 +156,7 @@ namespace AsadaLisboaBackend.Services.Document
             var affectedRows = await _applicationDbContext.SaveChangesAsync();
 
             if (affectedRows < 1)
-                throw new NotFoundException("Documento no encontrada.");
+                throw new NotFoundException("Documento no encontrado.");
 
             return true;
         }
