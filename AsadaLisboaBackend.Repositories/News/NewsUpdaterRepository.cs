@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models;
+﻿using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
@@ -17,18 +16,17 @@ namespace AsadaLisboaBackend.Repositories.News
 
         public async Task<New> UpdateNew(Guid id, New newModel)
         {
-            var affectedRows = await _context.News
-                .Where(n => n.Id == id)
-                .ExecuteUpdateAsync(p => p
-                    .SetProperty(n => n.Slug, newModel.Slug)
-                    .SetProperty(n => n.Title, newModel.Title)
-                    .SetProperty(n => n.ImageUrl, newModel.ImageUrl)
-                    .SetProperty(n => n.FileName, newModel.FileName)
-                    .SetProperty(n => n.FilePath, newModel.FilePath)
-                    .SetProperty(n => n.StatusId, newModel.StatusId)
-                    //.SetProperty(n => n.Categories, newModel.Categories)
-                    .SetProperty(n => n.Description, newModel.Description)
-                    .SetProperty(n => n.LastEditionDate, newModel.LastEditionDate));
+            _context.Attach(newModel);
+
+            _context.Entry(newModel).Property(n => n.Slug).IsModified = false;
+            _context.Entry(newModel).Property(n => n.Title).IsModified = false;
+            _context.Entry(newModel).Property(n => n.ImageUrl).IsModified = false;
+            _context.Entry(newModel).Property(n => n.FileName).IsModified = false;
+            _context.Entry(newModel).Property(n => n.FilePath).IsModified = false;
+            _context.Entry(newModel).Property(n => n.Description).IsModified = false;
+            _context.Entry(newModel).Property(n => n.LastEditionDate).IsModified = false;
+
+            var affectedRows = await _context.SaveChangesAsync();
 
             if (affectedRows < 1)
                 throw new UpdateObjectException("Error al modificar la noticia.");
