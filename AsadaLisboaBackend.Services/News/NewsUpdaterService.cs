@@ -7,6 +7,7 @@ using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Editor;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.FileSystem;
+using AsadaLisboaBackend.RepositoryContracts.Statuses;
 
 namespace AsadaLisboaBackend.Services.News
 {
@@ -18,8 +19,9 @@ namespace AsadaLisboaBackend.Services.News
         private readonly INewsGetterRepository _newsGetterRepository;
         private readonly IEditorDeleterService _editorDeleterService;
         private readonly INewsUpdaterRepository _newsUpdaterRepository;
+        private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorUpdaterService editorUpdaterService, IEditorDeleterService editorDeleterService, ApplicationDbContext context, IFileSystemManager fileSystem)
+        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorUpdaterService editorUpdaterService, IEditorDeleterService editorDeleterService, IStatusesGetterRepository statusesGetterRepository, ApplicationDbContext context, IFileSystemManager fileSystem)
         {
             _context = context;
             _fileSystem = fileSystem;
@@ -27,6 +29,7 @@ namespace AsadaLisboaBackend.Services.News
             _editorUpdaterService = editorUpdaterService;
             _newsGetterRepository = newsGetterRepository;
             _newsUpdaterRepository = newsUpdaterRepository;
+            _statusesGetterRepository = statusesGetterRepository;
         }
 
         public async Task<NewResponseDTO> UpdateNew(Guid id, NewRequestDTO newRequestDTO)
@@ -56,9 +59,12 @@ namespace AsadaLisboaBackend.Services.News
                 .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))
                 .ToListAsync();
 
+            var status = await _statusesGetterRepository.GetStatus(newRequestDTO.StatusId);
+
             var newModel = new New()
             {
                 Id = id,
+                StatusId = status.Id,
                 ImageUrl = imageUrl,
                 FileName = fileName,
                 FilePath = filePath,
@@ -66,7 +72,6 @@ namespace AsadaLisboaBackend.Services.News
                 Categories = categories,
                 Slug = existingNew.Slug,
                 Title = newRequestDTO.Title,
-                StatusId = newRequestDTO.StatusId,
                 LastEditionDate = DateTime.UtcNow,
                 PublicationDate = existingNew.PublicationDate,
             };

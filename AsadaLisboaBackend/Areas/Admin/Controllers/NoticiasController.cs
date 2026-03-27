@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Models.DTOs.Shared;
+using AsadaLisboaBackend.Models.DTOs.Status;
 using AsadaLisboaBackend.ServiceContracts.News;
+using AsadaLisboaBackend.ServiceContracts.Statuses;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -14,13 +17,15 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         private readonly INewsGetterService _newsGetterService;
         private readonly INewsUpdaterService _newsUpdaterService;
         private readonly INewsDeleterService _newsDeleterService;
+        private readonly IStatusesUpdaterService _statusesUpdaterService;
 
-        public NoticiasController(INewsAdderService newsAdderService, INewsUpdaterService newsUpdaterService, INewsDeleterService newsDeleterService, INewsGetterService newsGetterService)
+        public NoticiasController(INewsAdderService newsAdderService, INewsUpdaterService newsUpdaterService, INewsDeleterService newsDeleterService, INewsGetterService newsGetterService, IStatusesUpdaterService statusesUpdaterService)
         {
             _newsAdderService = newsAdderService;
             _newsGetterService = newsGetterService;
             _newsUpdaterService = newsUpdaterService;
             _newsDeleterService = newsDeleterService;
+            _statusesUpdaterService = statusesUpdaterService;
         }
 
         [HttpGet("")]
@@ -45,6 +50,13 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         public async Task<ActionResult<NewResponseDTO>> UpdateNew([FromRoute] Guid id, [FromBody] NewRequestDTO newRequestDTO)
         {
             return Ok(await _newsUpdaterService.UpdateNew(id, newRequestDTO));
+        }
+
+        [HttpPut("cambiar-estado/{id}")]
+        public async Task<IActionResult> ChangeNewStatus([FromRoute] Guid id, [FromBody] StatusChangeRequestDTO statusChangeRequestDTO)
+        {
+            await _statusesUpdaterService.ChangeStatus(id, statusChangeRequestDTO.StatusId, ObjectTypeEnum.New);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]

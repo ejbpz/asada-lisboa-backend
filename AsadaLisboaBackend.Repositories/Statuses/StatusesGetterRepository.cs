@@ -21,8 +21,8 @@ namespace AsadaLisboaBackend.Repositories.Statuses
                 .Select(StatusExtensions.MapStatusResponseDTO())
                 .ToListAsync();
         }
-        
-        public async Task<string> GetStatus(Guid id)
+
+        public async Task<StatusResponseDTO> GetStatus(Guid id)
         {
             var status = await _context.Statuses
                 .Select(StatusExtensions.MapStatusResponseDTO())
@@ -31,7 +31,7 @@ namespace AsadaLisboaBackend.Repositories.Statuses
             if (status is null)
                 throw new NotFoundException("No existe el estado seleccionado.");
 
-            return status.Name;
+            return status;
         }
     }
 }

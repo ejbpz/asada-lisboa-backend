@@ -8,6 +8,7 @@ using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Editor;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.FileSystem;
+using AsadaLisboaBackend.RepositoryContracts.Statuses;
 
 namespace AsadaLisboaBackend.Services.News
 {
@@ -17,13 +18,15 @@ namespace AsadaLisboaBackend.Services.News
         private readonly IFileSystemManager _fileSystem;
         private readonly INewsAdderRepository _newsAdderRepository;
         private readonly IEditorUpdaterService _editorUpdaterService;
+        private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorUpdaterService editorUpdaterService, ApplicationDbContext context, IFileSystemManager fileSystem)
+        public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorUpdaterService editorUpdaterService, IStatusesGetterRepository statusesGetterRepository, ApplicationDbContext context, IFileSystemManager fileSystem)
         {
             _context = context;
             _fileSystem = fileSystem;
             _newsAdderRepository = newsAdderRepository;
             _editorUpdaterService = editorUpdaterService;
+            _statusesGetterRepository = statusesGetterRepository;
         }
 
         public async Task<NewResponseDTO> CreateNew(NewRequestDTO newRequestDTO)
@@ -49,16 +52,18 @@ namespace AsadaLisboaBackend.Services.News
                 .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))
                 .ToListAsync();
 
+            var status = await _statusesGetterRepository.GetStatus(newRequestDTO.StatusId);
+
             var newModel = new New()
             {
                 Id = id,
+                StatusId = status.Id,
                 ImageUrl = imageUrl,
                 FileName = fileName,
                 FilePath = filePath,
+                Description = content,
                 Categories = categories,
                 Title = newRequestDTO.Title,
-                Description = content.ToString(),
-                StatusId = newRequestDTO.StatusId,
                 PublicationDate = DateTime.UtcNow,
                 LastEditionDate = DateTime.UtcNow,
                 Slug = GenerateSlug.New(newRequestDTO.Title, id),

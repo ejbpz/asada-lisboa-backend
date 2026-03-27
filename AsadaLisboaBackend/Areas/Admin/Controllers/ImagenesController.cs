@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Models.DTOs.Shared;
+using AsadaLisboaBackend.Models.DTOs.Status;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.ServiceContracts.Statuses;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -14,12 +17,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         private readonly IWebHostEnvironment _env;
         private readonly IImageService _imageService;
         private readonly IImagesGetterService _imagesGetterService;
+        private readonly IStatusesUpdaterService _statusesUpdaterService;
 
-        public ImagenesController(IImageService imageService, IWebHostEnvironment env, IImagesGetterService imagesGetterService)
+        public ImagenesController(IImageService imageService, IWebHostEnvironment env, IImagesGetterService imagesGetterService, IStatusesUpdaterService statusesUpdaterService)
         {
             _env = env;
             _imageService = imageService;
             _imagesGetterService = imagesGetterService;
+            _statusesUpdaterService = statusesUpdaterService;
         }
 
         [HttpGet("")]
@@ -58,6 +63,13 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
 
             var result = await _imageService.UpdateImage(id, ImageUpdateRequestDTO, options);
             return Ok(result);
+        }
+
+        [HttpPut("cambiar-estado/{id}")]
+        public async Task<IActionResult> ChangeImageStatus([FromRoute] Guid id, [FromBody] StatusChangeRequestDTO statusChangeRequestDTO)
+        {
+            await _statusesUpdaterService.ChangeStatus(id, statusChangeRequestDTO.StatusId, ObjectTypeEnum.Image);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]

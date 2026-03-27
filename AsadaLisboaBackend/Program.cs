@@ -117,10 +117,12 @@ builder.Services.AddScoped<INewsUpdaterRepository, NewsUpdaterRepository>();
 builder.Services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
 
 builder.Services.AddScoped<IStatusesGetterRepository, StatusesGetterRepository>();
+builder.Services.AddScoped<IStatusesUpdaterRepository, StatusesUpdaterRepository>();
 
 builder.Services.AddScoped<IFileSystemManager, FileSystemManager>();
 
 builder.Services.AddScoped<IStatusesGetterService, StatusesGetterService>();
+builder.Services.AddScoped<IStatusesUpdaterService, StatusesUpdaterService>();
 
 builder.Services.AddScoped<IEditorAdderService, EditorAdderService>();
 builder.Services.AddScoped<IEditorUpdaterService, EditorUpdaterService>();

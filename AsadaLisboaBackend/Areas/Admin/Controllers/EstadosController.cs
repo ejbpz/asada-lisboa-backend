@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Models.DTOs.Status;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 
-namespace AsadaLisboaBackend.Controllers
+namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
-    [Route("api/[controller]")]
+    [Area("Admin")]
+    [Route("api/[area]/[controller]")]
     public class EstadosController : ControllerBase
     {
         private readonly IStatusesGetterService _statusesGetterService;
