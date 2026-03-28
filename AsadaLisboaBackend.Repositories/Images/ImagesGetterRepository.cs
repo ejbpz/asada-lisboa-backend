@@ -67,7 +67,7 @@ namespace AsadaLisboaBackend.Repositories.Images
             };
         }
 
-        public async Task<ImageResponseDTO> GetImage(Guid id)
+        public async Task<Image> GetImage(Guid id)
         {
             var image = await _context.Images
                 .AsNoTracking()
@@ -78,7 +78,7 @@ namespace AsadaLisboaBackend.Repositories.Images
             if (image is null)
                 throw new NotFoundException("La imagen seleccionada no existe.");
 
-            return image.ToImageResponseDTO();
+            return image;
         }
     }
 }

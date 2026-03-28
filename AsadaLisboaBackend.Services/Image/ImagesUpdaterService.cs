@@ -4,6 +4,7 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.FileSystem;
 
 namespace AsadaLisboaBackend.Services.Image
@@ -12,19 +13,20 @@ namespace AsadaLisboaBackend.Services.Image
     {
         private readonly IFileSystemManager _fileSystem;
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IImagesGetterRepository _imagesGetterRespository;
+        private readonly IImagesUpdaterRepository _imagesUpdaterRepository;
 
-        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemManager fileSystem)
+        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemManager fileSystem, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository)
         {
             _fileSystem = fileSystem;
             _applicationDbContext = applicationDbContext;
+            _imagesUpdaterRepository = imagesUpdaterRepository;
+            _imagesGetterRespository = imagesGetterRespository;
         }
 
         public async Task<ImageResponseDTO> UpdateImage(Guid id, ImageUpdateRequestDTO imageUpdateRequestDTO)
         {
-            var image = await _applicationDbContext.Images
-                .Include(i => i.Status)
-                .Include(i => i.Categories)
-                .FirstOrDefaultAsync(i => i.Id == id);
+            var image = await _imagesGetterRespository.GetImage(id);
 
             if (image is null)
                 throw new NotFoundException("Imagen no encontrada.");
@@ -72,8 +74,8 @@ namespace AsadaLisboaBackend.Services.Image
                 throw new CreateObjectException("Error al actualizar la imagen.");
             }
 
-            await _applicationDbContext.SaveChangesAsync();
-            return image.ToImageResponseDTO();
+            return (await _imagesUpdaterRepository.UpdateImage(image))
+                .ToImageResponseDTO();
         }
     }
 }

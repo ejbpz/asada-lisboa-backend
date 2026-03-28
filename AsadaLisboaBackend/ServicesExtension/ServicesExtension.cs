@@ -89,7 +89,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IConfigurationsDeleterService, ConfigurationsDeleterService>();
 
             // Images
+            services.AddScoped<IImagesAdderRepository, ImagesAdderRepository>();
             services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
+            services.AddScoped<IImagesUpdaterRepository, ImagesUpdaterRepository>();
+            services.AddScoped<IImagesDeleterRepository, ImagesDeleterRepository>();
 
             services.AddScoped<IImagesAdderService, ImagesAdderService>();
             services.AddScoped<IImagesGetterService, ImagesGetterService>();

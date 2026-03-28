@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Models.DatabaseContext;
+﻿using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.FileSystem;
 
 namespace AsadaLisboaBackend.Services.Image
@@ -9,18 +8,19 @@ namespace AsadaLisboaBackend.Services.Image
     public class ImagesDeleterService : IImagesDeleterService
     {
         private readonly IFileSystemManager _fileSystem;
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IImagesGetterRepository _imagesGetterRepository;
+        private readonly IImagesDeleterRepository _imagesDeleterRepository;
 
-        public ImagesDeleterService(ApplicationDbContext applicationDbContext, IFileSystemManager fileSystem)
+        public ImagesDeleterService(IFileSystemManager fileSystem, IImagesDeleterRepository imagesDeleterRepository, IImagesGetterRepository imagesGetterRepository)
         {
             _fileSystem = fileSystem;
-            _applicationDbContext = applicationDbContext;
+            _imagesGetterRepository = imagesGetterRepository;
+            _imagesDeleterRepository = imagesDeleterRepository;
         }
 
         public async Task DeleteImage(Guid id)
         {
-            var image = await _applicationDbContext.Images
-                .FirstOrDefaultAsync(i => i.Id == id);
+            var image = await _imagesGetterRepository.GetImage(id);
 
             if (image is null)
                 throw new NotFoundException("Imagen no encontrada.");
@@ -28,8 +28,7 @@ namespace AsadaLisboaBackend.Services.Image
             if (!string.IsNullOrEmpty(image.FileName))
                 await _fileSystem.DeleteAsync(image.FileName, "images");
 
-            _applicationDbContext.Images.Remove(image);
-            await _applicationDbContext.SaveChangesAsync();
+            await _imagesDeleterRepository.DeleteImage(id);
         }
     }
 }

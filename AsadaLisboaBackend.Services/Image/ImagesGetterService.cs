@@ -23,7 +23,8 @@ namespace AsadaLisboaBackend.Services.Image
 
         public async Task<ImageResponseDTO> GetImage(Guid id)
         {
-            return await _imagesGetterRepository.GetImage(id);
+            return (await _imagesGetterRepository.GetImage(id))
+                .ToImageResponseDTO();
         }
     }
 }

@@ -18,13 +18,15 @@ namespace AsadaLisboaBackend.Repositories.News
         {
             _context.Attach(newModel);
 
-            _context.Entry(newModel).Property(n => n.Slug).IsModified = false;
-            _context.Entry(newModel).Property(n => n.Title).IsModified = false;
-            _context.Entry(newModel).Property(n => n.ImageUrl).IsModified = false;
-            _context.Entry(newModel).Property(n => n.FileName).IsModified = false;
-            _context.Entry(newModel).Property(n => n.FilePath).IsModified = false;
-            _context.Entry(newModel).Property(n => n.Description).IsModified = false;
-            _context.Entry(newModel).Property(n => n.LastEditionDate).IsModified = false;
+            _context.Entry(newModel).Property(n => n.Slug).IsModified = true;
+            _context.Entry(newModel).Property(n => n.Title).IsModified = true;
+            _context.Entry(newModel).Property(n => n.StatusId).IsModified = true;
+            _context.Entry(newModel).Property(n => n.ImageUrl).IsModified = true;
+            _context.Entry(newModel).Property(n => n.FileName).IsModified = true;
+            _context.Entry(newModel).Property(n => n.FilePath).IsModified = true;
+            _context.Entry(newModel).Property(n => n.Categories).IsModified = true;
+            _context.Entry(newModel).Property(n => n.Description).IsModified = true;
+            _context.Entry(newModel).Property(n => n.LastEditionDate).IsModified = true;
 
             var affectedRows = await _context.SaveChangesAsync();
 

@@ -2,8 +2,9 @@
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
-using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.Models.DatabaseContext;
+using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.FileSystem;
 
 namespace AsadaLisboaBackend.Services.Image
@@ -11,12 +12,14 @@ namespace AsadaLisboaBackend.Services.Image
     public class ImagesAdderService : IImagesAdderService
     {
         private readonly IFileSystemManager _fileSystem;
+        private readonly IImagesAdderRepository _imagesAdderRepository;
         private readonly ApplicationDbContext _applicationDbContext;
 
-        public ImagesAdderService(ApplicationDbContext applicationDbContext, IFileSystemManager fileSystem)
+        public ImagesAdderService(ApplicationDbContext applicationDbContext, IImagesAdderRepository imagesAdderRepository, IFileSystemManager fileSystem)
         {
             _fileSystem = fileSystem;
             _applicationDbContext = applicationDbContext;
+            _imagesAdderRepository = imagesAdderRepository;
         }
 
         public async Task<ImageResponseDTO> CreateImage(ImageRequestDTO imageRequestDTO)
@@ -60,10 +63,8 @@ namespace AsadaLisboaBackend.Services.Image
                     Description = imageRequestDTO.Description,
                 };
 
-                _applicationDbContext.Images.Add(image);
-                await _applicationDbContext.SaveChangesAsync();
-
-                return image.ToImageResponseDTO();
+                return (await _imagesAdderRepository.CreateImage(image))
+                    .ToImageResponseDTO();
             }
             catch
             {
