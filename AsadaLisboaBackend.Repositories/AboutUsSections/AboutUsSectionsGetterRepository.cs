@@ -26,7 +26,8 @@ namespace AsadaLisboaBackend.Repositories.AboutUsSections
             {
                 string search = searchSortRequestDTO.Search.ToLower();
 
-                query = query.Where(c => (c.SectionType).ToLower().Contains(search));
+                query = query.Where(a =>
+                        EF.Functions.Like(a.SectionType, $"%{search}%"));
             }
 
             // Sort
@@ -42,8 +43,6 @@ namespace AsadaLisboaBackend.Repositories.AboutUsSections
             {
                 Total = await query.CountAsync(),
                 Data = await query
-                    .AsNoTracking()
-                    .OrderBy(u => u.Id)
                     .Skip(searchSortRequestDTO.Offset)
                     .Take(searchSortRequestDTO.Take)
                     .Select(AboutUsExtensions.MapAboutUsResponseDTO())

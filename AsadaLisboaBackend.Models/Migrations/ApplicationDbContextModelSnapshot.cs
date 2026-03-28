@@ -84,6 +84,48 @@ namespace AsadaLisboaBackend.Models.Migrations
                         .IsUnique();
 
                     b.ToTable("Charges");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2797641b-3f01-4fc7-bc88-96a4fbf20db7"),
+                            Name = "Presidente"
+                        },
+                        new
+                        {
+                            Id = new Guid("ba3b8826-24b2-44d8-8e1e-7af7202c125d"),
+                            Name = "Vicepresidente"
+                        },
+                        new
+                        {
+                            Id = new Guid("cbec9bae-c444-4234-a851-1a2d9f544192"),
+                            Name = "Secretario"
+                        },
+                        new
+                        {
+                            Id = new Guid("c6ea3e4f-ed3f-4cad-9697-bff213b8e5dd"),
+                            Name = "Tesorero"
+                        },
+                        new
+                        {
+                            Id = new Guid("f10c568a-e590-4402-88ac-8467cb6d8a9b"),
+                            Name = "Vocal 1"
+                        },
+                        new
+                        {
+                            Id = new Guid("e0bfd8c2-0151-4de8-99b3-ac2b99800eb9"),
+                            Name = "Vocal 2"
+                        },
+                        new
+                        {
+                            Id = new Guid("cc1ad219-1f4b-47bc-a3d6-8723e8250375"),
+                            Name = "Vocal 3"
+                        },
+                        new
+                        {
+                            Id = new Guid("219d007a-7678-4d0e-87d1-ecfa4ef0402a"),
+                            Name = "Fiscal"
+                        });
                 });
 
             modelBuilder.Entity("AsadaLisboaBackend.Models.Contact", b =>
@@ -254,6 +296,9 @@ namespace AsadaLisboaBackend.Models.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -324,6 +369,14 @@ namespace AsadaLisboaBackend.Models.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
@@ -343,6 +396,10 @@ namespace AsadaLisboaBackend.Models.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PublicationDate");
@@ -352,7 +409,7 @@ namespace AsadaLisboaBackend.Models.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("AsadaLisboaBackend.Models.New", b =>
@@ -363,8 +420,15 @@ namespace AsadaLisboaBackend.Models.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -418,7 +482,19 @@ namespace AsadaLisboaBackend.Models.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Status");
+                    b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("171b840d-48b0-4f83-81dd-1921215898ac"),
+                            Name = "Draft"
+                        },
+                        new
+                        {
+                            Id = new Guid("7c3d1291-f268-4938-872e-d3f62ca8ab68"),
+                            Name = "Active"
+                        });
                 });
 
             modelBuilder.Entity("AsadaLisboaBackend.Models.VisualSetting", b =>

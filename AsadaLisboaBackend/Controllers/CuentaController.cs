@@ -24,7 +24,7 @@ namespace AsadaLisboaBackend.Controllers
         }
 
         [HttpPost("iniciar-sesion")]
-        public async Task<ActionResult<AuthenticationResponseDTO>> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginRequestDTO loginRequestDTO)
         {
             return Ok(await _loginService.Login(loginRequestDTO));
         }
@@ -46,7 +46,8 @@ namespace AsadaLisboaBackend.Controllers
         [HttpPost("olvidar-contrasena")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO resetPasswordDTO)
         {
-            return Ok(await _resetPasswordService.ForgotPassword(resetPasswordDTO.Email));
+            await _resetPasswordService.ForgotPassword(resetPasswordDTO.Email);
+            return NoContent();
         }
 
         [HttpPost("restaurar-contrasena")]

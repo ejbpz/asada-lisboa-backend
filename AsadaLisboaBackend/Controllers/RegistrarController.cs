@@ -5,9 +5,9 @@ using AsadaLisboaBackend.ServiceContracts.Account;
 
 namespace AsadaLisboaBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
+    [Route("api/[controller]")]
     public class RegistrarController : ControllerBase
     {
         private readonly IRegisterUserService _userService;
@@ -20,22 +20,17 @@ namespace AsadaLisboaBackend.Controllers
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> RegisterUser([FromBody] RegisterRequestDTO dto)
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterRequestDTO registerRequestDTO)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            await _userService.RegisterUser(dto);
-
+            await _userService.RegisterUser(registerRequestDTO);
             return Created();
         }
 
         [HttpPost("confirmar-correo")]
-        public async Task<IActionResult> VerifyEmaill([FromBody] VerificationCodeRequestDTO request)
+        public async Task<IActionResult> VerifyEmaill([FromQuery] VerificationCodeRequestDTO request)
         {
-            var result = await _verificationCodeService.ConfirmEmailAsync(request.Email, request.Token);
-            if (!result) return BadRequest("Token inválido o expirado.");
-            return Ok("Correo confirmado correctamente.");
+            await _verificationCodeService.ConfirmEmailAsync(request.Email, request.Token);
+            return NoContent();
 
         }
     }
