@@ -1,4 +1,5 @@
 ﻿using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 
@@ -19,7 +20,7 @@ namespace AsadaLisboaBackend.Repositories.Contacts
             var affectedRows = await _context.SaveChangesAsync();
 
             if (affectedRows < 1)
-                throw new Exception("Error al crear el contacto."); // TODO: Create custom exception.
+                throw new NotFoundException("Error al crear el contacto.");
 
             return contact;
         }

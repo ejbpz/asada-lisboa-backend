@@ -15,6 +15,16 @@ namespace AsadaLisboaBackend.Models.Configurations
 
             builder.HasIndex(x => x.Name)
                 .IsUnique();
+
+            builder.HasData(
+                new Charge { Id = Guid.NewGuid(), Name = "Presidente" },
+                new Charge { Id = Guid.NewGuid(), Name = "Vicepresidente" },
+                new Charge { Id = Guid.NewGuid(), Name = "Secretario" },
+                new Charge { Id = Guid.NewGuid(), Name = "Tesorero" },
+                new Charge { Id = Guid.NewGuid(), Name = "Vocal 1" },
+                new Charge { Id = Guid.NewGuid(), Name = "Vocal 2" },
+                new Charge { Id = Guid.NewGuid(), Name = "Vocal 3" },
+                new Charge { Id = Guid.NewGuid(), Name = "Fiscal" });
         }
     }
 }

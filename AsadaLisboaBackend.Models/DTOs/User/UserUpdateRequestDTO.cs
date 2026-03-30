@@ -5,6 +5,7 @@ namespace AsadaLisboaBackend.Models.DTOs.User
 {
     public class UserUpdateRequestDTO
     {
+        [Required(ErrorMessage = "El cargo es requerido.")]
         public Guid ChargeId { get; set; }
 
         [Required(ErrorMessage = "La ubicación de la imagen del usuario es requerido.")]

@@ -1,0 +1,8 @@
+﻿namespace AsadaLisboaBackend.Utils.OptionsPattern
+{
+    public class FileStorageOptions
+    {
+        public string BasePath { get; set; } = string.Empty;
+        public string BaseUrl { get; set; } = string.Empty;
+    }
+}

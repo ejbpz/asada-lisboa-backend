@@ -9,6 +9,10 @@
         public DateTime PublicationDate { get; set; }
         public long FileSize { get; set; }
 
+        public string Url { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
+
         // Foreign Key
         public Guid StatusId { get; set; }
         public Status? Status { get; set; }

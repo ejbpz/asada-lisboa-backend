@@ -133,7 +133,10 @@ namespace AsadaLisboaBackend.Services.Jwt
 
             string? email = principal.FindFirstValue(ClaimTypes.Email);
 
-            ApplicationUser? user = await _userManager.FindByEmailAsync(email ?? "");
+            if (email is null)
+                throw new InvalidAccessTokenException("Token de acceso inválido.");
+
+            ApplicationUser? user = await _userManager.FindByEmailAsync(email);
 
             if (user is null)
                 throw new NotFoundException("Usuario inexistente.");
