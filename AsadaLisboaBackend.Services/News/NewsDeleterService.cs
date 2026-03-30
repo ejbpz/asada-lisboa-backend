@@ -2,7 +2,7 @@
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.Models.DatabaseContext;
-using AsadaLisboaBackend.ServiceContracts.Editor;
+using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.RepositoryContracts.News;
 
 namespace AsadaLisboaBackend.Services.News
@@ -10,13 +10,13 @@ namespace AsadaLisboaBackend.Services.News
     public class NewsDeleterService : INewsDeleterService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IEditorDeleterService _editorDeleterService;
+        private readonly IEditorsDeleterService _editorsDeleterService;
         private readonly INewsDeleterRepository _newsDeleterRepository;
 
-        public NewsDeleterService(INewsDeleterRepository newsDeleterRepository, ApplicationDbContext context, IEditorDeleterService editorDeleterService)
+        public NewsDeleterService(INewsDeleterRepository newsDeleterRepository, ApplicationDbContext context, IEditorsDeleterService editorsDeleterService)
         {
             _context = context;
-            _editorDeleterService = editorDeleterService;
+            _editorsDeleterService = editorsDeleterService;
             _newsDeleterRepository = newsDeleterRepository;
         }
 
@@ -29,9 +29,9 @@ namespace AsadaLisboaBackend.Services.News
             if (existingNew is null)
                 throw new NotFoundException("La noticia no fue encontrada.");
 
-            await _editorDeleterService.DeletePrincipalImage(existingNew.FileName);
+            await _editorsDeleterService.DeletePrincipalImage(existingNew.FileName);
 
-            await _editorDeleterService.DeleteContentImages(existingNew.Description);
+            await _editorsDeleterService.DeleteContentImages(existingNew.Description);
 
             await _newsDeleterRepository.DeleteNew(id);
         }

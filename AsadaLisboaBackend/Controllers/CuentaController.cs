@@ -2,8 +2,8 @@
 using AsadaLisboaBackend.Models.DTOs.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Models.DTOs.Account;
-using AsadaLisboaBackend.ServiceContracts.Jwt;
-using AsadaLisboaBackend.ServiceContracts.Account;
+using AsadaLisboaBackend.ServiceContracts.Jwts;
+using AsadaLisboaBackend.ServiceContracts.Accounts;
 
 namespace AsadaLisboaBackend.Controllers
 {
@@ -12,13 +12,13 @@ namespace AsadaLisboaBackend.Controllers
     [Route("api/[controller]")]
     public class CuentaController : ControllerBase
     {
-        private readonly IJwtService _jwtService;
+        private readonly IJwtsService _jwtsService;
         private readonly ILoginService _loginService;
         private readonly IResetPasswordService _resetPasswordService;
 
-        public CuentaController(IResetPasswordService resetPasswordService, ILoginService loginService, IJwtService jwtService)
+        public CuentaController(IResetPasswordService resetPasswordService, ILoginService loginService, IJwtsService jwtsService)
         {
-            _jwtService = jwtService;
+            _jwtsService = jwtsService;
             _loginService = loginService;
             _resetPasswordService = resetPasswordService;
         }
@@ -33,14 +33,14 @@ namespace AsadaLisboaBackend.Controllers
         [HttpPost("cerrar-sesion")]
         public async Task<IActionResult> Logout()
         {
-            await _jwtService.DeleteToken();
+            await _jwtsService.DeleteToken();
             return Ok();
         } 
 
         [HttpPost("refrescar-token")]
         public ActionResult<AuthenticationResponseDTO> RefreshToken(RefreshTokenRequestDTO refreshTokenRequestDTO)
         {
-            return Ok(_jwtService.ValidateRefreshToken(refreshTokenRequestDTO));
+            return Ok(_jwtsService.ValidateRefreshToken(refreshTokenRequestDTO));
         }
 
         [HttpPost("olvidar-contrasena")]

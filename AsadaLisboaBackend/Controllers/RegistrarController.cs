@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Models.DTOs.Account;
-using AsadaLisboaBackend.ServiceContracts.Account;
+using AsadaLisboaBackend.ServiceContracts.Accounts;
 
 namespace AsadaLisboaBackend.Controllers
 {

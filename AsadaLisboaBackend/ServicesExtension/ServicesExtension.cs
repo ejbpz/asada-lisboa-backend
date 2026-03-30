@@ -1,6 +1,8 @@
-﻿using AsadaLisboaBackend.FileSystem;
+﻿using AsadaLisboaBackend.ServiceContracts.FileSystems;
+using AsadaLisboaBackend.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Configurations;
+using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
@@ -9,20 +11,21 @@ using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
-using AsadaLisboaBackend.ServiceContracts.FileSystem;
-using AsadaLisboaBackend.ServiceContracts.ReCaptcha;
+using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
+using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.Contacts;
-using AsadaLisboaBackend.ServiceContracts.Account;
+using AsadaLisboaBackend.ServiceContracts.Accounts;
 using AsadaLisboaBackend.ServiceContracts.Charges;
-using AsadaLisboaBackend.ServiceContracts.Editor;
-using AsadaLisboaBackend.ServiceContracts.Email;
+using AsadaLisboaBackend.ServiceContracts.Editors;
+using AsadaLisboaBackend.ServiceContracts.Emails;
 using AsadaLisboaBackend.ServiceContracts.Users;
-using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.News;
-using AsadaLisboaBackend.ServiceContracts.Jwt;
+using AsadaLisboaBackend.ServiceContracts.Jwts;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.Repositories.Configurations;
+using AsadaLisboaBackend.Repositories.Documents;
 using AsadaLisboaBackend.Repositories.Contacts;
 using AsadaLisboaBackend.Repositories.Statuses;
 using AsadaLisboaBackend.Repositories.Charges;
@@ -31,17 +34,18 @@ using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.Services.Configurations;
-using AsadaLisboaBackend.Services.ReCaptcha;
+using AsadaLisboaBackend.Services.ReCaptchas;
+using AsadaLisboaBackend.Services.Documents;
 using AsadaLisboaBackend.Services.Statuses;
 using AsadaLisboaBackend.Services.Contacts;
-using AsadaLisboaBackend.Services.Account;
+using AsadaLisboaBackend.Services.Accounts;
 using AsadaLisboaBackend.Services.Charges;
-using AsadaLisboaBackend.Services.Editor;
+using AsadaLisboaBackend.Services.Editors;
+using AsadaLisboaBackend.Services.Emails;
+using AsadaLisboaBackend.Services.Images;
 using AsadaLisboaBackend.Services.Users;
-using AsadaLisboaBackend.Services.Email;
-using AsadaLisboaBackend.Services.Image;
 using AsadaLisboaBackend.Services.News;
-using AsadaLisboaBackend.Services.Jwt;
+using AsadaLisboaBackend.Services.Jwts;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
@@ -50,10 +54,10 @@ namespace AsadaLisboaBackend.ServicesExtension
         public static IServiceCollection ServicesRegistration(this IServiceCollection services)
         {
             // File System
-            services.AddScoped<IFileSystemManager, FileSystemManager>();
+            services.AddScoped<IFileSystemsManager, FileSystemsManager>();
 
             // ReCaptcha
-            services.AddScoped<IReCaptchaService, ReCaptchaService>();
+            services.AddScoped<IReCaptchasService, ReCaptchasService>();
 
             // Contacts
             services.AddScoped<IContactsAdderService, ContactsAdderService>();
@@ -87,6 +91,17 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IConfigurationsGetterService, ConfigurationsGetterService>();
             services.AddScoped<IConfigurationsUpdaterService, ConfigurationsUpdaterService>();
             services.AddScoped<IConfigurationsDeleterService, ConfigurationsDeleterService>();
+
+            // Documents
+            services.AddScoped<IDocumentsAdderRepository, DocumentsAdderRepository>();
+            services.AddScoped<IDocumentsGetterRepository, DocumentsGetterRepository>();
+            services.AddScoped<IDocumentsUpdaterRepository, DocumentsUpdaterRepository>();
+            services.AddScoped<IDocumentsDeleterRepository, DocumentsDeleterRepository>();
+
+            services.AddScoped<IDocumentsAdderService, DocumentsAdderService>();
+            services.AddScoped<IDocumentsGetterService, DocumentsGetterService>();
+            services.AddScoped<IDocumentsUpdaterService, DocumentsUpdaterService>();
+            services.AddScoped<IDocumentsDeleterService, DocumentsDeleterService>();
 
             // Images
             services.AddScoped<IImagesAdderRepository, ImagesAdderRepository>();
@@ -125,14 +140,14 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
 
             // Editor
-            services.AddScoped<IEditorAdderService, EditorAdderService>();
-            services.AddScoped<IEditorUpdaterService, EditorUpdaterService>();
-            services.AddScoped<IEditorDeleterService, EditorDeleterService>();
+            services.AddScoped<IEditorsAdderService, EditorsAdderService>();
+            services.AddScoped<IEditorsUpdaterService, EditorsUpdaterService>();
+            services.AddScoped<IEditorsDeleterService, EditorsDeleterService>();
 
             // Account
-            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IJwtsService, JwtsService>();
             services.AddScoped<ILoginService, LoginService>();
-            services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IEmailsSenderService, EmailsSenderService>();
             services.AddScoped<IRegisterUserService, RegisterUserService>();
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddScoped<IVerificationCodeService, VerificationCodeService>();

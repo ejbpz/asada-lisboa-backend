@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AsadaLisboaBackend.Models.DTOs.Editor;
-using AsadaLisboaBackend.ServiceContracts.Editor;
+using AsadaLisboaBackend.ServiceContracts.Editors;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -9,17 +9,17 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     [Route("api/[area]/[controller]")]
     public class EditorController : ControllerBase
     {
-        private readonly IEditorAdderService _editorAdderService;
+        private readonly IEditorsAdderService _editorsAdderService;
 
-        public EditorController(IEditorAdderService editorAdderService)
+        public EditorController(IEditorsAdderService editorsAdderService)
         {
-            _editorAdderService = editorAdderService;
+            _editorsAdderService = editorsAdderService;
         }
 
         [HttpPost("imagen-temp")]
         public async Task<IActionResult> CreateTemporalImage([FromForm] EditorRequestDTO editorRequestDTO)
         {
-            return Created("~/api/admin/editor", await _editorAdderService.CreateTemporalImage(editorRequestDTO));
+            return Created("~/api/admin/editor", await _editorsAdderService.CreateTemporalImage(editorRequestDTO));
         }
     }
 }

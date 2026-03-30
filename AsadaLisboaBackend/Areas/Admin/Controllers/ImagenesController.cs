@@ -3,7 +3,7 @@ using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Status;
-using AsadaLisboaBackend.ServiceContracts.Image;
+using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers

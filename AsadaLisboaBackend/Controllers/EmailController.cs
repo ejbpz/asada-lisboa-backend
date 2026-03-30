@@ -3,8 +3,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Utils.OptionsPattern;
-using AsadaLisboaBackend.ServiceContracts.Email;
-using AsadaLisboaBackend.ServiceContracts.ReCaptcha;
+using AsadaLisboaBackend.ServiceContracts.Emails;
+using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
 using AsadaLisboaBackend.Models.DTOs.InformationMessage;
 
 namespace AsadaLisboaBackend.Controllers
@@ -16,14 +16,14 @@ namespace AsadaLisboaBackend.Controllers
     public class EmailController : ControllerBase
     {
         private readonly ReCaptchaOptions _reCaptchaOptions;
-        private readonly IReCaptchaService _reCaptchaService;
-        private readonly IEmailSenderService _emailSenderService;
+        private readonly IReCaptchasService _reCaptchasService;
+        private readonly IEmailsSenderService _emailsSenderService;
 
-        public EmailController(IEmailSenderService emailSenderService, IOptions<ReCaptchaOptions> options, IReCaptchaService reCaptchaService)
+        public EmailController(IEmailsSenderService emailsSenderService, IOptions<ReCaptchaOptions> options, IReCaptchasService reCaptchasService)
         {
             _reCaptchaOptions = options.Value;
-            _reCaptchaService = reCaptchaService;
-            _emailSenderService = emailSenderService;
+            _reCaptchasService = reCaptchasService;
+            _emailsSenderService = emailsSenderService;
         }
 
         [HttpGet("re-captcha")]
@@ -35,13 +35,13 @@ namespace AsadaLisboaBackend.Controllers
             if (string.IsNullOrEmpty(_reCaptchaOptions.SECRET_KEY) && string.IsNullOrWhiteSpace(_reCaptchaOptions.SECRET_KEY))
                 throw new ArgumentNullException("Error con el proveedor del correos.");
 
-            return await _reCaptchaService.ReCaptchaValidation(reCaptchaResponse, _reCaptchaOptions.SECRET_KEY);
+            return await _reCaptchasService.ReCaptchaValidation(reCaptchaResponse, _reCaptchaOptions.SECRET_KEY);
         }
 
         [HttpPost("")]
         public async Task<IActionResult> SendEmail([FromForm] SendEmailRequestDTO sendEmailRequestDTO)
         {
-            await _emailSenderService.SendContactMessage(sendEmailRequestDTO);
+            await _emailsSenderService.SendContactMessage(sendEmailRequestDTO);
             return NoContent();
         }
     }

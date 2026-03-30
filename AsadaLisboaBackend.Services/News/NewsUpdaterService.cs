@@ -4,9 +4,9 @@ using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.Models.DatabaseContext;
-using AsadaLisboaBackend.ServiceContracts.Editor;
+using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.RepositoryContracts.News;
-using AsadaLisboaBackend.ServiceContracts.FileSystem;
+using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 
 namespace AsadaLisboaBackend.Services.News
@@ -14,19 +14,19 @@ namespace AsadaLisboaBackend.Services.News
     public class NewsUpdaterService : INewsUpdaterService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IFileSystemManager _fileSystem;
-        private readonly IEditorUpdaterService _editorUpdaterService;
+        private readonly IFileSystemsManager _fileSystems;
         private readonly INewsGetterRepository _newsGetterRepository;
-        private readonly IEditorDeleterService _editorDeleterService;
+        private readonly IEditorsUpdaterService _editorsUpdaterService;
+        private readonly IEditorsDeleterService _editorsDeleterService;
         private readonly INewsUpdaterRepository _newsUpdaterRepository;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorUpdaterService editorUpdaterService, IEditorDeleterService editorDeleterService, IStatusesGetterRepository statusesGetterRepository, ApplicationDbContext context, IFileSystemManager fileSystem)
+        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorsUpdaterService editorsUpdaterService, IEditorsDeleterService editorsDeleterService, IStatusesGetterRepository statusesGetterRepository, ApplicationDbContext context, IFileSystemsManager fileSystems)
         {
             _context = context;
-            _fileSystem = fileSystem;
-            _editorDeleterService = editorDeleterService;
-            _editorUpdaterService = editorUpdaterService;
+            _fileSystems = fileSystems;
+            _editorsDeleterService = editorsDeleterService;
+            _editorsUpdaterService = editorsUpdaterService;
             _newsGetterRepository = newsGetterRepository;
             _newsUpdaterRepository = newsUpdaterRepository;
             _statusesGetterRepository = statusesGetterRepository;
@@ -42,18 +42,18 @@ namespace AsadaLisboaBackend.Services.News
 
             if (newRequestDTO.File is not null)
             {
-                var newImageUrl = await _fileSystem.SaveAsync(newRequestDTO.File, "news");
+                var newImageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "news");
 
                 if (!string.IsNullOrEmpty(existingNew.FileName))
-                    await _fileSystem.DeleteAsync(existingNew.FileName, "news");
+                    await _fileSystems.DeleteAsync(existingNew.FileName, "news");
 
                 imageUrl = newImageUrl;
                 fileName = Path.GetFileName(imageUrl);
                 filePath = $"news/{fileName}";
             }
 
-            var content = await _editorUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
-            await _editorDeleterService.DeleteUnusedImages(existingNew.Description, newRequestDTO.Description);
+            var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
+            await _editorsDeleterService.DeleteUnusedImages(existingNew.Description, newRequestDTO.Description);
 
             var categories = await _context.Categories
                 .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))

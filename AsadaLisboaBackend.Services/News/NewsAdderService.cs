@@ -5,9 +5,9 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.Models.DatabaseContext;
-using AsadaLisboaBackend.ServiceContracts.Editor;
+using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.RepositoryContracts.News;
-using AsadaLisboaBackend.ServiceContracts.FileSystem;
+using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 
 namespace AsadaLisboaBackend.Services.News
@@ -15,17 +15,17 @@ namespace AsadaLisboaBackend.Services.News
     public class NewsAdderService : INewsAdderService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IFileSystemManager _fileSystem;
+        private readonly IFileSystemsManager _fileSystems;
         private readonly INewsAdderRepository _newsAdderRepository;
-        private readonly IEditorUpdaterService _editorUpdaterService;
+        private readonly IEditorsUpdaterService _editorsUpdaterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorUpdaterService editorUpdaterService, IStatusesGetterRepository statusesGetterRepository, ApplicationDbContext context, IFileSystemManager fileSystem)
+        public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorsUpdaterService editorsUpdaterService, IStatusesGetterRepository statusesGetterRepository, ApplicationDbContext context, IFileSystemsManager fileSystems)
         {
             _context = context;
-            _fileSystem = fileSystem;
+            _fileSystems = fileSystems;
             _newsAdderRepository = newsAdderRepository;
-            _editorUpdaterService = editorUpdaterService;
+            _editorsUpdaterService = editorsUpdaterService;
             _statusesGetterRepository = statusesGetterRepository;
         }
 
@@ -39,14 +39,14 @@ namespace AsadaLisboaBackend.Services.News
 
             if (newRequestDTO.File is not null)
             {
-                imageUrl = await _fileSystem.SaveAsync(newRequestDTO.File, "news");
+                imageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "news");
                 fileName = Path.GetFileName(imageUrl);
             }
 
             if(imageUrl != string.Empty && fileName != string.Empty)
                 filePath = $"news/{fileName}";
 
-            var content = await _editorUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
+            var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
 
             var categories = await _context.Categories
                 .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))

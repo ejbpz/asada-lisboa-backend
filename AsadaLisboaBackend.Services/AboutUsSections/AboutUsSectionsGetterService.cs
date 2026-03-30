@@ -1,8 +1,7 @@
-﻿using AsadaLisboaBackend.Models.DTOs.AboutUs;
-using AsadaLisboaBackend.Models.DTOs.Shared;
-using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using AsadaLisboaBackend.RepositoryContracts.Contacts;
+﻿using AsadaLisboaBackend.Models.DTOs.Shared;
+using AsadaLisboaBackend.Models.DTOs.AboutUs;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
+using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
 namespace AsadaLisboaBackend.Services.AboutUsSections
 {
