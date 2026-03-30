@@ -1,0 +1,28 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "JwtOptions": {
+    "EXPIRATION_MINUTES": 20,
+    "KEY": "Private-Key (256 bits)",
+    "ISSUER": "https://localhost:5199",
+    "AUDIENCE": "https://localhost:4200"
+  },
+  "RefreshJwtOptions": {
+    "EXPIRATION_MINUTES": 1440
+  },
+  "ConnectionStrings": {
+    "AsadaLisboaDB": "Server=localhost;Database=AsadaLisboaDb;User Id=sa;Password=your_password;"
+  },
+  "ContactEmailOptions": {
+    "CONTACT_EMAIL": "example@email.com"
+  },
+  "ReCaptchaOptions": {
+    "SECRET_KEY": "ReCaptcha Secret Key"
+  },
+  "RESEND_API_TOKEN": "ReCaptcha Secret Token"
+}
