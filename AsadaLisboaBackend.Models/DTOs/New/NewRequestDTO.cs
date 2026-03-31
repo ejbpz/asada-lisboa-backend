@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Utils.ImageAttribute;
 
 namespace AsadaLisboaBackend.Models.DTOs.New
@@ -24,6 +25,6 @@ namespace AsadaLisboaBackend.Models.DTOs.New
         [Required(ErrorMessage = "El estado de la noticia es requerido.")]
         public Guid StatusId { get; set; }
 
-        public List<Guid> CategoryIds { get; set; } = new();
+        public List<CategoryRequestDTO> Categories { get; set; } = new();
     }
 }

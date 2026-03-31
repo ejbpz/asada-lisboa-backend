@@ -37,12 +37,12 @@ namespace AsadaLisboaBackend.Services.Documents
 
             document.Slug = GenerateSlug.New(documentUpdateRequestDTO.Title, document.Id);
 
-            var categories = await _applicationDbContext.Categories
-                .Where(c => documentUpdateRequestDTO.CategoryIds.Contains(c.Id))
-                .ToListAsync();
+            //var categories = await _applicationDbContext.Categories
+            //    .Where(c => documentUpdateRequestDTO.CategoryIds.Contains(c.Id))
+            //    .ToListAsync();
 
-            document.Categories.Clear();
-            document.Categories = categories;
+            //document.Categories.Clear();
+            //document.Categories = categories;
 
             if (documentUpdateRequestDTO.File is null || documentUpdateRequestDTO.File.Length <= 0)
                 throw new NotFoundException("Error al actualizar el documento.");

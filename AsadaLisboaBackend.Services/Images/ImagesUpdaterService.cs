@@ -37,12 +37,12 @@ namespace AsadaLisboaBackend.Services.Images
 
             image.Slug = GenerateSlug.New(imageUpdateRequestDTO.Title, image.Id);
 
-            var categories = await _applicationDbContext.Categories
-                .Where(c => imageUpdateRequestDTO.CategoryIds.Contains(c.Id))
-                .ToListAsync();
+            //var categories = await _applicationDbContext.Categories
+            //    .Where(c => imageUpdateRequestDTO.CategoryIds.Contains(c.Id))
+            //    .ToListAsync();
 
-            image.Categories.Clear();
-            image.Categories = categories;
+            //image.Categories.Clear();
+            //image.Categories = categories;
 
             if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
                 throw new ArgumentNullException("Error al actualizar la imagen.");

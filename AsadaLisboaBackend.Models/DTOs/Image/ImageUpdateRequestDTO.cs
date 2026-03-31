@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Utils.ImageAttribute;
 
 namespace AsadaLisboaBackend.Models.DTOs.Image
@@ -21,8 +22,8 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
         [Range(1, int.MaxValue, ErrorMessage = "Debe selecionar un estado válido.")]
         public Guid StatusId { get; set; }
 
-        public List<Guid> CategoryIds { get; set; } = new();
-        
+        public List<CategoryRequestDTO> Categories { get; set; } = new();
+
 
     }
 }

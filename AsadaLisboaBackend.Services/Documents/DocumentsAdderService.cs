@@ -43,9 +43,9 @@ namespace AsadaLisboaBackend.Services.Documents
                 var status = await _applicationDbContext.Statuses
                     .FirstOrDefaultAsync(c => c.Id == documentRequestDTO.StatusId);
 
-                var categories = await _applicationDbContext.Categories
-                    .Where(c => documentRequestDTO.CategoryIds.Contains(c.Id))
-                    .ToListAsync();
+                //var categories = await _applicationDbContext.Categories
+                //    .Where(c => documentRequestDTO.CategoryIds.Contains(c.Id))
+                //    .ToListAsync();
 
                 var document = new Models.Document()
                 {
@@ -55,7 +55,7 @@ namespace AsadaLisboaBackend.Services.Documents
                     Status = status,
                     FileName = fileName,
                     FilePath = filePath,
-                    Categories = categories,
+                    //Categories = categories,
                     Title = documentRequestDTO.Title,
                     PublicationDate = DateTime.UtcNow,
                     StatusId = documentRequestDTO.StatusId,

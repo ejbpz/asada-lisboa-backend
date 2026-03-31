@@ -2,6 +2,7 @@
 using AsadaLisboaBackend.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Configurations;
+using AsadaLisboaBackend.RepositoryContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
@@ -11,6 +12,7 @@ using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
+using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
 using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
@@ -25,6 +27,7 @@ using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Jwts;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.Repositories.Configurations;
+using AsadaLisboaBackend.Repositories.Categories;
 using AsadaLisboaBackend.Repositories.Documents;
 using AsadaLisboaBackend.Repositories.Contacts;
 using AsadaLisboaBackend.Repositories.Statuses;
@@ -34,6 +37,7 @@ using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.Services.Configurations;
+using AsadaLisboaBackend.Services.Categories;
 using AsadaLisboaBackend.Services.ReCaptchas;
 using AsadaLisboaBackend.Services.Documents;
 using AsadaLisboaBackend.Services.Statuses;
@@ -131,6 +135,11 @@ namespace AsadaLisboaBackend.ServicesExtension
 
             services.AddScoped<IStatusesGetterService, StatusesGetterService>();
             services.AddScoped<IStatusesUpdaterService, StatusesUpdaterService>();
+
+            // Categories
+            services.AddScoped<ICategoriesGetterRepository, CategoriesGetterRepository>();
+
+            services.AddScoped<ICategoriesGetterService, CategoriesGetterService>();
 
             // Charges
             services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();

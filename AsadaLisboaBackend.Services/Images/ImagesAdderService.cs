@@ -43,9 +43,9 @@ namespace AsadaLisboaBackend.Services.Images
                 var status = await _applicationDbContext.Statuses
                     .FirstOrDefaultAsync(c => c.Id == imageRequestDTO.StatusId);
 
-                var categories = await _applicationDbContext.Categories
-                    .Where(c => imageRequestDTO.CategoryIds.Contains(c.Id))
-                    .ToListAsync();
+                //var categories = await _applicationDbContext.Categories
+                //    .Where(c => imageRequestDTO.CategoryIds.Contains(c.Id))
+                //    .ToListAsync();
 
                 var image = new Models.Image()
                 {
@@ -55,7 +55,7 @@ namespace AsadaLisboaBackend.Services.Images
                     Status = status,
                     FilePath = filePath,
                     FileName = fileName,
-                    Categories = categories,
+                    //Categories = categories,
                     Title = imageRequestDTO.Title,
                     PublicationDate = DateTime.UtcNow,
                     StatusId = imageRequestDTO.StatusId,

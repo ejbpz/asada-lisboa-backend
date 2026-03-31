@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Utils.ImageAttribute;
 
 namespace AsadaLisboaBackend.Models.DTOs.Document
@@ -23,6 +24,6 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
 
         public Guid DocumentTypeId { get; set; }
 
-        public List<Guid> CategoryIds { get; set; } = new();
+        public List<CategoryRequestDTO> Categories { get; set; } = new();
     }
 }

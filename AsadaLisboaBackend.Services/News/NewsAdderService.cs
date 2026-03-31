@@ -49,9 +49,9 @@ namespace AsadaLisboaBackend.Services.News
 
             var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
 
-            var categories = await _context.Categories
-                .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))
-                .ToListAsync();
+            //var categories = await _context.Categories
+            //    .Where(c => newRequestDTO.CategoryIds.Contains(c.Id))
+            //    .ToListAsync();
 
             var status = await _statusesGetterRepository.GetStatus(newRequestDTO.StatusId);
 
@@ -63,7 +63,7 @@ namespace AsadaLisboaBackend.Services.News
                 FileName = fileName,
                 FilePath = filePath,
                 Description = content,
-                Categories = categories,
+                //Categories = categories,
                 Title = newRequestDTO.Title,
                 PublicationDate = DateTime.UtcNow,
                 LastEditionDate = DateTime.UtcNow,
