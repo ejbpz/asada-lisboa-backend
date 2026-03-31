@@ -64,10 +64,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IReCaptchasService, ReCaptchasService>();
 
             // Contacts
-            services.AddScoped<IContactsAdderService, ContactsAdderService>();
-            services.AddScoped<IContactsGetterService, ContactsGetterService>();
             services.AddScoped<IContactsUpdaterService, ContactsUpdaterService>();
             services.AddScoped<IContactsDeleterService, ContactsDeleterService>();
+            services.AddScoped<IContactsGetterService, ContactsGetterService>();
+            services.AddScoped<IContactsAdderService, ContactsAdderService>();
 
             services.AddScoped<IContactsAdderRepository, ContactsAdderRepository>();
             services.AddScoped<IContactsGetterRepository, ContactsGetterRepository>();
@@ -75,10 +75,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IContactsDeleterRepository, ContactsDeleterRepository>();
 
             // About Us
-            services.AddScoped<IAboutUsSectionsAdderRepository, AboutUsSectionsAdderRepository>();
-            services.AddScoped<IAboutUsSectionsGetterRepository, AboutUsSectionsGetterRepository>();
             services.AddScoped<IAboutUsSectionsUpdaterRepository, AboutUsSectionsUpdaterRepository>();
             services.AddScoped<IAboutUsSectionsDeleterRepository, AboutUsSectionsDeleterRepository>();
+            services.AddScoped<IAboutUsSectionsGetterRepository, AboutUsSectionsGetterRepository>();
+            services.AddScoped<IAboutUsSectionsAdderRepository, AboutUsSectionsAdderRepository>();
 
             services.AddScoped<IAboutUsSectionsAdderService, AboutUsSectionsAdderService>();
             services.AddScoped<IAboutUsSectionsGetterService, AboutUsSectionsGetterService>();
@@ -86,10 +86,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDeleterService>();
 
             // Configurations
-            services.AddScoped<IConfigurationsAdderRepository, ConfigurationsAdderRepository>();
-            services.AddScoped<IConfigurationsGetterRepository, ConfigurationsGetterRepository>();
             services.AddScoped<IConfigurationsUpdaterRepository, ConfigurationsUpdaterRepository>();
             services.AddScoped<IConfigurationsDeleterRepository, ConfigurationsDeleterRepository>();
+            services.AddScoped<IConfigurationsGetterRepository, ConfigurationsGetterRepository>();
+            services.AddScoped<IConfigurationsAdderRepository, ConfigurationsAdderRepository>();
 
             services.AddScoped<IConfigurationsAdderService, ConfigurationsAdderService>();
             services.AddScoped<IConfigurationsGetterService, ConfigurationsGetterService>();
@@ -97,10 +97,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IConfigurationsDeleterService, ConfigurationsDeleterService>();
 
             // Documents
-            services.AddScoped<IDocumentsAdderRepository, DocumentsAdderRepository>();
-            services.AddScoped<IDocumentsGetterRepository, DocumentsGetterRepository>();
             services.AddScoped<IDocumentsUpdaterRepository, DocumentsUpdaterRepository>();
             services.AddScoped<IDocumentsDeleterRepository, DocumentsDeleterRepository>();
+            services.AddScoped<IDocumentsGetterRepository, DocumentsGetterRepository>();
+            services.AddScoped<IDocumentsAdderRepository, DocumentsAdderRepository>();
 
             services.AddScoped<IDocumentsAdderService, DocumentsAdderService>();
             services.AddScoped<IDocumentsGetterService, DocumentsGetterService>();
@@ -108,10 +108,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IDocumentsDeleterService, DocumentsDeleterService>();
 
             // Images
-            services.AddScoped<IImagesAdderRepository, ImagesAdderRepository>();
-            services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
             services.AddScoped<IImagesUpdaterRepository, ImagesUpdaterRepository>();
             services.AddScoped<IImagesDeleterRepository, ImagesDeleterRepository>();
+            services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
+            services.AddScoped<IImagesAdderRepository, ImagesAdderRepository>();
 
             services.AddScoped<IImagesAdderService, ImagesAdderService>();
             services.AddScoped<IImagesGetterService, ImagesGetterService>();
@@ -119,10 +119,10 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IImagesDeleterService, ImagesDeleterService>();
 
             // News
-            services.AddScoped<INewsAdderRepository, NewsAdderRepository>();
-            services.AddScoped<INewsGetterRepository, NewsGetterRepository>();
             services.AddScoped<INewsUpdaterRepository, NewsUpdaterRepository>();
             services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
+            services.AddScoped<INewsGetterRepository, NewsGetterRepository>();
+            services.AddScoped<INewsAdderRepository, NewsAdderRepository>();
 
             services.AddScoped<INewsAdderService, NewsAdderService>();
             services.AddScoped<INewsGetterService, NewsGetterService>();
@@ -130,21 +130,23 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<INewsDeleterService, NewsDeleterService>();
 
             // Statuses
-            services.AddScoped<IStatusesGetterRepository, StatusesGetterRepository>();
             services.AddScoped<IStatusesUpdaterRepository, StatusesUpdaterRepository>();
+            services.AddScoped<IStatusesGetterRepository, StatusesGetterRepository>();
 
             services.AddScoped<IStatusesGetterService, StatusesGetterService>();
             services.AddScoped<IStatusesUpdaterService, StatusesUpdaterService>();
 
             // Categories
+            services.AddScoped<ICategoriesDeleterRepository, CategoriesDeleterRepository>();
             services.AddScoped<ICategoriesGetterRepository, CategoriesGetterRepository>();
             services.AddScoped<ICategoriesAdderRepository, CategoriesAdderRepository>();
 
             services.AddScoped<ICategoriesGetterService, CategoriesGetterService>();
+            services.AddScoped<ICategoriesDeleterService, CategoriesDeleterService>();
 
             // Charges
-            services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
             services.AddScoped<IChargesUpdaterRepository, ChargesUpdaterRepository>();
+            services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
 
             services.AddScoped<IChargesGetterService, ChargesGetterService>();
             services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
