@@ -50,7 +50,10 @@ app.UseStaticFiles();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.InjectStylesheet("/css/swagger-styles.css");
+    });
 }
 
 app.UseHttpsRedirection();

@@ -1,0 +1,46 @@
+﻿body {
+    background-color: #FFFFFF !important;
+}
+.logo_small_svg__cls-3 {
+    fill: #FFFFFF !important;
+}
+
+.swagger-ui .topbar {
+    background-color: #095D98 !important;
+}
+
+.swagger-ui .topbar .download-url-wrapper .select-label #select {
+    border: 2px solid #333333 !important;
+}
+
+.swagger-ui .info .title small {
+    background-color: #333333 !important;
+}
+
+.swagger-ui .info .title small.version-stamp {
+    background-color: #0A98E6 !important;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background-color: #0A98E6 !important;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background-color: #4FB06D !important;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+    background-color: #F5C26B !important;
+}
+
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+    background-color: #DC143C !important;
+}
+
+.swagger-ui .opblock.opblock-patch .opblock-summary-method {
+    background-color: #5FBC9F !important;
+}
+
+.swagger-ui .opblock .opblock-summary-path {
+    text-transform: lowercase !important;
+}

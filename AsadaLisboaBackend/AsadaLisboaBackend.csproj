@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +29,6 @@
     <ProjectReference Include="..\AsadaLisboaBackend.ServiceContracts\AsadaLisboaBackend.ServiceContracts.csproj" />
     <ProjectReference Include="..\AsadaLisboaBackend.Services\AsadaLisboaBackend.Services.csproj" />
     <ProjectReference Include="..\AsadaLisboaBackend.Utils\AsadaLisboaBackend.Utils.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>
