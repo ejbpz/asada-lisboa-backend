@@ -145,6 +145,7 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<ICategoriesDeleterService, CategoriesDeleterService>();
 
             // Charges
+            services.AddScoped<IChargesUpdaterRepository, ChargesUpdaterRepository>();
             services.AddScoped<IChargesDeleterRepository, ChargesDeleterRepository>();
             services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
             services.AddScoped<IChargesAdderRepository, ChargesAdderRepository>();
@@ -152,6 +153,7 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IChargesAdderService, ChargesAdderService>();
             services.AddScoped<IChargesGetterService, ChargesGetterService>();
             services.AddScoped<IChargesDeleterService, ChargesDeleterService>();
+            services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
 
             // Editor
             services.AddScoped<IEditorsAdderService, EditorsAdderService>();

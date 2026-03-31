@@ -13,12 +13,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
     {
         private readonly IChargesAdderService _chargesAdderService;
         private readonly IChargesGetterService _chargesGetterService;
+        private readonly IChargesUpdaterService _chargesUpdaterService;
         private readonly IChargesDeleterService _chargesDeleterService;
 
-        public CargosController(IChargesGetterService chargesGetterService, IChargesAdderService chargesAdderService, IChargesDeleterService chargesDeleterService)
+        public CargosController(IChargesGetterService chargesGetterService, IChargesAdderService chargesAdderService, IChargesDeleterService chargesDeleterService, IChargesUpdaterService chargesUpdaterService)
         {
             _chargesAdderService = chargesAdderService;
             _chargesGetterService = chargesGetterService;
+            _chargesUpdaterService = chargesUpdaterService;
             _chargesDeleterService = chargesDeleterService;
         }
 
@@ -32,6 +34,12 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         public async Task<ActionResult<ChargeResponseDTO>> CreateCharge([FromBody] string chargeRequest)
         {
             return Created("~/api/admin/cargos", await _chargesAdderService.CreateCharge(chargeRequest));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ChargeResponseDTO>> UpdateCharge([FromQuery] Guid id, [FromBody] string chargeRequest)
+        {
+            return Ok(await _chargesUpdaterService.UpdateCharge(id, chargeRequest));
         }
 
         [HttpDelete("{id}")]
