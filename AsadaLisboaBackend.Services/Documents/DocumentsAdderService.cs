@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Services.Exceptions;
+﻿using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DTOs.Document;
 using AsadaLisboaBackend.Utils.SlugGeneration;
-using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Documents;
+using AsadaLisboaBackend.ServiceContracts.Categories;
+using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
@@ -12,14 +12,16 @@ namespace AsadaLisboaBackend.Services.Documents
     public class DocumentsAdderService: IDocumentsAdderService
     {
         private readonly IFileSystemsManager _fileSystems;
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IDocumentsAdderRepository _documentAdderRepository;
+        private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public DocumentsAdderService(ApplicationDbContext applicationDbContext, IDocumentsAdderRepository documentAdderRepository, IFileSystemsManager fileSystems)
+        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IFileSystemsManager fileSystems)
         {
             _fileSystems = fileSystems;
-            _applicationDbContext = applicationDbContext;
+            _categoriesGetterService = categoriesGetterService;
             _documentAdderRepository = documentAdderRepository;
+            _statusesGetterRepository = statusesGetterRepository;
         }
 
         public async Task<DocumentResponseDTO> CreateDocument(DocumentRequestDTO documentRequestDTO)
@@ -40,25 +42,21 @@ namespace AsadaLisboaBackend.Services.Documents
 
                 var slug = GenerateSlug.New(documentRequestDTO.Title, documentId);
 
-                var status = await _applicationDbContext.Statuses
-                    .FirstOrDefaultAsync(c => c.Id == documentRequestDTO.StatusId);
+                var status = await _statusesGetterRepository.GetStatus(documentRequestDTO.StatusId);
 
-                //var categories = await _applicationDbContext.Categories
-                //    .Where(c => documentRequestDTO.CategoryIds.Contains(c.Id))
-                //    .ToListAsync();
+                var categories = await _categoriesGetterService.ToCreateCategories(documentRequestDTO.Categories);
 
                 var document = new Models.Document()
                 {
                     Id = documentId,
                     Url = url,
                     Slug = slug,
-                    Status = status,
                     FileName = fileName,
                     FilePath = filePath,
-                    //Categories = categories,
+                    StatusId = status.Id,
+                    Categories = categories,
                     Title = documentRequestDTO.Title,
                     PublicationDate = DateTime.UtcNow,
-                    StatusId = documentRequestDTO.StatusId,
                     FileSize = documentRequestDTO.File.Length,
                     Description = documentRequestDTO.Description,
                     DocumentTypeId = documentRequestDTO.DocumentTypeId,

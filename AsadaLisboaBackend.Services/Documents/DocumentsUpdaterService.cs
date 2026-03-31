@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Services.Exceptions;
+﻿using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DTOs.Document;
 using AsadaLisboaBackend.Utils.SlugGeneration;
-using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Documents;
+using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
@@ -12,14 +11,14 @@ namespace AsadaLisboaBackend.Services.Documents
     public class DocumentsUpdaterService : IDocumentsUpdaterService
     {
         private readonly IFileSystemsManager _fileSystems;
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IDocumentsGetterRepository _documentGetterRepository;
         private readonly IDocumentsUpdaterRepository _documentUpdateRespository;
 
-        public DocumentsUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository)
+        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService)
         {
-             _fileSystems = fileSystems;
-            _applicationDbContext = applicationDbContext;
+            _fileSystems = fileSystems;
+            _categoriesGetterService = categoriesGetterService;
             _documentGetterRepository = documentGetterRepository;
             _documentUpdateRespository = documentUpdateRespository;
         }
@@ -37,12 +36,7 @@ namespace AsadaLisboaBackend.Services.Documents
 
             document.Slug = GenerateSlug.New(documentUpdateRequestDTO.Title, document.Id);
 
-            //var categories = await _applicationDbContext.Categories
-            //    .Where(c => documentUpdateRequestDTO.CategoryIds.Contains(c.Id))
-            //    .ToListAsync();
-
-            //document.Categories.Clear();
-            //document.Categories = categories;
+            document.Categories = await _categoriesGetterService.ToCreateCategories(documentUpdateRequestDTO.Categories);
 
             if (documentUpdateRequestDTO.File is null || documentUpdateRequestDTO.File.Length <= 0)
                 throw new NotFoundException("Error al actualizar el documento.");

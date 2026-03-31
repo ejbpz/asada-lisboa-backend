@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models.DTOs.Image;
+﻿using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
-using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.RepositoryContracts.Images;
+using AsadaLisboaBackend.ServiceContracts.Categories;
+using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 
 namespace AsadaLisboaBackend.Services.Images
@@ -12,14 +12,16 @@ namespace AsadaLisboaBackend.Services.Images
     public class ImagesAdderService : IImagesAdderService
     {
         private readonly IFileSystemsManager _fileSystems;
-        private readonly ApplicationDbContext _applicationDbContext;
         private readonly IImagesAdderRepository _imagesAdderRepository;
+        private readonly ICategoriesGetterService _categoriesGetterService;
+        private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public ImagesAdderService(ApplicationDbContext applicationDbContext, IImagesAdderRepository imagesAdderRepository, IFileSystemsManager fileSystems)
+        public ImagesAdderService(IImagesAdderRepository imagesAdderRepository, IFileSystemsManager fileSystems, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository)
         {
             _fileSystems = fileSystems;
-            _applicationDbContext = applicationDbContext;
             _imagesAdderRepository = imagesAdderRepository;
+            _categoriesGetterService = categoriesGetterService;
+            _statusesGetterRepository = statusesGetterRepository;
         }
 
         public async Task<ImageResponseDTO> CreateImage(ImageRequestDTO imageRequestDTO)
@@ -40,25 +42,21 @@ namespace AsadaLisboaBackend.Services.Images
 
                 var slug = GenerateSlug.New(imageRequestDTO.Title, imageId);
 
-                var status = await _applicationDbContext.Statuses
-                    .FirstOrDefaultAsync(c => c.Id == imageRequestDTO.StatusId);
+                var status = await _statusesGetterRepository.GetStatus(imageRequestDTO.StatusId);
 
-                //var categories = await _applicationDbContext.Categories
-                //    .Where(c => imageRequestDTO.CategoryIds.Contains(c.Id))
-                //    .ToListAsync();
+                var categories = await _categoriesGetterService.ToCreateCategories(imageRequestDTO.Categories);
 
                 var image = new Models.Image()
                 {
                     Id = imageId,
                     Url = url,
                     Slug = slug,
-                    Status = status,
                     FilePath = filePath,
                     FileName = fileName,
-                    //Categories = categories,
+                    StatusId = status.Id,
+                    Categories = categories,
                     Title = imageRequestDTO.Title,
                     PublicationDate = DateTime.UtcNow,
-                    StatusId = imageRequestDTO.StatusId,
                     FileSize = imageRequestDTO.File.Length,
                     Description = imageRequestDTO.Description,
                 };

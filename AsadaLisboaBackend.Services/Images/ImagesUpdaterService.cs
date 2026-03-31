@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models.DTOs.Image;
+﻿using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.RepositoryContracts.Images;
+using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 
 namespace AsadaLisboaBackend.Services.Images
@@ -12,14 +12,14 @@ namespace AsadaLisboaBackend.Services.Images
     public class ImagesUpdaterService : IImagesUpdaterService
     {
         private readonly IFileSystemsManager _fileSystems;
-        private readonly ApplicationDbContext _applicationDbContext;
         private readonly IImagesGetterRepository _imagesGetterRespository;
+        private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IImagesUpdaterRepository _imagesUpdaterRepository;
 
-        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository)
+        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService)
         {
             _fileSystems = fileSystems;
-            _applicationDbContext = applicationDbContext;
+            _categoriesGetterService = categoriesGetterService;
             _imagesUpdaterRepository = imagesUpdaterRepository;
             _imagesGetterRespository = imagesGetterRespository;
         }
@@ -37,12 +37,7 @@ namespace AsadaLisboaBackend.Services.Images
 
             image.Slug = GenerateSlug.New(imageUpdateRequestDTO.Title, image.Id);
 
-            //var categories = await _applicationDbContext.Categories
-            //    .Where(c => imageUpdateRequestDTO.CategoryIds.Contains(c.Id))
-            //    .ToListAsync();
-
-            //image.Categories.Clear();
-            //image.Categories = categories;
+            image.Categories = await _categoriesGetterService.ToCreateCategories(imageUpdateRequestDTO.Categories);
 
             if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
                 throw new ArgumentNullException("Error al actualizar la imagen.");

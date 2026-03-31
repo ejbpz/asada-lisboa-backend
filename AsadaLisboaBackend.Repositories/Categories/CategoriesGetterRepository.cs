@@ -3,6 +3,7 @@ using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Categories;
+using AsadaLisboaBackend.Models;
 
 namespace AsadaLisboaBackend.Repositories.Categories
 {
@@ -54,6 +55,24 @@ namespace AsadaLisboaBackend.Repositories.Categories
             return await query
                 .OrderBy(c => c.Name)
                 .Select(CategoryExtensions.MapCategoryResponseDTO())
+                .ToListAsync();
+        }
+
+        public async Task<List<CategoryResponseDTO>> NoRepeatNames(List<CategoryRequestDTO> categoryRequestDTO, List<string> names)
+        {
+            return await _context.Categories
+                .AsNoTracking()
+                .Where(c => names.Contains(c.Name.Trim().ToLower()))
+                .Select(CategoryExtensions.MapCategoryResponseDTO())
+                .ToListAsync();
+        }
+
+        public async Task<List<Category>> ToCreateCategories(List<CategoryResponseDTO> categoryResponseDTO)
+        {
+            return await _context.Categories
+                .AsNoTracking()
+                .Where(c => !categoryResponseDTO.Any(r => r.Name.Trim().ToLower() == c.Name.Trim().ToLower()))
+                .Select(c => new Category { Id = c.Id, Name = c.Name })
                 .ToListAsync();
         }
     }

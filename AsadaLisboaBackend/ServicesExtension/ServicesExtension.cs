@@ -138,6 +138,7 @@ namespace AsadaLisboaBackend.ServicesExtension
 
             // Categories
             services.AddScoped<ICategoriesGetterRepository, CategoriesGetterRepository>();
+            services.AddScoped<ICategoriesAdderRepository, CategoriesAdderRepository>();
 
             services.AddScoped<ICategoriesGetterService, CategoriesGetterService>();
 
