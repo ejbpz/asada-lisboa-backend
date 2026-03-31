@@ -17,15 +17,15 @@ namespace AsadaLisboaBackend.Services.Categories
             _categoriesGetterRepository = categoriesGetterRepository;
         }
 
-        public async Task<List<CategoryResponseDTO>> GetCategories(ObjectTypeEnum objectTypeEnum)
+        public async Task<List<CategoryResponseDTO>> GetCategories()
         {
-            return await _categoriesGetterRepository.GetCategories(objectTypeEnum);
+            return await _categoriesGetterRepository.GetCategories();
         }
 
-        public async Task<List<CategoryResponseDTO>> SearchCategories(ObjectTypeEnum objectTypeEnum, string search)
+        public async Task<List<CategoryResponseDTO>> SearchCategories(string search)
         {
             search = search.Trim().ToLower();
-            return await _categoriesGetterRepository.SearchCategories(objectTypeEnum, search);
+            return await _categoriesGetterRepository.SearchCategories(search);
         }
 
         public async Task<List<Category>> ToCreateCategories(List<CategoryRequestDTO> categories)

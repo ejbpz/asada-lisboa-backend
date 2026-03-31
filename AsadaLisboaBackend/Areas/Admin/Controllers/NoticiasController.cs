@@ -4,10 +4,8 @@ using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Status;
-using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
-using AsadaLisboaBackend.ServiceContracts.Categories;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -22,16 +20,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         private readonly INewsUpdaterService _newsUpdaterService;
         private readonly INewsDeleterService _newsDeleterService;
         private readonly IStatusesUpdaterService _statusesUpdaterService;
-        private readonly ICategoriesGetterService _categoriesGetterService;
 
-        public NoticiasController(INewsAdderService newsAdderService, INewsUpdaterService newsUpdaterService, INewsDeleterService newsDeleterService, INewsGetterService newsGetterService, IStatusesUpdaterService statusesUpdaterService, ICategoriesGetterService categoriesGetterService)
+        public NoticiasController(INewsAdderService newsAdderService, INewsUpdaterService newsUpdaterService, INewsDeleterService newsDeleterService, INewsGetterService newsGetterService, IStatusesUpdaterService statusesUpdaterService)
         {
             _newsAdderService = newsAdderService;
             _newsGetterService = newsGetterService;
             _newsUpdaterService = newsUpdaterService;
             _newsDeleterService = newsDeleterService;
             _statusesUpdaterService = statusesUpdaterService;
-            _categoriesGetterService = categoriesGetterService;
         }
 
         [HttpGet("")]
@@ -44,18 +40,6 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         public async Task<ActionResult<PageResponseDTO<NewResponseDTO>>> GetNew([FromRoute] Guid id)
         {
             return Ok(await _newsGetterService.GetNew(id));
-        }
-
-        [HttpGet("categorias")]
-        public async Task<ActionResult<List<CategoryResponseDTO>>> GetCategories()
-        {
-            return Ok(await _categoriesGetterService.GetCategories(ObjectTypeEnum.New));
-        }
-        
-        [HttpGet("categorias/buscar")]
-        public async Task<ActionResult<List<CategoryResponseDTO>>> SearchCategories([FromQuery] string search)
-        {
-            return Ok(await _categoriesGetterService.SearchCategories(ObjectTypeEnum.New, search));
         }
 
         [HttpPost("")]

@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models.Enums;
+using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Categories;
-using AsadaLisboaBackend.Models;
 
 namespace AsadaLisboaBackend.Repositories.Categories
 {
@@ -16,21 +15,14 @@ namespace AsadaLisboaBackend.Repositories.Categories
             _context = context;
         }
 
-        public async Task<List<CategoryResponseDTO>> SearchCategories(ObjectTypeEnum objectTypeEnum, string search)
+        public async Task<List<CategoryResponseDTO>> SearchCategories(string search)
         {
-            var query = _context.Categories
+            return await _context.Categories
                 .AsNoTracking()
-                .AsQueryable();
-
-            query = objectTypeEnum switch
-            {
-                ObjectTypeEnum.New => query.Include(c => c.News),
-                ObjectTypeEnum.Image => query.Include(c => c.Images),
-                ObjectTypeEnum.Document => query.Include(c => c.Documents),
-                _ => query
-            };
-
-            return await query
+                .Include(c => c.News)
+                .Include(c => c.Images)
+                .Include(c => c.Documents)
+                .Distinct()
                 .Where(c => c.Name.ToLower().Trim().Contains(search))
                 .OrderBy(c => c.Name)
                 .Take(10)
@@ -38,21 +30,14 @@ namespace AsadaLisboaBackend.Repositories.Categories
                 .ToListAsync();
         }
 
-        public async Task<List<CategoryResponseDTO>> GetCategories(ObjectTypeEnum objectTypeEnum)
+        public async Task<List<CategoryResponseDTO>> GetCategories()
         {
-            var query = _context.Categories
+            return await _context.Categories
                 .AsNoTracking()
-                .AsQueryable();
-
-            query = objectTypeEnum switch
-            {
-                ObjectTypeEnum.New => query.Include(c => c.News),
-                ObjectTypeEnum.Image => query.Include(c => c.Images),
-                ObjectTypeEnum.Document => query.Include(c => c.Documents),
-                _ => query
-            };
-
-            return await query
+                .Include(c => c.News)
+                .Include(c => c.Images)
+                .Include(c => c.Documents)
+                .Distinct()
                 .OrderBy(c => c.Name)
                 .Select(CategoryExtensions.MapCategoryResponseDTO())
                 .ToListAsync();

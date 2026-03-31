@@ -4,10 +4,8 @@ using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Status;
-using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
-using AsadaLisboaBackend.ServiceContracts.Categories;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -22,16 +20,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         private readonly IImagesDeleterService _imagesDeleterService;
         private readonly IImagesUpdaterService _imagesUpdaterService;
         private readonly IStatusesUpdaterService _statusesUpdaterService;
-        private readonly ICategoriesGetterService _categoriesGetterService;
 
-        public ImagenesController(IImagesAdderService imagesAdderService, IImagesGetterService imagesGetterService, IImagesDeleterService imagesDeleterService, IImagesUpdaterService imagesUpdaterService, IStatusesUpdaterService statusesUpdaterService, ICategoriesGetterService categoriesGetterService)
+        public ImagenesController(IImagesAdderService imagesAdderService, IImagesGetterService imagesGetterService, IImagesDeleterService imagesDeleterService, IImagesUpdaterService imagesUpdaterService, IStatusesUpdaterService statusesUpdaterService)
         {
             _imagesAdderService = imagesAdderService;
             _imagesGetterService = imagesGetterService;
             _imagesDeleterService = imagesDeleterService;
             _imagesUpdaterService = imagesUpdaterService;
             _statusesUpdaterService = statusesUpdaterService;
-            _categoriesGetterService = categoriesGetterService;
         }
 
         [HttpGet("")]
@@ -44,18 +40,6 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         public async Task<ActionResult<PageResponseDTO<ImageResponseDTO>>> GetImage([FromRoute] Guid id)
         {
             return Ok(await _imagesGetterService.GetImage(id));
-        }
-
-        [HttpGet("categorias")]
-        public async Task<ActionResult<List<CategoryResponseDTO>>> GetCategories()
-        {
-            return Ok(await _categoriesGetterService.GetCategories(ObjectTypeEnum.Image));
-        }
-
-        [HttpGet("categorias/buscar")]
-        public async Task<ActionResult<List<CategoryResponseDTO>>> SearchCategories([FromQuery] string search)
-        {
-            return Ok(await _categoriesGetterService.SearchCategories(ObjectTypeEnum.Image, search));
         }
 
         [HttpPost("")]

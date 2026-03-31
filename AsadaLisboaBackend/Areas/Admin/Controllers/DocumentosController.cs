@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.Models.DTOs.Status;
 using AsadaLisboaBackend.Models.DTOs.Shared;
-using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Models.DTOs.Document;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.Documents;
-using AsadaLisboaBackend.ServiceContracts.Categories;
 
 namespace AsadaLisboaBackend.Areas.Admin.Controllers
 {
@@ -22,16 +20,14 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         private readonly IStatusesUpdaterService _statusesUpdaterService;
         private readonly IDocumentsUpdaterService _documentsUpdaterService;
         private readonly IDocumentsDeleterService _documentsDeleterService;
-        private readonly ICategoriesGetterService _categoriesGetterService;
 
-        public DocumentosController(IDocumentsAdderService documentsAdderService, IDocumentsGetterService documentsGetterService, IDocumentsUpdaterService documentsUpdaterService, IDocumentsDeleterService documentsDeleterService, IStatusesUpdaterService statusesUpdaterService, ICategoriesGetterService categoriesGetterService)
+        public DocumentosController(IDocumentsAdderService documentsAdderService, IDocumentsGetterService documentsGetterService, IDocumentsUpdaterService documentsUpdaterService, IDocumentsDeleterService documentsDeleterService, IStatusesUpdaterService statusesUpdaterService)
         {
             _documentsAdderService = documentsAdderService;
             _documentsGetterService = documentsGetterService;
             _statusesUpdaterService = statusesUpdaterService;
             _documentsUpdaterService = documentsUpdaterService;
             _documentsDeleterService = documentsDeleterService;
-            _categoriesGetterService = categoriesGetterService;
         }
 
         [HttpGet("")]
@@ -44,18 +40,6 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         public async Task<ActionResult<PageResponseDTO<DocumentResponseDTO>>> GetDocument([FromRoute] Guid id)
         {
             return Ok(await _documentsGetterService.GetDocument(id));
-        }
-
-        [HttpGet("categorias")]
-        public async Task<ActionResult<List<CategoryResponseDTO>>> GetCategories()
-        {
-            return Ok(await _categoriesGetterService.GetCategories(ObjectTypeEnum.Document));
-        }
-
-        [HttpGet("categorias/buscar")]
-        public async Task<ActionResult<List<CategoryResponseDTO>>> SearchCategories([FromQuery] string search)
-        {
-            return Ok(await _categoriesGetterService.SearchCategories(ObjectTypeEnum.Document, search));
         }
 
         [HttpPost("")]
