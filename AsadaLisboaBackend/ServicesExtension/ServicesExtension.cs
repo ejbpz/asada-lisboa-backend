@@ -145,11 +145,13 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<ICategoriesDeleterService, CategoriesDeleterService>();
 
             // Charges
-            services.AddScoped<IChargesUpdaterRepository, ChargesUpdaterRepository>();
+            services.AddScoped<IChargesDeleterRepository, ChargesDeleterRepository>();
             services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
+            services.AddScoped<IChargesAdderRepository, ChargesAdderRepository>();
 
+            services.AddScoped<IChargesAdderService, ChargesAdderService>();
             services.AddScoped<IChargesGetterService, ChargesGetterService>();
-            services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
+            services.AddScoped<IChargesDeleterService, ChargesDeleterService>();
 
             // Editor
             services.AddScoped<IEditorsAdderService, EditorsAdderService>();

@@ -15,6 +15,13 @@ namespace AsadaLisboaBackend.Repositories.Charges
             _context = context;
         }
 
+        public async Task<bool> ExistsCharge(string name)
+        {
+            return await _context.Charges
+                .AsNoTracking()
+                .AnyAsync(c => c.Name.Trim().ToLower() == name);
+        }
+
         public async Task<ChargeResponseDTO> GetCharge(Guid id)
         {
             var charge = await _context.Charges

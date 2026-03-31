@@ -17,5 +17,11 @@ namespace AsadaLisboaBackend.Services.Charges
         {
             return await _chargesGetterRepository.GetCharges();
         }
+
+        public async Task<bool> ExistsCharge(string name)
+        {
+            name = name.Trim().ToLower();
+            return await _chargesGetterRepository.ExistsCharge(name);
+        }
     }
 }
