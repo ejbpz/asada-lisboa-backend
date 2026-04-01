@@ -7,22 +7,20 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
 {
     public class DocumentRequestDTO
     {
-        [Required(ErrorMessage = "El titulo es requerido")]
+        [Required(ErrorMessage = "El titulo es requerido.")]
         [StringLength(50)]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "La descripción es requerida")]
+        [Required(ErrorMessage = "La descripción es requerida.")]
         [StringLength(100)]
         public string Description { get; set; } = string.Empty;
 
-
-        [AllowedExtensions(new string[] { ".pdf", ".docx", ".xlsx" })]
-        [MaxFileSize(5)] // Límite de 5 MB
+        [MaxFileSize(15, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]
+        [AllowedExtensions(new string[] { ".pdf", ".docx", ".xlsx", ".csv", ".txt", ".zip" }, ErrorMessage = "La extensión del documento no es válida.")]
         public IFormFile File { get; set; } = null!;
 
+        [Required(ErrorMessage = "Debe selecionar un estado válido.")]
         public Guid StatusId { get; set; }
-
-        public Guid DocumentTypeId { get; set; }
 
         public List<CategoryRequestDTO> Categories { get; set; } = new();
     }

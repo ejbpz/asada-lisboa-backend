@@ -6,6 +6,7 @@ using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
+using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 
 namespace AsadaLisboaBackend.Services.Documents
 {
@@ -15,13 +16,15 @@ namespace AsadaLisboaBackend.Services.Documents
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IDocumentsAdderRepository _documentAdderRepository;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
+        private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
 
-        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IFileSystemsManager fileSystems)
+        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IDocumentTypesGetterRepository documentTypesGetterRepository, IFileSystemsManager fileSystems)
         {
             _fileSystems = fileSystems;
             _categoriesGetterService = categoriesGetterService;
             _documentAdderRepository = documentAdderRepository;
             _statusesGetterRepository = statusesGetterRepository;
+            _documentTypesGetterRepository = documentTypesGetterRepository;
         }
 
         public async Task<DocumentResponseDTO> CreateDocument(DocumentRequestDTO documentRequestDTO)
@@ -46,6 +49,12 @@ namespace AsadaLisboaBackend.Services.Documents
 
                 var categories = await _categoriesGetterService.ToCreateCategories(documentRequestDTO.Categories);
 
+                var extension = Path.GetExtension(url);
+                var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
+
+                if (documentTypeId is null)
+                    throw new NotFoundException("Tipo de documento no soportado.");
+
                 var document = new Models.Document()
                 {
                     Id = documentId,
@@ -57,9 +66,9 @@ namespace AsadaLisboaBackend.Services.Documents
                     Categories = categories,
                     Title = documentRequestDTO.Title,
                     PublicationDate = DateTime.UtcNow,
+                    DocumentTypeId = documentTypeId.Value,
                     FileSize = documentRequestDTO.File.Length,
                     Description = documentRequestDTO.Description,
-                    DocumentTypeId = documentRequestDTO.DocumentTypeId,
                 };
 
                 return (await _documentAdderRepository.CreateDocument(document))

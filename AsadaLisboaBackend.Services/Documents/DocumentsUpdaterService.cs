@@ -5,6 +5,7 @@ using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
+using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 
 namespace AsadaLisboaBackend.Services.Documents
 {
@@ -14,13 +15,15 @@ namespace AsadaLisboaBackend.Services.Documents
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IDocumentsGetterRepository _documentGetterRepository;
         private readonly IDocumentsUpdaterRepository _documentUpdateRespository;
+        private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
 
-        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService)
+        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService, IDocumentTypesGetterRepository documentTypesGetterRepository)
         {
             _fileSystems = fileSystems;
             _categoriesGetterService = categoriesGetterService;
             _documentGetterRepository = documentGetterRepository;
             _documentUpdateRespository = documentUpdateRespository;
+            _documentTypesGetterRepository = documentTypesGetterRepository;
         }
 
         public async Task<DocumentResponseDTO> UpdateDocument(Guid id, DocumentUpdateRequestDTO documentUpdateRequestDTO)
@@ -67,6 +70,14 @@ namespace AsadaLisboaBackend.Services.Documents
 
                 throw new CreateObjectException("Error al actualizar el documento.");
             }
+
+            var extension = Path.GetExtension(newUrl);
+            var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
+
+            if (documentTypeId is null)
+                throw new NotFoundException("Tipo de documento no soportado.");
+
+            document.DocumentTypeId = documentTypeId.Value;
 
             return (await _documentUpdateRespository.UpdateDocument(document))
                 .ToDocumentResponseDTO();

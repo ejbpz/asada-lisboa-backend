@@ -2,6 +2,7 @@
 using AsadaLisboaBackend.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.Configurations;
+using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 using AsadaLisboaBackend.RepositoryContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
@@ -27,6 +28,7 @@ using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Jwts;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.Repositories.Configurations;
+using AsadaLisboaBackend.Repositories.DocumentTypes;
 using AsadaLisboaBackend.Repositories.Categories;
 using AsadaLisboaBackend.Repositories.Documents;
 using AsadaLisboaBackend.Repositories.Contacts;
@@ -62,6 +64,9 @@ namespace AsadaLisboaBackend.ServicesExtension
 
             // ReCaptcha
             services.AddScoped<IReCaptchasService, ReCaptchasService>();
+
+            // Document Types
+            services.AddScoped<IDocumentTypesGetterRepository, DocumentTypesGetterRepository>();
 
             // Contacts
             services.AddScoped<IContactsUpdaterService, ContactsUpdaterService>();
