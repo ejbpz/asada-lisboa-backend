@@ -57,7 +57,7 @@ namespace AsadaLisboaBackend.Repositories.Categories
             return await _context.Categories
                 .AsNoTracking()
                 .Where(c => !categoryResponseDTO.Any(r => r.Name.Trim().ToLower() == c.Name.Trim().ToLower()))
-                .Select(c => new Category { Id = c.Id, Name = c.Name })
+                .Select(c => new Category { Name = c.Name })
                 .ToListAsync();
         }
     }
