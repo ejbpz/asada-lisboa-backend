@@ -40,9 +40,9 @@ namespace AsadaLisboaBackend.Controllers
         } 
 
         [HttpPost("refrescar-token")]
-        public ActionResult<AuthenticationResponseDTO> RefreshToken([FromBody] RefreshTokenRequestDTO refreshTokenRequestDTO)
+        public async Task<ActionResult<AuthenticationResponseDTO>> RefreshToken([FromBody] RefreshTokenRequestDTO refreshTokenRequestDTO)
         {
-            return Ok(_jwtsService.ValidateRefreshToken(refreshTokenRequestDTO));
+            return Ok(await _jwtsService.ValidateRefreshToken(refreshTokenRequestDTO));
         }
 
         [HttpPost("olvidar-contrasena")]

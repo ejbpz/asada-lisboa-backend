@@ -1,13 +1,11 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Models.DTOs.Account;
 using AsadaLisboaBackend.ServiceContracts.Accounts;
 
 namespace AsadaLisboaBackend.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
     [ApiVersion("1.0")]
     [Route("api/[controller]")]
     public class RegistrarController : ControllerBase
@@ -22,7 +20,6 @@ namespace AsadaLisboaBackend.Controllers
         }
 
         [HttpPost("")]
-        [AllowAnonymous]
         public async Task<IActionResult> RegisterUser([FromForm] RegisterRequestDTO registerRequestDTO)
         {
             await _userService.RegisterUser(registerRequestDTO);
