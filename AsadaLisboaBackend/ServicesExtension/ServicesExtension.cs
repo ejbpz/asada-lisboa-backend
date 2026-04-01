@@ -13,6 +13,7 @@ using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
+using AsadaLisboaBackend.ServiceContracts.Principals;
 using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
 using AsadaLisboaBackend.ServiceContracts.Documents;
@@ -39,6 +40,7 @@ using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.Services.Configurations;
+using AsadaLisboaBackend.Services.Principals;
 using AsadaLisboaBackend.Services.Categories;
 using AsadaLisboaBackend.Services.ReCaptchas;
 using AsadaLisboaBackend.Services.Documents;
@@ -67,6 +69,9 @@ namespace AsadaLisboaBackend.ServicesExtension
 
             // Document Types
             services.AddScoped<IDocumentTypesGetterRepository, DocumentTypesGetterRepository>();
+
+            // Principals
+            services.AddScoped<IPrincipalsGetterService, PrincipalsGetterService>();
 
             // Contacts
             services.AddScoped<IContactsUpdaterService, ContactsUpdaterService>();
