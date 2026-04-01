@@ -22,5 +22,8 @@ namespace AsadaLisboaBackend.Models.DTOs.User
         [Required(ErrorMessage = "El segundo apellido del usuario es requerido.")]
         [StringLength(20, MinimumLength = 2, ErrorMessage = "El segundo apellido del usuario debe ser entre {1} y {0} caracteres.")]
         public string SecondLastName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El rol es requerido.")]
+        public Guid RoleId { get; set; }
     }
 }

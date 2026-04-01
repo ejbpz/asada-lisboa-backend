@@ -11,11 +11,13 @@ namespace AsadaLisboaBackend.Services.Users
     public class UsersUpdaterService : IUsersUpdaterService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IChargesGetterRepository _chargesGetterRepository;
 
-        public UsersUpdaterService(UserManager<ApplicationUser> userManager, IChargesGetterRepository chargesGetterRepository)
+        public UsersUpdaterService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IChargesGetterRepository chargesGetterRepository)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _chargesGetterRepository = chargesGetterRepository;
         }
 
@@ -31,6 +33,11 @@ namespace AsadaLisboaBackend.Services.Users
             if (charge is null)
                 throw new NotFoundException("Cargo seleccionado no encontrado.");
 
+            var role = await _roleManager.FindByIdAsync(userUpdateRequestDTO.RoleId.ToString());
+
+            if (role is null)
+                throw new NotFoundException("Rol seleccionado no encontrado.");
+
             user.ChargeId = charge.Id;
             user.FirstName = userUpdateRequestDTO.FirstName;
             user.PhoneNumber = userUpdateRequestDTO.PhoneNumber;
@@ -45,6 +52,16 @@ namespace AsadaLisboaBackend.Services.Users
                     result.Errors.Select(e => new ErrorDetailResponseDTO(e.Code, e.Description)
                     ).ToList()
                 );
+
+            var currentRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+            if(currentRole is not null)
+            {
+                if (!role.Name!.Equals(currentRole, StringComparison.InvariantCultureIgnoreCase))
+                    await _userManager.RemoveFromRoleAsync(user, currentRole);
+            }
+
+            await _userManager.AddToRoleAsync(user, role.Name!);
         }
     }
 }

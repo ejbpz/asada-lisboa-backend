@@ -16,11 +16,14 @@ namespace AsadaLisboaBackend.Models.DTOs.Account
         
         [Required(ErrorMessage = "El cargo es requerido.")]
         public Guid ChargeId { get; set; }
+        
+        [Required(ErrorMessage = "El rol es requerido.")]
+        public Guid RoleId { get; set; }
 
         [Required(ErrorMessage = "Email es requerido.")]
         [RegularExpression(Constants.EMAIL_REGEX, ErrorMessage = "Formato incorrecto para un email.")]
         public string Email { get; set; } = string.Empty;
-        
+
         [RegularExpression(Constants.PHONE_REGEX, ErrorMessage = "Formato incorrecto para un número telefónico.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
