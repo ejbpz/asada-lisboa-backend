@@ -12,6 +12,11 @@ namespace AsadaLisboaBackend.Controllers
     {
         private readonly IPrincipalsGetterService _principalsGetterService;
 
+        public PrincipalController(IPrincipalsGetterService principalsGetterService)
+        {
+            _principalsGetterService = principalsGetterService;
+        }
+
         [HttpGet("")]
         public async Task<ActionResult<PrincipalRequestDTO>> GetPrincipalInformation()
         {

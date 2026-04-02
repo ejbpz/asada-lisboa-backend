@@ -14,7 +14,7 @@ namespace AsadaLisboaBackend.Services.Images
             _imagesGetterRepository = imagesGetterRepository;
         }
 
-        public async Task<PageResponseDTO<ImageResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
+        public async Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
         {
             searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
 

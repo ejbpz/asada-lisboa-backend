@@ -18,7 +18,7 @@ namespace AsadaLisboaBackend.Repositories.Documents
             _context = context;
         }
 
-        public async Task<PageResponseDTO<DocumentResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
+        public async Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
         {
             IQueryable<Models.Document> query = _context.Documents
                    .AsNoTracking()
@@ -62,13 +62,13 @@ namespace AsadaLisboaBackend.Repositories.Documents
                 _ => query.OrderByDescending(i => i.PublicationDate)
             };
 
-            return new PageResponseDTO<DocumentResponseDTO>()
+            return new PageResponseDTO<DocumentMinimalResponseDTO>()
             {
                 Total = await query.CountAsync(),
                 Data = await query
                     .Skip(searchSortRequestDTO.Offset)
                     .Take(searchSortRequestDTO.Take)
-                    .Select(DocumentExtensions.MapDocumentResponseDTO())
+                    .Select(DocumentExtensions.MapDocumentMinimalResponseDTO())
                     .ToListAsync(),
             };
         }

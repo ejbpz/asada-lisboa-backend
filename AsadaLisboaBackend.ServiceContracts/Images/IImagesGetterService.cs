@@ -5,7 +5,7 @@ namespace AsadaLisboaBackend.ServiceContracts.Images
 {
     public interface IImagesGetterService
     {
-        public Task<PageResponseDTO<ImageResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO);
+        public Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO);
         public Task<ImageResponseDTO> GetImage(Guid id);
     }
 }

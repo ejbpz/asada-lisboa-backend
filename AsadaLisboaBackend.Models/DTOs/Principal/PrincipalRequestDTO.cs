@@ -6,8 +6,8 @@ namespace AsadaLisboaBackend.Models.DTOs.Principal
 {
     public class PrincipalRequestDTO
     {
-        public List<NewResponseDTO> News { get; set; } = new List<NewResponseDTO>();
-        public List<ImageResponseDTO> Images { get; set; } = new List<ImageResponseDTO>();
-        public List<DocumentResponseDTO> Documents { get; set; } = new List<DocumentResponseDTO>();
+        public List<NewMinimalResponseDTO> News { get; set; } = new List<NewMinimalResponseDTO>();
+        public List<ImageMinimalResponseDTO> Images { get; set; } = new List<ImageMinimalResponseDTO>();
+        public List<DocumentMinimalResponseDTO> Documents { get; set; } = new List<DocumentMinimalResponseDTO>();
     }
 }

@@ -5,7 +5,7 @@ namespace AsadaLisboaBackend.ServiceContracts.Documents
 {
     public interface IDocumentsGetterService
     {
-        public Task<PageResponseDTO<DocumentResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO);
+        public Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO);
         public Task<DocumentResponseDTO> GetDocument(Guid id);
     }
 }

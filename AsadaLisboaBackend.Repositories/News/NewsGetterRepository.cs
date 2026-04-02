@@ -31,7 +31,7 @@ namespace AsadaLisboaBackend.Repositories.News
             return newModel.ToNewResponseDTO();
         }
 
-        public async Task<PageResponseDTO<NewResponseDTO>> GetNews(SearchSortRequestDTO searchSortRequestDTO)
+        public async Task<PageResponseDTO<NewMinimalResponseDTO>> GetNews(SearchSortRequestDTO searchSortRequestDTO)
         {
             IQueryable<New> query = _context.News
                 .AsNoTracking()
@@ -70,13 +70,13 @@ namespace AsadaLisboaBackend.Repositories.News
                 _ => query.OrderByDescending(n => n.PublicationDate)
             };
 
-            return new PageResponseDTO<NewResponseDTO>()
+            return new PageResponseDTO<NewMinimalResponseDTO>()
             {
                 Total = await query.CountAsync(),
                 Data = await query
                     .Skip(searchSortRequestDTO.Offset)
                     .Take(searchSortRequestDTO.Take)
-                    .Select(NewExtensions.MapNewResponseDTO())
+                    .Select(NewExtensions.MapNewMinimalResponseDTO())
                     .ToListAsync(),
             };
         }

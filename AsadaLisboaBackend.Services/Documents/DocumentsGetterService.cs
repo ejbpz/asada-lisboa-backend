@@ -14,7 +14,7 @@ namespace AsadaLisboaBackend.Services.Documents
             _documentGetterRepository = documentGetterRepository;
         }
 
-        public async Task<PageResponseDTO<DocumentResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
+        public async Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
         {
             searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
 

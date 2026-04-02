@@ -17,7 +17,7 @@ namespace AsadaLisboaBackend.Repositories.Images
             _context = context;
         }
 
-        public async Task<PageResponseDTO<ImageResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
+        public async Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
         {
             IQueryable<Image> query = _context.Images
                 .AsNoTracking()
@@ -56,13 +56,13 @@ namespace AsadaLisboaBackend.Repositories.Images
                 _ => query.OrderByDescending(i => i.PublicationDate)
             };
 
-            return new PageResponseDTO<ImageResponseDTO>()
+            return new PageResponseDTO<ImageMinimalResponseDTO>()
             {
                 Total = await query.CountAsync(),
                 Data = await query
                     .Skip(searchSortRequestDTO.Offset)
                     .Take(searchSortRequestDTO.Take)
-                    .Select(ImageExtensions.MapImageResponseDTO())
+                    .Select(ImageExtensions.MapImageMinimalResponseDTO())
                     .ToListAsync(),
             };
         }
