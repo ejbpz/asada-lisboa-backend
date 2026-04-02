@@ -19,7 +19,7 @@ namespace AsadaLisboaBackend.ErrorHandling
 
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
             {
                 HttpContext = httpContext,
                 Exception = exception,
@@ -30,6 +30,8 @@ namespace AsadaLisboaBackend.ErrorHandling
                     Status = StatusCodes.Status400BadRequest,
                 }
             });
+
+            return true;
         }
     }
 }

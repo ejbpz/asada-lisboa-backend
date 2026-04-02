@@ -29,12 +29,14 @@ namespace AsadaLisboaBackend.ErrorHandling
 
             problemDetails.Extensions["errors"] = identityErrorException.Errors;
 
-            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
             {
                 Exception = exception,
                 HttpContext = httpContext,
                 ProblemDetails = problemDetails
             });
+
+            return true;
         }
     }
 }

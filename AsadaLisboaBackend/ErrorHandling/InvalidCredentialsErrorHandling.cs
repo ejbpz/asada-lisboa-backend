@@ -20,7 +20,7 @@ namespace AsadaLisboaBackend.ErrorHandling
 
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
             {
                 HttpContext = httpContext,
                 Exception = exception,
@@ -31,6 +31,8 @@ namespace AsadaLisboaBackend.ErrorHandling
                     Status = StatusCodes.Status401Unauthorized,
                 }
             });
+
+            return true;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace AsadaLisboaBackend.ErrorHandling
                 _ => StatusCodes.Status500InternalServerError,
             };
 
-            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
             {
                 HttpContext = httpContext,
                 Exception = exception,
@@ -30,6 +30,8 @@ namespace AsadaLisboaBackend.ErrorHandling
                     Detail = exception.Message,
                 }
             });
+
+            return true;
         }
     }
 }
