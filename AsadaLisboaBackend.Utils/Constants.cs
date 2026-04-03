@@ -10,5 +10,9 @@
         public const string EMAIL_REGEX = @"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$";
         public const string PHONE_REGEX = @"^(?:\d{8}|\d{4}-\d{4}|(?:\d{2}-){3}\d{2})$";
         public const string DOMAIN_RECAPTCHA = "https://www.google.com/recaptcha/api/siteverify";
+
+        public const string ROLE_LECTOR = "Lector";
+        public const string ROLE_EDITOR = "Editor";
+        public const string ROLE_ADMINISTRADOR = "Administrador";
     }
 }

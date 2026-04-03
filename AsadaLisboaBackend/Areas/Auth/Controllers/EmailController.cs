@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.ServiceContracts.Emails;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
@@ -11,7 +10,6 @@ using AsadaLisboaBackend.Models.DTOs.InformationMessage;
 namespace AsadaLisboaBackend.Areas.Auth.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
     [EnableRateLimiting("contact-limiter")]
     [Area("Auth")]
     [ApiVersion("1.0")]

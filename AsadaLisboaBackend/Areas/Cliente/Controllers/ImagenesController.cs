@@ -1,6 +1,5 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.ServiceContracts.Images;
@@ -8,7 +7,6 @@ using AsadaLisboaBackend.ServiceContracts.Images;
 namespace AsadaLisboaBackend.Areas.Cliente.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
     [Area("Cliente")]
     [ApiVersion("1.0")]
     [Route("api/[area]/[controller]")]

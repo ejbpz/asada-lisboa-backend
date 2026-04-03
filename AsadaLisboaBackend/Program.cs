@@ -1,20 +1,18 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using AsadaLisboaBackend.Conventions;
 using AsadaLisboaBackend.Middlewares;
 using AsadaLisboaBackend.ServicesExtension;
 using AsadaLisboaBackend.Utils.OptionsPattern;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using AsadaLisboaBackend.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
 {
-    var policy = new AuthorizationPolicyBuilder()
-    .RequireAuthenticatedUser()
-    .Build();
-
-    options.Filters.Add(new AuthorizeFilter(policy));
-});
+    options.Conventions.Add(new AuthorizationConvention());
+}).AddXmlSerializerFormatters();
 
 builder.Services.SwaggerRegistration();
 builder.Services.VersioningRegistration();
@@ -39,7 +37,12 @@ builder.Services.AddHttpClient();
 
 builder.Services.AuthenticationsRegistration(builder.Configuration);
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Constants.ROLE_ADMINISTRADOR, p => p.RequireRole(Constants.ROLE_ADMINISTRADOR));
+    options.AddPolicy(Constants.ROLE_EDITOR, p => p.RequireRole(Constants.ROLE_EDITOR, Constants.ROLE_ADMINISTRADOR));
+    options.AddPolicy(Constants.ROLE_LECTOR, p => p.RequireRole(Constants.ROLE_LECTOR, Constants.ROLE_EDITOR, Constants.ROLE_ADMINISTRADOR));
+});
 
 var app = builder.Build();
 

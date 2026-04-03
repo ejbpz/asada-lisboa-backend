@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using AsadaLisboaBackend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using AsadaLisboaBackend.Models.DTOs.Jwt;
 using AsadaLisboaBackend.Models.DTOs.Account;
@@ -9,7 +10,6 @@ using AsadaLisboaBackend.ServiceContracts.Accounts;
 namespace AsadaLisboaBackend.Areas.Auth.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
     [Area("Auth")]
     [ApiVersion("1.0")]
     [Route("api/[area]/[controller]")]
@@ -32,7 +32,7 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
             return Ok(await _loginService.Login(loginRequestDTO));
         }
 
-        [Authorize]
+        [Authorize(Policy = Constants.ROLE_LECTOR)]
         [HttpPost("cerrar-sesion")]
         public async Task<IActionResult> Logout()
         {
