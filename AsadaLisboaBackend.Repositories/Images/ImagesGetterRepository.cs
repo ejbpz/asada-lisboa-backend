@@ -80,5 +80,19 @@ namespace AsadaLisboaBackend.Repositories.Images
 
             return image;
         }
+
+        public async Task<Image> GetImageBySlug(string slug)
+        {
+            var image = await _context.Images
+                .AsNoTracking()
+                .Include(i => i.Status)
+                .Include(i => i.Categories)
+                .FirstOrDefaultAsync(i => i.Slug == slug);
+
+            if (image is null)
+                throw new NotFoundException("La imagen seleccionada no existe.");
+
+            return image;
+        }
     }
 }

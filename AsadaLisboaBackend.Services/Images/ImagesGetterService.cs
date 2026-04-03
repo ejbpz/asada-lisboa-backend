@@ -26,5 +26,11 @@ namespace AsadaLisboaBackend.Services.Images
             return (await _imagesGetterRepository.GetImage(id))
                 .ToImageResponseDTO();
         }
+
+        public async Task<ImageResponseDTO> GetImageBySlug(string slug)
+        {
+            return (await _imagesGetterRepository.GetImageBySlug(slug))
+                .ToImageResponseDTO();
+        }
     }
 }

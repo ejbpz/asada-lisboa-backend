@@ -77,6 +77,9 @@ namespace AsadaLisboaBackend.Repositories.Documents
         {
             var document = await _context.Documents
                     .AsNoTracking()
+                    .Include(d => d.Status)
+                    .Include(d => d.Categories)
+                    .Include(d => d.DocumentType)
                     .FirstOrDefaultAsync(i => i.Id == id);
 
             if (document is null)
@@ -89,6 +92,9 @@ namespace AsadaLisboaBackend.Repositories.Documents
         {
             var document = await _context.Documents
                     .AsNoTracking()
+                    .Include(d => d.Status)
+                    .Include(d => d.Categories)
+                    .Include(d => d.DocumentType)
                     .FirstOrDefaultAsync(i => i.Slug == slug);
 
             if (document is null)

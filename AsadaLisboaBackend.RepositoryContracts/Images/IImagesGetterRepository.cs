@@ -7,6 +7,7 @@ namespace AsadaLisboaBackend.RepositoryContracts.Images
     public interface IImagesGetterRepository
     {
         public Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO);
+        public Task<Image> GetImageBySlug(string slug);
         public Task<Image> GetImage(Guid id);
     }
 }
