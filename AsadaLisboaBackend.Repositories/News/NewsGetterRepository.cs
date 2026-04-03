@@ -31,6 +31,20 @@ namespace AsadaLisboaBackend.Repositories.News
             return newModel.ToNewResponseDTO();
         }
 
+        public async Task<NewResponseDTO> GetNewBySlug(string slug)
+        {
+            var newModel = await _context.News
+                .AsNoTracking()
+                .Include(n => n.Status)
+                .Include(n => n.Categories)
+                .FirstOrDefaultAsync(n => n.Slug == slug);
+
+            if (newModel is null)
+                throw new NotFoundException("La noticia seleccionada no existe.");
+
+            return newModel.ToNewResponseDTO();
+        }
+
         public async Task<PageResponseDTO<NewMinimalResponseDTO>> GetNews(SearchSortRequestDTO searchSortRequestDTO)
         {
             IQueryable<New> query = _context.News

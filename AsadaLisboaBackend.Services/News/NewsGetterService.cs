@@ -19,6 +19,11 @@ namespace AsadaLisboaBackend.Services.News
             return await _newsGetterRepository.GetNew(id);
         }
 
+        public async Task<NewResponseDTO> GetNewBySlug(string slug)
+        {
+            return await _newsGetterRepository.GetNewBySlug(slug);
+        }
+
         public async Task<PageResponseDTO<NewMinimalResponseDTO>> GetNews(SearchSortRequestDTO searchSortRequestDTO)
         {
             searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
