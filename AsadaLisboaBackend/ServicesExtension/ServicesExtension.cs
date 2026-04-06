@@ -13,6 +13,7 @@ using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.Principals;
 using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
@@ -40,6 +41,7 @@ using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.Services.Configurations;
+using AsadaLisboaBackend.Services.MemoryCaches;
 using AsadaLisboaBackend.Services.Principals;
 using AsadaLisboaBackend.Services.Categories;
 using AsadaLisboaBackend.Services.ReCaptchas;
@@ -61,6 +63,9 @@ namespace AsadaLisboaBackend.ServicesExtension
     {
         public static IServiceCollection ServicesRegistration(this IServiceCollection services)
         {
+            // Cache
+            services.AddScoped<IMemoryCachesService, MemoryCachesService>();
+
             // File System
             services.AddScoped<IFileSystemsManager, FileSystemsManager>();
 

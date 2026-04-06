@@ -1,12 +1,14 @@
+using Serilog;
 using AsadaLisboaBackend.Middlewares;
 using AsadaLisboaBackend.ServicesExtension;
 using AsadaLisboaBackend.Utils.OptionsPattern;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.ControllerRegistration();
+
+builder.Services.AddMemoryCache();
 
 builder.Services.SwaggerRegistration();
 builder.Services.VersioningRegistration();
