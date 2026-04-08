@@ -9,6 +9,7 @@ using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
+using Elastic.Clients.Elasticsearch;
 
 namespace AsadaLisboaBackend.Services.Documents
 {
@@ -21,8 +22,9 @@ namespace AsadaLisboaBackend.Services.Documents
         private readonly IDocumentsGetterRepository _documentGetterRepository;
         private readonly IDocumentsUpdaterRepository _documentUpdateRespository;
         private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
+        private readonly ElasticsearchClient _elastic;
 
-        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService, IDocumentTypesGetterRepository documentTypesGetterRepository, ILogger<DocumentsUpdaterService> logger, IMemoryCachesService memoryCachesService)
+        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService, IDocumentTypesGetterRepository documentTypesGetterRepository, ILogger<DocumentsUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
             _fileSystems = fileSystems;
@@ -31,6 +33,7 @@ namespace AsadaLisboaBackend.Services.Documents
             _documentGetterRepository = documentGetterRepository;
             _documentUpdateRespository = documentUpdateRespository;
             _documentTypesGetterRepository = documentTypesGetterRepository;
+            _elastic = elastic;
         }
 
         public async Task<DocumentResponseDTO> UpdateDocument(Guid id, DocumentUpdateRequestDTO documentUpdateRequestDTO)
@@ -99,6 +102,16 @@ namespace AsadaLisboaBackend.Services.Documents
             _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
 
             _logger.LogInformation("Documento con id {DocumentId} actualizado correctamente.", documentUpdated.Id);
+
+            var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
+            {
+                Id = document.Id,
+                Type = "Documento",
+                Title = document.Title,
+                Description = document.Description,
+
+            };
+            await _elastic.IndexAsync(doc);
 
             return documentUpdated.ToDocumentResponseDTO();
         }
