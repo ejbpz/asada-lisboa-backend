@@ -9,6 +9,7 @@ using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.Utils;
+using Elastic.Clients.Elasticsearch;
 
 namespace AsadaLisboaBackend.Services.Images
 {
@@ -20,8 +21,9 @@ namespace AsadaLisboaBackend.Services.Images
         private readonly IImagesAdderRepository _imagesAdderRepository;
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
+        private readonly ElasticsearchClient _elastic;
 
-        public ImagesAdderService(IImagesAdderRepository imagesAdderRepository, IFileSystemsManager fileSystems, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<ImagesAdderService> logger, IMemoryCachesService memoryCachesService)
+        public ImagesAdderService(IImagesAdderRepository imagesAdderRepository, IFileSystemsManager fileSystems, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<ImagesAdderService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
             _fileSystems = fileSystems;
@@ -29,6 +31,7 @@ namespace AsadaLisboaBackend.Services.Images
             _imagesAdderRepository = imagesAdderRepository;
             _categoriesGetterService = categoriesGetterService;
             _statusesGetterRepository = statusesGetterRepository;
+            _elastic = elastic;
         }
 
         public async Task<ImageResponseDTO> CreateImage(ImageRequestDTO imageRequestDTO)
@@ -75,6 +78,17 @@ namespace AsadaLisboaBackend.Services.Images
                 _logger.LogInformation("Imagen creada exitosamente con id: {ImageId}", imageCreated.Id);
 
                 _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);
+
+                //Add to ElasticSearch
+                var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
+                {
+                    Id = image.Id,
+                    Type = "Imagen",
+                    Title = image.Title,
+                    Description = image.Description,
+                    Slug = image.Slug,
+                };
+                await _elastic.IndexAsync(imag);
 
                 return imageCreated.ToImageResponseDTO();
             }
