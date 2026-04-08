@@ -5,6 +5,8 @@ using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using Elastic.Clients.Elasticsearch;
+using AsadaLisboaBackend.Models;
 
 namespace AsadaLisboaBackend.Services.News
 {
@@ -15,14 +17,16 @@ namespace AsadaLisboaBackend.Services.News
         private readonly INewsGetterRepository _newsGetterRepository;
         private readonly INewsDeleterRepository _newsDeleterRepository;
         private readonly IEditorsDeleterService _editorsDeleterService;
+        private readonly ElasticsearchClient _elastic;
 
-        public NewsDeleterService(INewsDeleterRepository newsDeleterRepository, IEditorsDeleterService editorsDeleterService, INewsGetterRepository newsGetterRepository, ILogger<NewsDeleterService> logger, IMemoryCachesService memoryCachesService)
+        public NewsDeleterService(INewsDeleterRepository newsDeleterRepository, IEditorsDeleterService editorsDeleterService, INewsGetterRepository newsGetterRepository, ILogger<NewsDeleterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
             _memoryCachesService = memoryCachesService;
             _newsGetterRepository = newsGetterRepository;
             _editorsDeleterService = editorsDeleterService;
             _newsDeleterRepository = newsDeleterRepository;
+            _elastic = elastic;
         }
 
         public async Task DeleteNew(Guid id)
@@ -37,6 +41,9 @@ namespace AsadaLisboaBackend.Services.News
             await _editorsDeleterService.DeleteContentImages(existingNew.Description);
 
             await _newsDeleterRepository.DeleteNew(id);
+
+            // Eliminar del índice
+            await _elastic.DeleteAsync<New>(id, d => d.Index("noticias"));
 
             _memoryCachesService.RemoveById(Constants.CACHE_NEWS, existingNew.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
