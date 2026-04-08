@@ -9,6 +9,7 @@ using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using Elastic.Clients.Elasticsearch;
 
 namespace AsadaLisboaBackend.Services.Images
 {
@@ -20,8 +21,9 @@ namespace AsadaLisboaBackend.Services.Images
         private readonly IImagesGetterRepository _imagesGetterRespository;
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IImagesUpdaterRepository _imagesUpdaterRepository;
+        private readonly ElasticsearchClient _elastic;
 
-        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService, ILogger<ImagesUpdaterService> logger, IMemoryCachesService memoryCachesService)
+        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService, ILogger<ImagesUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
             _fileSystems = fileSystems;
@@ -29,6 +31,7 @@ namespace AsadaLisboaBackend.Services.Images
             _categoriesGetterService = categoriesGetterService;
             _imagesUpdaterRepository = imagesUpdaterRepository;
             _imagesGetterRespository = imagesGetterRespository;
+            _elastic = elastic;
         }
 
         public async Task<ImageResponseDTO> UpdateImage(Guid id, ImageUpdateRequestDTO imageUpdateRequestDTO)
@@ -82,6 +85,17 @@ namespace AsadaLisboaBackend.Services.Images
 
             _memoryCachesService.RemoveById(Constants.CACHE_IMAGES, imageUpdated.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);
+
+            //Add to ElasticSearch
+            var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
+            {
+                Id = image.Id,
+                Type = "Imagen",
+                Title = image.Title,
+                Description = image.Description,
+                Slug = image.Slug,
+            };
+            await _elastic.IndexAsync(imag);
 
             return imageUpdated.ToImageResponseDTO();
         }
