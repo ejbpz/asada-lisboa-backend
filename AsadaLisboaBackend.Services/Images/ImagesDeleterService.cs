@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.ServiceContracts.Images;
-using AsadaLisboaBackend.RepositoryContracts.Images;
+﻿using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
+using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils;
+using Microsoft.Extensions.Logging;
+using Elastic.Clients.Elasticsearch;
+using AsadaLisboaBackend.Models;
 
 namespace AsadaLisboaBackend.Services.Images
 {
@@ -15,14 +17,16 @@ namespace AsadaLisboaBackend.Services.Images
         private readonly IMemoryCachesService _memoryCachesService;
         private readonly IImagesGetterRepository _imagesGetterRepository;
         private readonly IImagesDeleterRepository _imagesDeleterRepository;
+        private readonly ElasticsearchClient _elastic;
 
-        public ImagesDeleterService(IFileSystemsManager fileSystems, IImagesDeleterRepository imagesDeleterRepository, IImagesGetterRepository imagesGetterRepository, ILogger<ImagesDeleterService> logger,IMemoryCachesService memoryCachesService)
+        public ImagesDeleterService(IFileSystemsManager fileSystems, IImagesDeleterRepository imagesDeleterRepository, IImagesGetterRepository imagesGetterRepository, ILogger<ImagesDeleterService> logger,IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _imagesGetterRepository = imagesGetterRepository;
             _imagesDeleterRepository = imagesDeleterRepository;
+            _elastic = elastic;
         }
 
         public async Task DeleteImage(Guid id)
@@ -40,10 +44,16 @@ namespace AsadaLisboaBackend.Services.Images
 
             await _imagesDeleterRepository.DeleteImage(id);
 
+            // Eliminar del índice
+            await _elastic.DeleteAsync<Image>(id, d => d.Index("imagenes"));
+
+
             _memoryCachesService.RemoveById(Constants.CACHE_IMAGES, image.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);
 
             _logger.LogInformation("Imagen con id {Id} eliminada correctamente.", id);
+
+
         }
     }
 }
