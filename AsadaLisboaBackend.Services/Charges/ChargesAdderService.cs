@@ -4,6 +4,8 @@ using AsadaLisboaBackend.Models.DTOs.Charge;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.Charges;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Charges
 {
@@ -12,12 +14,14 @@ namespace AsadaLisboaBackend.Services.Charges
         private readonly IChargesGetterService _chargesGetterService;
         private readonly IChargesAdderRepository _chargesAdderRepository;
         private readonly ILogger<ChargesAdderService> _logger;
+        private readonly IMemoryCachesService _memoryCachesService;
 
-        public ChargesAdderService(IChargesGetterService chargesGetterService, IChargesAdderRepository chargesAdderRepository, ILogger<ChargesAdderService> logger)
+        public ChargesAdderService(IChargesGetterService chargesGetterService, IChargesAdderRepository chargesAdderRepository, ILogger<ChargesAdderService> logger, IMemoryCachesService memoryCachesService)
         {
             _chargesGetterService = chargesGetterService;
             _chargesAdderRepository = chargesAdderRepository;
             _logger = logger;
+            _memoryCachesService = memoryCachesService;
         }
 
         public async Task<ChargeResponseDTO> CreateCharge(string nameCharge)
@@ -36,6 +40,8 @@ namespace AsadaLisboaBackend.Services.Charges
 
                
                 var result = await _chargesAdderRepository.CreateCharge(charge);
+
+                _memoryCachesService.ChangeVersion(Constants.CACHE_CHARGES);
 
                 return result;
 
