@@ -24,7 +24,7 @@ namespace AsadaLisboaBackend.Services.Emails
 
         public async Task SendResetPasswordToken(string name, string email, string token)
         {
-            string url = $"{Constants.DOMAIN_HOST}/api/cuenta/restaurar-contrasena/?token={token}&email={email}";
+            string url = $"{Constants.CLIENT_HOST}/cuenta/restaurar-contrasena/?token={token}&email={email}";
 
             var variables = new Dictionary<string, object>()
             {
@@ -87,7 +87,7 @@ namespace AsadaLisboaBackend.Services.Emails
 
         public async Task SendVerificationCode(string name, string email, string token)
         {
-            string url = $"{Constants.DOMAIN_HOST}/api/registrar/confirmar-correo/?token={token}&email={email}";
+            string url = $"{Constants.CLIENT_HOST}/cuenta/confirmar-correo/?token={token}&email={email}";
 
             var variables = new Dictionary<string, object>()
             {

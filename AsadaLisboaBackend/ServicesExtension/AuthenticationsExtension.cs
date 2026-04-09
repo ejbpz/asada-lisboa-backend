@@ -1,10 +1,11 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.Models.IdentityModels;
-using AsadaLisboaBackend.Models.DatabaseContext;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
@@ -37,6 +38,7 @@ namespace AsadaLisboaBackend.ServicesExtension
                 {
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
+                        RoleClaimType = ClaimTypes.Role,
                         ValidateAudience = true,
                         ValidAudience = configuration["JwtOptions:AUDIENCE"], // Who sent the token.
                         ValidateIssuer = true,

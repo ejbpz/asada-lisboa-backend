@@ -42,7 +42,7 @@ namespace AsadaLisboaBackend.Services.Accounts
                 throw new InvalidCredentialsException("Correo electrónico y/o contraseña incorrectos.");
             }
 
-            var autenticationResponse = _jwtsService.GenerateToken(user);
+            var autenticationResponse = await _jwtsService.GenerateToken(user);
 
             user.RefreshToken = autenticationResponse.RefreshToken;
             user.RefreshTokenExpiration = autenticationResponse.RefreshTokenExpiration;

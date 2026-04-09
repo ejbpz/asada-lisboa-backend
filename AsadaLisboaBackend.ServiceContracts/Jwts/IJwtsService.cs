@@ -6,7 +6,7 @@ namespace AsadaLisboaBackend.ServiceContracts.Jwts
 {
     public interface IJwtsService
     {
-        public AuthenticationResponseDTO GenerateToken(ApplicationUser user);
+        public Task<AuthenticationResponseDTO> GenerateToken(ApplicationUser user);
         public ClaimsPrincipal? GetClaimsPrincipal(string token);
         public Task DeleteToken();
         public Task<AuthenticationResponseDTO> ValidateRefreshToken(RefreshTokenRequestDTO refreshTokenRequestDTO);

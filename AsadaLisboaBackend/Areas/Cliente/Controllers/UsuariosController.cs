@@ -22,7 +22,7 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PageResponseDTO<UserResponseDTO>>> GetUsers([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
         {
-            return Ok(await _usersGetterService.GetUsers(searchSortRequestDTO));
+            return Ok(await _usersGetterService.GetPublicUsers(searchSortRequestDTO));
         }
     }
 }
