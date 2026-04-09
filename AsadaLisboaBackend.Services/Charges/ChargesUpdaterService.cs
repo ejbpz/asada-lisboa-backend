@@ -3,6 +3,8 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.Charges;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
 using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Charges
 {
@@ -11,12 +13,14 @@ namespace AsadaLisboaBackend.Services.Charges
         private readonly IChargesGetterService _chargesGetterService;
         private readonly IChargesUpdaterRepository _chargesUpdaterRepository;
         private readonly ILogger<ChargesUpdaterService> _logger;
+        private readonly IMemoryCachesService _memoryCachesService;
 
-        public ChargesUpdaterService(IChargesGetterService chargesGetterService, IChargesUpdaterRepository chargesUpdaterRepository, ILogger<ChargesUpdaterService> logger)
+        public ChargesUpdaterService(IChargesGetterService chargesGetterService, IChargesUpdaterRepository chargesUpdaterRepository, ILogger<ChargesUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
             _chargesGetterService = chargesGetterService;
             _chargesUpdaterRepository = chargesUpdaterRepository;
             _logger = logger;
+            _memoryCachesService = memoryCachesService;
         }
 
         public async Task<ChargeResponseDTO> UpdateCharge(Guid id, string chargeRequest)
@@ -33,6 +37,9 @@ namespace AsadaLisboaBackend.Services.Charges
             var result = await _chargesUpdaterRepository.UpdateCharge(id, chargeRequest);
 
             _logger.LogInformation("Cargo con ID: {Id} actualizado exitosamente.", id);
+
+            _memoryCachesService.RemoveById(Constants.CACHE_CHARGES, id);
+            _memoryCachesService.ChangeVersion(Constants.CACHE_CHARGES);
 
             return result;
         }
