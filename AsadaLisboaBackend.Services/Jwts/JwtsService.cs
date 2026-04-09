@@ -32,7 +32,7 @@ namespace AsadaLisboaBackend.Services.Jwts
             _refreshJwtOptions = jwtRefreshOptions.Value;
         }
 
-        public AuthenticationResponseDTO GenerateToken(ApplicationUser user)
+        public async Task<AuthenticationResponseDTO> GenerateToken(ApplicationUser user)
         {
             _logger.LogInformation("Generando token JWT para el usuario con email: {Email}", user.Email);
 
@@ -40,7 +40,9 @@ namespace AsadaLisboaBackend.Services.Jwts
             DateTime expirationToken = DateTime.UtcNow.AddMinutes(_jwtOptions.EXPIRATION_MINUTES);
             DateTime expirationRefreshToken = DateTime.UtcNow.AddMinutes(_refreshJwtOptions.EXPIRATION_MINUTES);
 
-            Claim[] claims = new Claim[]
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // Subject => Who's the user, user's ID. 
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID => Token unique identifier.
@@ -50,6 +52,8 @@ namespace AsadaLisboaBackend.Services.Jwts
                 new Claim(ClaimTypes.Name, $"{user.FirstName} {user.FirstLastName} {user.SecondLastName}"),
             };
 
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            
             // Converts Key (string) to Bytes.
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.KEY));
             // Generate credentials using Key and Algorithm.
@@ -179,7 +183,7 @@ namespace AsadaLisboaBackend.Services.Jwts
                 throw new InvalidRefreshTokenException("Token de refrescamiento inválido.");
             }
 
-            AuthenticationResponseDTO authenticationResponseDTO = GenerateToken(user);
+            AuthenticationResponseDTO authenticationResponseDTO = await GenerateToken(user);
 
             user.RefreshToken = authenticationResponseDTO.RefreshToken;
             user.RefreshTokenExpiration = authenticationResponseDTO.RefreshTokenExpiration;
