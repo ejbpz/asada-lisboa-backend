@@ -3,6 +3,8 @@ using AsadaLisboaBackend.Models.DTOs.Configuration;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
 using AsadaLisboaBackend.RepositoryContracts.Configurations;
 using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Configurations
 {
@@ -10,11 +12,13 @@ namespace AsadaLisboaBackend.Services.Configurations
     {
         private readonly IConfigurationsAdderRepository _configurationsAdderRepository;
         private readonly ILogger<ConfigurationsAdderService> _logger;
+        private readonly IMemoryCachesService _memoryCachesService;
 
-        public ConfigurationsAdderService(IConfigurationsAdderRepository configurationsAdderRepository, ILogger<ConfigurationsAdderService> logger)
+        public ConfigurationsAdderService(IConfigurationsAdderRepository configurationsAdderRepository, ILogger<ConfigurationsAdderService> logger, IMemoryCachesService memoryCachesService)
         {
             _configurationsAdderRepository = configurationsAdderRepository;
             _logger = logger;
+            _memoryCachesService = memoryCachesService;
         }
 
         public async Task<ConfigurationResponseDTO> CreateConfiguration(ConfigurationsRequestDTO configurationRequestDTO)
@@ -35,6 +39,9 @@ namespace AsadaLisboaBackend.Services.Configurations
                    configurationRequestDTO.SettingType,
                    configurationRequestDTO.Order
                );
+
+                _memoryCachesService.ChangeVersion(Constants.CACHE_CONFIGURATIONS);
+
                 return result.ToConfigurationResponseDTO();
 
             }
