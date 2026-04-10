@@ -4,6 +4,8 @@ using AsadaLisboaBackend.Models.DTOs.Contact;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.Contacts;
 using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Contacts
 {
@@ -11,11 +13,13 @@ namespace AsadaLisboaBackend.Services.Contacts
     {
         private readonly IContactsAdderRepository _contactsAdderRepository;
         private readonly ILogger<ContactsAdderService> _logger;
+        private readonly IMemoryCachesService _memoryCachesService;
 
-        public ContactsAdderService(IContactsAdderRepository contactsAdderRepository, ILogger<ContactsAdderService> logger)
+        public ContactsAdderService(IContactsAdderRepository contactsAdderRepository, ILogger<ContactsAdderService> logger, IMemoryCachesService memoryCachesService)
         {
             _contactsAdderRepository = contactsAdderRepository;
             _logger = logger;
+            _memoryCachesService = memoryCachesService;
         }
 
         public async Task<ContactResponseDTO> CreateContact(ContactRequestDTO contactRequestDTO)
@@ -35,6 +39,8 @@ namespace AsadaLisboaBackend.Services.Contacts
                   contactRequestDTO.ContactType,
                   contactRequestDTO.Order
               );
+
+                _memoryCachesService.ChangeVersion(Constants.CACHE_CONTACTS);
 
                 return result.ToContactResponseDTO();
             
