@@ -39,7 +39,10 @@ namespace AsadaLisboaBackend.Services.Images
             var image = await _imagesGetterRespository.GetImage(id);
 
             if (image is null)
+            {
+                _logger.LogError("Imagen con {Id}, no encontrada.", id);
                 throw new NotFoundException("Imagen no encontrada.");
+            }
 
             image.Title = imageUpdateRequestDTO.Title;
             image.StatusId = imageUpdateRequestDTO.StatusId;
@@ -50,7 +53,10 @@ namespace AsadaLisboaBackend.Services.Images
             image.Categories = await _categoriesGetterService.ToCreateCategories(imageUpdateRequestDTO.Categories);
 
             if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
+            {
+                _logger.LogError("Nueva imagen nula para el id: {id}.", id);
                 throw new ArgumentNullException("Error al actualizar la imagen.");
+            }
 
             string? newUrl = string.Empty;
 
