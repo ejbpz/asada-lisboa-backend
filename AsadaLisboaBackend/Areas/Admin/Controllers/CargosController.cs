@@ -56,7 +56,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Updates an specific charge in the system.
         /// </summary>
         /// <param name="id">The ID of the charge to update.</param>
         /// <param name="chargeRequest">The updated charge data.</param>
