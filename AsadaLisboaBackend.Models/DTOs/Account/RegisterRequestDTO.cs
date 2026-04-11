@@ -28,12 +28,12 @@ namespace AsadaLisboaBackend.Models.DTOs.Account
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Contraseña es requerida.")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe incluir mayúsculas, minúsculas y números.")]
+        [RegularExpression(Constants.PASSWORD_REGEX, ErrorMessage = "No corresponde a un formato de contraseña.")]
         public string Password { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Confirmar Contraseña es requerida.")]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe incluir mayúsculas, minúsculas y números.")]
+        [RegularExpression(Constants.PASSWORD_REGEX, ErrorMessage = "No corresponde a un formato de contraseña.")]
         [Compare("Password", ErrorMessage = "Debe coincidir con la contraseña.")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }

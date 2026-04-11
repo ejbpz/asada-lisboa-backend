@@ -1,24 +1,24 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Shared;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Principal;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.Principals;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
-using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Principals
 {
     public class PrincipalsGetterService : IPrincipalsGetterService
     {
         private readonly INewsGetterService _newsGetterService;
+        private readonly ILogger<PrincipalsGetterService> _logger;
+        private readonly IMemoryCachesService _memoryCachesService;
         private readonly IImagesGetterService _imagesGetterService;
         private readonly IDocumentsGetterService _documentsGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
-        private readonly ILogger<PrincipalsGetterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
 
         public PrincipalsGetterService(INewsGetterService newsGetterService, IImagesGetterService imagesGetterService, IDocumentsGetterService documentsGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<PrincipalsGetterService> logger, IMemoryCachesService memoryCachesService)
         {
@@ -44,7 +44,7 @@ namespace AsadaLisboaBackend.Services.Principals
             };
 
 
-            var statusId = await _memoryCachesService.GetOrCreateCacheList<PrincipalRequestDTO>(
+            var statusId = await _memoryCachesService.GetOrCreateCacheList<Guid>(
 
                    resource: Constants.CACHE_USERS,
                    request: searchSortRequestDTO,

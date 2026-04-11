@@ -1,9 +1,9 @@
-﻿using AsadaLisboaBackend.Models.Enums;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.Enums;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
-using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Statuses
 {
@@ -61,9 +61,6 @@ namespace AsadaLisboaBackend.Services.Statuses
                 );
                 throw;
             }
-
-
-        }
         }
     }
 }

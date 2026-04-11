@@ -1,32 +1,33 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Configuration;
-using AsadaLisboaBackend.RepositoryContracts.Configurations;
-using AsadaLisboaBackend.ServiceContracts.Configurations;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.MemoryCaches;
+﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
-using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Models.DTOs.Configuration;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.ServiceContracts.Configurations;
+using AsadaLisboaBackend.RepositoryContracts.Configurations;
 
 namespace AsadaLisboaBackend.Services.Configurations
 {
     public class ConfigurationsUpdaterService : IConfigurationsUpdaterService
     {
-        private readonly IConfigurationsUpdaterRepository _configurationsUpdaterRepository;
-        private readonly ILogger<ConfigurationsUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly ILogger<ConfigurationsUpdaterService> _logger;
+        private readonly IConfigurationsUpdaterRepository _configurationsUpdaterRepository;
 
         public ConfigurationsUpdaterService(IConfigurationsUpdaterRepository configurationsUpdaterRepository, ILogger<ConfigurationsUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _configurationsUpdaterRepository = configurationsUpdaterRepository;            _logger = logger;
+            _logger = logger;
             _memoryCachesService = memoryCachesService;
-
+            _configurationsUpdaterRepository = configurationsUpdaterRepository;
         }
 
         public async Task<ConfigurationResponseDTO> UpdateConfiguration(Guid id, ConfigurationsRequestDTO configurationRequestDTO)
         {
            var result = await _configurationsUpdaterRepository.UpdateConfiguration(id, configurationRequestDTO);
 
-            if (result = null){
+            if (result is null){
                 _logger.LogWarning("No se encontró configuración para actualizar con Id: {Id}", id);
+                throw new NotFoundException($"No se encontró configuración para actualizar con Id: {id}");
             }
 
             _logger.LogInformation("Actualización exitosa de configuración con Id: {Id}", id);

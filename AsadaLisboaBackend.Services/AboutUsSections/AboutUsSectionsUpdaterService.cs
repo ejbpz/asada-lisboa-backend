@@ -1,9 +1,10 @@
-﻿using AsadaLisboaBackend.Models.DTOs.AboutUs;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.AboutUs;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using Microsoft.Extensions.Logging;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.AboutUsSections
 {
@@ -24,9 +25,10 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
         {
             var result = await _aboutUsSectionsUpdaterRepository.UpdateAboutUsSection(id, aboutUsRequestDTO);
 
-            if (result = null)
+            if (result is null)
             {
                 _logger.LogWarning("No se encontró AboutUsSection para actualizar con Id: {Id}", id);
+                throw new NotFoundException($"No se encontró AboutUsSection para actualizar con Id: {id}");
             }
 
             _logger.LogInformation("Actualización exitosa de AboutUsSection con Id: {Id}", id);

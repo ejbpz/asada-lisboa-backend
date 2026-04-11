@@ -11,6 +11,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Account
 
         [Required(ErrorMessage = "La contraseña es requerida.")]
         [StringLength(20, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre {2} y {1} caracteres.")]
+        [RegularExpression(Constants.PASSWORD_REGEX, ErrorMessage = "No corresponde a un formato de contraseña.")]
         public string Password { get; set; } = string.Empty;
     }
 }

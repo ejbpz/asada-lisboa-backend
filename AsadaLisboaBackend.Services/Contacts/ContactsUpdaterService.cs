@@ -4,6 +4,7 @@ using AsadaLisboaBackend.RepositoryContracts.Contacts;
 using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Services.Exceptions;
 
 namespace AsadaLisboaBackend.Services.Contacts
 {
@@ -24,9 +25,10 @@ namespace AsadaLisboaBackend.Services.Contacts
         {
             var result = (await _contactsUpdaterRepository.UpdateContact(id, contactsRequestDTO));
 
-            if (result = null)
+            if (result is null)
             {
                 _logger.LogWarning("No se encontró contacto para actualizar con Id: {Id}", id);
+                throw new NotFoundException($"No se encontró contacto para actualizar con Id: {id}");
             }
 
             _logger.LogInformation("Actualización exitosa de contacto con Id: {Id}", id);

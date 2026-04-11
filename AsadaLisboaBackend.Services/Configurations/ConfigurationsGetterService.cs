@@ -1,26 +1,24 @@
-﻿using AsadaLisboaBackend.Models.DTOs.AboutUs;
-using AsadaLisboaBackend.Models.DTOs.Configuration;
-using AsadaLisboaBackend.Models.DTOs.Shared;
-using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using AsadaLisboaBackend.RepositoryContracts.Configurations;
-using AsadaLisboaBackend.ServiceContracts.Configurations;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
-using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Models.DTOs.Shared;
+using AsadaLisboaBackend.Models.DTOs.Configuration;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.ServiceContracts.Configurations;
+using AsadaLisboaBackend.RepositoryContracts.Configurations;
 
 namespace AsadaLisboaBackend.Services.Configurations
 {
     public class ConfigurationsGetterService : IConfigurationsGetterService
     {
-        private readonly IConfigurationsGetterRepository _configurationsGetterRepository;
-        private readonly ILogger<ConfigurationsGetterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly ILogger<ConfigurationsGetterService> _logger;
+        private readonly IConfigurationsGetterRepository _configurationsGetterRepository;
 
         public ConfigurationsGetterService(IConfigurationsGetterRepository configurationsGetterRepository, ILogger<ConfigurationsGetterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _configurationsGetterRepository = configurationsGetterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _configurationsGetterRepository = configurationsGetterRepository;
         }
 
         public async Task<PageResponseDTO<ConfigurationResponseDTO>> GetConfigurations(SearchSortRequestDTO searchSortRequestDTO)
@@ -29,7 +27,7 @@ namespace AsadaLisboaBackend.Services.Configurations
             {
                 searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
 
-                var result  = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<AboutUsResponseDTO>>(
+                var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<ConfigurationResponseDTO>>(
 
                     resource: Constants.CACHE_CONFIGURATIONS,
                     request: searchSortRequestDTO,
@@ -53,5 +51,6 @@ namespace AsadaLisboaBackend.Services.Configurations
                 );
                 throw;
             }
+        }
     }
 }
