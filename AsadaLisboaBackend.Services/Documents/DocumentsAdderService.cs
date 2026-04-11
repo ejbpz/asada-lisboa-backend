@@ -40,7 +40,10 @@ namespace AsadaLisboaBackend.Services.Documents
         public async Task<DocumentResponseDTO> CreateDocument(DocumentRequestDTO documentRequestDTO)
         {
             if (documentRequestDTO.File is null || documentRequestDTO.File.Length == 0)
+            {
+                _logger.LogError("Archivo nulo o inválido a ser agregado.");
                 throw new ArgumentException("Archivo inválido.");
+            }
 
             var documentId = Guid.NewGuid();
 
@@ -63,7 +66,10 @@ namespace AsadaLisboaBackend.Services.Documents
                 var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
 
                 if (documentTypeId is null || !documentTypeId.HasValue)
+                {
+                    _logger.LogError("Tipo de documento no encontrado con id: {Id}.", documentTypeId);
                     throw new NotFoundException("Tipo de documento no soportado.");
+                }
 
                 var document = new Models.Document()
                 {

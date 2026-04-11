@@ -34,7 +34,10 @@ namespace AsadaLisboaBackend.Services.Documents
             var document = await _documentsGetterRespository.GetDocument(id);
 
             if (document is null)
+            {
+                _logger.LogError("Documento con id: {Id} no encontrado.", id);
                 throw new NotFoundException("Documento no encontrado.");
+            }
 
             if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
                 await _fileSystems.DeleteAsync(document.FileName, "document");
