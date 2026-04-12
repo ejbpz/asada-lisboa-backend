@@ -107,7 +107,6 @@ namespace AsadaLisboaBackend.Services.News
             };
             await _elastic.IndexAsync(news);
 
-
             return created.ToNewResponseDTO();
         }
     }

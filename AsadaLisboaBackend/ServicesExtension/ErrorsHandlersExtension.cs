@@ -2,8 +2,16 @@
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Global error handlers extension method.
+    /// </summary>
     public static class ErrorsHandlersExtension
     {
+        /// <summary>
+        /// Registration of global error handlers into services.
+        /// </summary>
+        /// <param name="services">Collection of services.</param>
+        /// <returns>List of registered services.</returns>
         public static IServiceCollection ErrorsHandlersRegistration(this IServiceCollection services)
         {
             services.AddExceptionHandler<InvalidRefreshTokenErrorHandling>();

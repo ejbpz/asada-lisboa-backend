@@ -4,6 +4,6 @@ namespace AsadaLisboaBackend.ServiceContracts.SearchGlobal
 {
     public interface ISearchGlobalService
     {
-        public Task<List<SearchGlobalDocument>> SearchAsync(string query);
+        public Task<List<SearchGlobalDocument>> Search(string query);
     }
 }

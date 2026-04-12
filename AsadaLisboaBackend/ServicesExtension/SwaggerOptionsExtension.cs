@@ -7,15 +7,26 @@ using AsadaLisboaBackend.Filters.Authorize;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Extension method to Swagger options.
+    /// </summary>
     public class SwaggerOptionsExtension : IConfigureOptions<SwaggerGenOptions>
     {
         private readonly IApiVersionDescriptionProvider _provider;
 
+        /// <summary>
+        /// SwaggerOptionsExtension Controller.
+        /// </summary>
+        /// <param name="provider">Provide information about API Versioning.</param>
         public SwaggerOptionsExtension(IApiVersionDescriptionProvider provider)
         {
             _provider = provider;
         }
 
+        /// <summary>
+        /// Configure the API Versioning into Swagger.
+        /// </summary>
+        /// <param name="options">Swagger options generation.</param>
         public void Configure(SwaggerGenOptions options)
         {
             foreach (var description in _provider.ApiVersionDescriptions)
@@ -40,8 +51,16 @@ namespace AsadaLisboaBackend.ServicesExtension
         }
     }
 
+    /// <summary>
+    /// Extension method to Swagger.
+    /// </summary>
     public static class SwaggerRegistrationExtension
     {
+        /// <summary>
+        /// Swagger registration into services.
+        /// </summary>
+        /// <param name="services">Collection of services.</param>
+        /// <returns>List of registered services.</returns>
         public static IServiceCollection SwaggerRegistration(this IServiceCollection services)
         {
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptionsExtension>();

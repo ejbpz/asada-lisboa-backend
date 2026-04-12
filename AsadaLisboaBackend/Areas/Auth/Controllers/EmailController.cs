@@ -9,6 +9,9 @@ using AsadaLisboaBackend.Models.DTOs.InformationMessage;
 
 namespace AsadaLisboaBackend.Areas.Auth.Controllers
 {
+    /// <summary>
+    /// Controller for manage emails.
+    /// </summary>
     [ApiController]
     [EnableRateLimiting("contact-limiter")]
     [Area("Auth")]
@@ -16,29 +19,36 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
     [Route("api/[area]/[controller]")]
     public class EmailController : ControllerBase
     {
-        private readonly ReCaptchaOptions _reCaptchaOptions;
         private readonly IReCaptchasService _reCaptchasService;
         private readonly IEmailsSenderService _emailsSenderService;
 
-        public EmailController(IEmailsSenderService emailsSenderService, IOptions<ReCaptchaOptions> options, IReCaptchasService reCaptchasService)
+        /// <summary>
+        /// Constructor for EmailController.
+        /// </summary>
+        /// <param name="reCaptchasService"></param>
+        /// <param name="emailsSenderService"></param>
+        public EmailController(IEmailsSenderService emailsSenderService, IReCaptchasService reCaptchasService)
         {
-            _reCaptchaOptions = options.Value;
             _reCaptchasService = reCaptchasService;
             _emailsSenderService = emailsSenderService;
         }
 
+        /// <summary>
+        /// Get ReCAPTCHA confirmation.
+        /// </summary>
+        /// <param name="reCaptchaRequest">ReCAPTCHA public key.</param>
+        /// <returns>ReCAPTCHA confirmation.</returns>
         [HttpGet("re-captcha")]
-        public async Task<bool> GetReCaptcha([FromBody] string reCaptchaResponse)
+        public async Task<bool> GetReCaptcha([FromBody] string reCaptchaRequest)
         {
-            if (string.IsNullOrEmpty(reCaptchaResponse) && string.IsNullOrWhiteSpace(reCaptchaResponse))
-                throw new ArgumentNullException("El reCaptcha ha sido nulo.");
-
-            if (string.IsNullOrEmpty(_reCaptchaOptions.SECRET_KEY) && string.IsNullOrWhiteSpace(_reCaptchaOptions.SECRET_KEY))
-                throw new ArgumentNullException("Error con el proveedor del correos.");
-
-            return await _reCaptchasService.ReCaptchaValidation(reCaptchaResponse, _reCaptchaOptions.SECRET_KEY);
+            return await _reCaptchasService.ReCaptchaValidation(reCaptchaRequest);
         }
 
+        /// <summary>
+        /// Send a communication email (client to ASADA).
+        /// </summary>
+        /// <param name="sendEmailRequestDTO">An object containing the details of the email to be send.</param>
+        /// <returns>No content.</returns>
         [HttpPost("")]
         public async Task<IActionResult> SendEmail([FromForm] SendEmailRequestDTO sendEmailRequestDTO)
         {

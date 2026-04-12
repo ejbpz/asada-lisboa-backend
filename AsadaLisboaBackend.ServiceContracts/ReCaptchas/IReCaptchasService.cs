@@ -2,6 +2,6 @@
 {
     public interface IReCaptchasService
     {
-        public Task<bool> ReCaptchaValidation(string reCaptchaResponse, string reCaptchaSecretKey);
+        public Task<bool> ReCaptchaValidation(string reCaptchaResponse);
     }
 }

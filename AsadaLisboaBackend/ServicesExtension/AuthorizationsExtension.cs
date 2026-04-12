@@ -2,8 +2,16 @@
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Extension method to Policies Authorization.
+    /// </summary>
     public static class AuthorizationsExtension
     {
+        /// <summary>
+        /// Authorization policies registration into services.
+        /// </summary>
+        /// <param name="services">Collection of services.</param>
+        /// <returns>List of registered services.</returns>
         public static IServiceCollection AuthorizationsRegistration(this IServiceCollection services)
         {
             services.AddAuthorization(options =>

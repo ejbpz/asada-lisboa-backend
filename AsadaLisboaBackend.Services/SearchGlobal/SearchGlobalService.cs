@@ -13,7 +13,7 @@ namespace AsadaLisboaBackend.Services.SearchGlobal
             _client = client;
         }
 
-        public async Task<List<SearchGlobalDocument>> SearchAsync(string query)
+        public async Task<List<SearchGlobalDocument>> Search(string query)
         {
             var response = await _client.SearchAsync<SearchGlobalDocument>(s => s
                 .Indices(new[] { "Documento", "Imagen", "Noticias" })

@@ -1,16 +1,25 @@
-﻿using AsadaLisboaBackend.Models.DatabaseContext;
-using AsadaLisboaBackend.Models.IdentityModels;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+﻿using System.Text;
 using System.Security.Claims;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using AsadaLisboaBackend.Models.IdentityModels;
+using AsadaLisboaBackend.Models.DatabaseContext;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Extension method to Identity Authentication.
+    /// </summary>
     public static class AuthenticationsExtension
     {
+        /// <summary>
+        /// Identity authentication registration into services.
+        /// </summary>
+        /// <param name="services">Collection of services.</param>
+        /// <param name="configuration">Access to the system configurations.</param>
+        /// <returns>List of registered services.</returns>
         public static IServiceCollection AuthenticationsRegistration(this IServiceCollection services, ConfigurationManager configuration)
         {
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

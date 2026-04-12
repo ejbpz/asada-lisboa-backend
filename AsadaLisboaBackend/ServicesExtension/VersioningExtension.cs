@@ -2,8 +2,16 @@
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Extension method to API Versioning.
+    /// </summary>
     public static class VersioningExtension
     {
+        /// <summary>
+        /// API Versioning registration into services.
+        /// </summary>
+        /// <param name="services">Collection of services.</param>
+        /// <returns>List of registered services.</returns>
         public static IServiceCollection VersioningRegistration(this IServiceCollection services)
         {
             services.AddApiVersioning(o =>

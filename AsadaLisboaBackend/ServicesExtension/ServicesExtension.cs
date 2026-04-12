@@ -13,6 +13,7 @@ using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
+using AsadaLisboaBackend.ServiceContracts.SearchGlobal;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.Principals;
 using AsadaLisboaBackend.ServiceContracts.Categories;
@@ -28,7 +29,6 @@ using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Jwts;
-using AsadaLisboaBackend.ServiceContracts.SearchGlobal;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.Repositories.Configurations;
 using AsadaLisboaBackend.Repositories.DocumentTypes;
@@ -42,6 +42,7 @@ using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.Services.Configurations;
+using AsadaLisboaBackend.Services.SearchGlobal;
 using AsadaLisboaBackend.Services.MemoryCaches;
 using AsadaLisboaBackend.Services.Principals;
 using AsadaLisboaBackend.Services.Categories;
@@ -57,12 +58,19 @@ using AsadaLisboaBackend.Services.Images;
 using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Services.News;
 using AsadaLisboaBackend.Services.Jwts;
-using AsadaLisboaBackend.Services.SearchGlobal;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Services and repositories registration extension method.
+    /// </summary>
     public static class ServicesExtension
     {
+        /// <summary>
+        /// Services and repositories registration into DI container.
+        /// </summary>        
+        /// <param name="services">Collection of services.</param>
+        /// <returns>List of registered services.</returns>
         public static IServiceCollection ServicesRegistration(this IServiceCollection services)
         {
             // Cache

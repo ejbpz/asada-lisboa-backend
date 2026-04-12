@@ -1,11 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Models.IdentityModels;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
+    /// <summary>
+    /// Extension method to seed admin user.
+    /// </summary>
     public static class SeedAdminUserExtension
     {
+        /// <summary>
+        /// Seed admin user apply to service provider.
+        /// </summary>
+        /// <param name="services">Collection of services.</param>
+        /// <returns>List of registered services.</returns>
+        /// <exception cref="CreateObjectException">To create user and assign roles.</exception>
         public static async Task SeedAdminUserAsync(this IServiceProvider services)
         {
             using var scope = services.CreateScope();
@@ -46,7 +56,7 @@ namespace AsadaLisboaBackend.ServicesExtension
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"Error creando usuario admin: {errors}");
+                throw new CreateObjectException($"Error creando usuario admin: {errors}");
             }
 
             var roleResult = await userManager.AddToRoleAsync(user, "Administrador");
@@ -54,7 +64,7 @@ namespace AsadaLisboaBackend.ServicesExtension
             if (!roleResult.Succeeded)
             {
                 var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                throw new Exception($"Error asignando rol: {errors}");
+                throw new CreateObjectException($"Error asignando rol: {errors}");
             }
         }
     }
