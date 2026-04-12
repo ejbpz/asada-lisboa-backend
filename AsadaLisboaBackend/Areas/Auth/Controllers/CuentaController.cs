@@ -41,7 +41,7 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// <param name="loginRequestDTO">An object containing the details of the login requests (email + password).</param>
         /// <returns>An ActionResult containing the logged in object.</returns>
         [HttpPost("iniciar-sesion")]
-        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromForm] LoginRequestDTO loginRequestDTO)
+        public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             return Ok(await _loginService.Login(loginRequestDTO));
         }
@@ -75,7 +75,7 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// <param name="resetPasswordDTO">An object containing the email of the user.</param>
         /// <returns>No content.</returns>
         [HttpPost("olvidar-contrasena")]
-        public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordRequestDTO resetPasswordDTO)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO resetPasswordDTO)
         {
             await _resetPasswordService.ForgotPassword(resetPasswordDTO.Email);
             return NoContent();
@@ -87,7 +87,7 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// <param name="resetPasswordRequestDTO">An object containing the details of the new password (email, token, password and confirmPassword).</param>
         /// <returns>No content.</returns>
         [HttpPost("restaurar-contrasena")]
-        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordRequestDTO resetPasswordRequestDTO)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO resetPasswordRequestDTO)
         {
             await _resetPasswordService.ResetPassword(resetPasswordRequestDTO.Email, resetPasswordRequestDTO.Token, resetPasswordRequestDTO.Password);
             return NoContent();

@@ -3,6 +3,7 @@ using Asp.Versioning.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using AsadaLisboaBackend.Filters.Authorize;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
@@ -51,6 +52,19 @@ namespace AsadaLisboaBackend.ServicesExtension
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using Bearer scheme.",
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                };
+
+                c.AddSecurityDefinition("Bearer", securityScheme);
+                c.OperationFilter<AuthorizeCheckOperationFilter>();
             });
 
             return services;

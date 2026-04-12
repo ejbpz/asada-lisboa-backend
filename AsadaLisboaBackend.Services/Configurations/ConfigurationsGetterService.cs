@@ -1,5 +1,8 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Shared;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Configuration;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
 using AsadaLisboaBackend.RepositoryContracts.Configurations;
 
@@ -7,18 +10,47 @@ namespace AsadaLisboaBackend.Services.Configurations
 {
     public class ConfigurationsGetterService : IConfigurationsGetterService
     {
+        private readonly IMemoryCachesService _memoryCachesService;
+        private readonly ILogger<ConfigurationsGetterService> _logger;
         private readonly IConfigurationsGetterRepository _configurationsGetterRepository;
 
-        public ConfigurationsGetterService(IConfigurationsGetterRepository configurationsGetterRepository)
+        public ConfigurationsGetterService(IConfigurationsGetterRepository configurationsGetterRepository, ILogger<ConfigurationsGetterService> logger, IMemoryCachesService memoryCachesService)
         {
+            _logger = logger;
+            _memoryCachesService = memoryCachesService;
             _configurationsGetterRepository = configurationsGetterRepository;
         }
 
         public async Task<PageResponseDTO<ConfigurationResponseDTO>> GetConfigurations(SearchSortRequestDTO searchSortRequestDTO)
         {
-            searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
+            try
+            {
+                searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
 
-            return await _configurationsGetterRepository.GetConfigurations(searchSortRequestDTO);
+                var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<ConfigurationResponseDTO>>(
+
+                    resource: Constants.CACHE_CONFIGURATIONS,
+                    request: searchSortRequestDTO,
+                    create: () => _configurationsGetterRepository.GetConfigurations(searchSortRequestDTO),
+                    time: TimeSpan.FromMinutes(5));
+
+                _logger.LogInformation(
+                    "Obtención exitosa de configuración. Página: {Page}, Tamaño: {Take}",
+                    searchSortRequestDTO.Page,
+                    searchSortRequestDTO.Take
+                );
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Error al obtener configuración. Página: {Page}, Tamaño: {Take}",
+                    searchSortRequestDTO.Page,
+                    searchSortRequestDTO.Take
+                );
+                throw;
+            }
         }
     }
 }

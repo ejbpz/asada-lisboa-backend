@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DTOs.Document;
@@ -15,6 +16,7 @@ namespace AsadaLisboaBackend.Services.Documents
 {
     public class DocumentsAdderService: IDocumentsAdderService
     {
+        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<DocumentsAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -23,9 +25,10 @@ namespace AsadaLisboaBackend.Services.Documents
         private readonly IStatusesGetterRepository _statusesGetterRepository;
         private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
 
-        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IDocumentTypesGetterRepository documentTypesGetterRepository, IFileSystemsManager fileSystems, ILogger<DocumentsAdderService> logger, IMemoryCachesService memoryCachesService)
+        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IDocumentTypesGetterRepository documentTypesGetterRepository, IFileSystemsManager fileSystems, ILogger<DocumentsAdderService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
+            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _categoriesGetterService = categoriesGetterService;
@@ -37,7 +40,10 @@ namespace AsadaLisboaBackend.Services.Documents
         public async Task<DocumentResponseDTO> CreateDocument(DocumentRequestDTO documentRequestDTO)
         {
             if (documentRequestDTO.File is null || documentRequestDTO.File.Length == 0)
+            {
+                _logger.LogError("Archivo nulo o inválido a ser agregado.");
                 throw new ArgumentException("Archivo inválido.");
+            }
 
             var documentId = Guid.NewGuid();
 
@@ -60,7 +66,10 @@ namespace AsadaLisboaBackend.Services.Documents
                 var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
 
                 if (documentTypeId is null || !documentTypeId.HasValue)
+                {
+                    _logger.LogError("Tipo de documento no encontrado con id: {Id}.", documentTypeId);
                     throw new NotFoundException("Tipo de documento no soportado.");
+                }
 
                 var document = new Models.Document()
                 {
@@ -82,6 +91,17 @@ namespace AsadaLisboaBackend.Services.Documents
                 _logger.LogInformation("Documento creado exitosamente con id: {DocumentId}", documentCreated.Id);
 
                 _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
+
+                //Add to ElasticSearch
+                var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO                   
+                {
+                    Id = document.Id,
+                    Type = "Documento",
+                    Title = document.Title,
+                    Description = document.Description,
+                    
+                };
+                await _elastic.IndexAsync(doc);
 
                 return documentCreated.ToDocumentResponseDTO();
             }

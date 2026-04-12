@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Elastic.Clients.Elasticsearch;
+using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Services.Exceptions;
@@ -9,12 +11,12 @@ using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.News
 {
     public class NewsUpdaterService : INewsUpdaterService
     {
+        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<NewsUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -25,9 +27,10 @@ namespace AsadaLisboaBackend.Services.News
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorsUpdaterService editorsUpdaterService, IEditorsDeleterService editorsDeleterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsUpdaterService> logger, IMemoryCachesService memoryCachesService)
+        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorsUpdaterService editorsUpdaterService, IEditorsDeleterService editorsDeleterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
+            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _newsGetterRepository = newsGetterRepository;
@@ -92,6 +95,18 @@ namespace AsadaLisboaBackend.Services.News
 
             _memoryCachesService.RemoveById(Constants.CACHE_NEWS, created.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
+
+            //Add to ElasticSearch
+            var news = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
+            {
+                Id = newModel.Id,
+                Type = "Noticias",
+                Title = newModel.Title,
+                Description = newModel.Description,
+                Slug = newModel.Slug,
+            };
+            await _elastic.IndexAsync(news);
+
 
             return created.ToNewResponseDTO();
         }

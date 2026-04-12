@@ -1,9 +1,9 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Image;
+﻿using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Images
 {

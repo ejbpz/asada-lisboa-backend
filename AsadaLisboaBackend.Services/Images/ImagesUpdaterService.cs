@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Services.Exceptions;
@@ -14,6 +15,7 @@ namespace AsadaLisboaBackend.Services.Images
 {
     public class ImagesUpdaterService : IImagesUpdaterService
     {
+        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<ImagesUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -21,9 +23,10 @@ namespace AsadaLisboaBackend.Services.Images
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IImagesUpdaterRepository _imagesUpdaterRepository;
 
-        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService, ILogger<ImagesUpdaterService> logger, IMemoryCachesService memoryCachesService)
+        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService, ILogger<ImagesUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
+            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _categoriesGetterService = categoriesGetterService;
@@ -36,7 +39,10 @@ namespace AsadaLisboaBackend.Services.Images
             var image = await _imagesGetterRespository.GetImage(id);
 
             if (image is null)
+            {
+                _logger.LogError("Imagen con {Id}, no encontrada.", id);
                 throw new NotFoundException("Imagen no encontrada.");
+            }
 
             image.Title = imageUpdateRequestDTO.Title;
             image.StatusId = imageUpdateRequestDTO.StatusId;
@@ -47,7 +53,10 @@ namespace AsadaLisboaBackend.Services.Images
             image.Categories = await _categoriesGetterService.ToCreateCategories(imageUpdateRequestDTO.Categories);
 
             if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
+            {
+                _logger.LogError("Nueva imagen nula para el id: {id}.", id);
                 throw new ArgumentNullException("Error al actualizar la imagen.");
+            }
 
             string? newUrl = string.Empty;
 
@@ -82,6 +91,17 @@ namespace AsadaLisboaBackend.Services.Images
 
             _memoryCachesService.RemoveById(Constants.CACHE_IMAGES, imageUpdated.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);
+
+            //Add to ElasticSearch
+            var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
+            {
+                Id = image.Id,
+                Type = "Imagen",
+                Title = image.Title,
+                Description = image.Description,
+                Slug = image.Slug,
+            };
+            await _elastic.IndexAsync(imag);
 
             return imageUpdated.ToImageResponseDTO();
         }

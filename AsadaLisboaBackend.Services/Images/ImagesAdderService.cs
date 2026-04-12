@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Elastic.Clients.Elasticsearch;
+using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
@@ -8,12 +10,12 @@ using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Images
 {
     public class ImagesAdderService : IImagesAdderService
     {
+        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<ImagesAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -21,9 +23,10 @@ namespace AsadaLisboaBackend.Services.Images
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public ImagesAdderService(IImagesAdderRepository imagesAdderRepository, IFileSystemsManager fileSystems, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<ImagesAdderService> logger, IMemoryCachesService memoryCachesService)
+        public ImagesAdderService(IImagesAdderRepository imagesAdderRepository, IFileSystemsManager fileSystems, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<ImagesAdderService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
             _logger = logger;
+            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _imagesAdderRepository = imagesAdderRepository;
@@ -75,6 +78,17 @@ namespace AsadaLisboaBackend.Services.Images
                 _logger.LogInformation("Imagen creada exitosamente con id: {ImageId}", imageCreated.Id);
 
                 _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);
+
+                //Add to ElasticSearch
+                var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
+                {
+                    Id = image.Id,
+                    Type = "Imagen",
+                    Title = image.Title,
+                    Description = image.Description,
+                    Slug = image.Slug,
+                };
+                await _elastic.IndexAsync(imag);
 
                 return imageCreated.ToImageResponseDTO();
             }

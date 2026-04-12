@@ -28,6 +28,7 @@ using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Jwts;
+using AsadaLisboaBackend.ServiceContracts.SearchGlobal;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
 using AsadaLisboaBackend.Repositories.Configurations;
 using AsadaLisboaBackend.Repositories.DocumentTypes;
@@ -56,6 +57,7 @@ using AsadaLisboaBackend.Services.Images;
 using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Services.News;
 using AsadaLisboaBackend.Services.Jwts;
+using AsadaLisboaBackend.Services.SearchGlobal;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
@@ -188,6 +190,9 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IUsersUpdaterService, UsersUpdaterService>();
             services.AddScoped<IUsersDeleterService, UsersDeleterService>();
             services.AddScoped<IUsersGetterRepository, UsersGetterRepository>();
+
+            //SearchGlobal
+            services.AddScoped<ISearchGlobalService, SearchGlobalService>();
 
             return services;
         }

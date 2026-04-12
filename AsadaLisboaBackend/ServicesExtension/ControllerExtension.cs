@@ -10,10 +10,7 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddControllers(options =>
             {
                 options.Conventions.Add(new AuthorizationConvention());
-
-                options.Filters.Add(new ConsumesAttribute("application/json"));
-                options.Filters.Add(new ProducesAttribute("application/json"));
-            }).AddXmlSerializerFormatters();
+            });
 
             return services;
         }
