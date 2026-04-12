@@ -5,8 +5,15 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace AsadaLisboaBackend.Conventions
 {
+    /// <summary>
+    /// Convention for adding Authorize Filters to Action Controllers.
+    /// </summary>
     public class AuthorizationConvention : IApplicationModelConvention
     {
+        /// <summary>
+        /// Apply the AuthorizeFilter into actions.
+        /// </summary>
+        /// <param name="application">Model to configure controllers.</param>
         public void Apply(ApplicationModel application)
         {
             foreach (var controller in application.Controllers)

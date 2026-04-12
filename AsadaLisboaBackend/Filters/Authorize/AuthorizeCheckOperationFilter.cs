@@ -5,8 +5,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AsadaLisboaBackend.Filters.Authorize
 {
+    /// <summary>
+    /// Filter to check authentication and authorization into Swagger.
+    /// </summary>
     public class AuthorizeCheckOperationFilter : IOperationFilter
     {
+        /// <summary>
+        /// Apply the Operation Filter into Swagger.
+        /// </summary>
+        /// <param name="operation">Operation from OpenApi to apply in Swagger.</param>
+        /// <param name="context">Context to apply the operation.</param>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             var hasAuthorizeAttribute =

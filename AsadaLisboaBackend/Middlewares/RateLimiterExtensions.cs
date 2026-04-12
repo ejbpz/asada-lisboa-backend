@@ -3,8 +3,16 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace AsadaLisboaBackend.Middlewares
 {
+    /// <summary>
+    /// Extension method to limit the email contact access.
+    /// </summary>
     public static class RateLimiterExtensions
     {
+        /// <summary>
+        /// Add the extension method to 'builder.Services' to limit the access.
+        /// </summary>
+        /// <param name="services">List of the application Services.</param>
+        /// <returns></returns>
         public static IServiceCollection AddContactRateLimiters(this IServiceCollection services)
         {
             services.AddRateLimiter(options => {
