@@ -54,7 +54,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="contactRequestDTO">An object containing the details of the contact to be created. Cannot be null.</param>
         /// <returns>An ActionResult containing the created ContactResponseDTO object.</returns>
         [HttpPost("")]
-        public async Task<ActionResult<ContactResponseDTO>> CreateContact([FromForm] ContactRequestDTO contactRequestDTO)
+        public async Task<ActionResult<ContactResponseDTO>> CreateContact([FromBody] ContactRequestDTO contactRequestDTO)
         {
             return Created("~/api/admin/contacto", await _contactsAdderService.CreateContact(contactRequestDTO));
         }
@@ -66,7 +66,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="contactRequestDTO">An object containing the updated details of the contact. Cannot be null.</param>
         /// <returns>An ActionResult containing the updated ContactResponseDTO object.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<ContactResponseDTO>> UpdateContact([FromRoute] Guid id, [FromForm] ContactRequestDTO contactRequestDTO)
+        public async Task<ActionResult<ContactResponseDTO>> UpdateContact([FromRoute] Guid id, [FromBody] ContactRequestDTO contactRequestDTO)
         {
             return Ok(await _contactsUpdaterService.UpdateContact(id, contactRequestDTO));
         }

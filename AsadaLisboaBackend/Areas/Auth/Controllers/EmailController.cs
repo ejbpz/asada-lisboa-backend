@@ -50,7 +50,7 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// <param name="sendEmailRequestDTO">An object containing the details of the email to be send.</param>
         /// <returns>No content.</returns>
         [HttpPost("")]
-        public async Task<IActionResult> SendEmail([FromForm] SendEmailRequestDTO sendEmailRequestDTO)
+        public async Task<IActionResult> SendEmail([FromBody] SendEmailRequestDTO sendEmailRequestDTO)
         {
             await _emailsSenderService.SendContactMessage(sendEmailRequestDTO);
             return NoContent();

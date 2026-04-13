@@ -54,7 +54,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="configurationRequestDTO">An object containing the details of the configuration to be created. Cannot be null.</param>
         /// <returns>An ActionResult containing the created ConfigurationResponseDTO object.</returns>
         [HttpPost("")]
-        public async Task<ActionResult<ConfigurationResponseDTO>> CreateConfiguration([FromForm] ConfigurationsRequestDTO configurationRequestDTO)
+        public async Task<ActionResult<ConfigurationResponseDTO>> CreateConfiguration([FromBody] ConfigurationsRequestDTO configurationRequestDTO)
         {
             return Created("~/api/admin/configuracion", await _configurationsAdderService.CreateConfiguration(configurationRequestDTO));
         }
@@ -66,7 +66,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="configurationRequestDTO">An object containing the updated details of the configuration. Cannot be null.</param>
         /// <returns>An ActionResult containing the updated ConfigurationResponseDTO object.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<ConfigurationResponseDTO>> UpdateConfiguration([FromRoute] Guid id, [FromForm] ConfigurationsRequestDTO configurationRequestDTO)
+        public async Task<ActionResult<ConfigurationResponseDTO>> UpdateConfiguration([FromRoute] Guid id, [FromBody] ConfigurationsRequestDTO configurationRequestDTO)
         {
             return Ok(await _configurationsUpdaterService.UpdateConfiguration(id, configurationRequestDTO));
         }

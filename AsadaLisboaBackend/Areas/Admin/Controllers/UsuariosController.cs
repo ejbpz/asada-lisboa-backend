@@ -61,7 +61,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="userUpdateRequestDTO">An object containing the updated details of the user.</param>
         /// <returns>No content.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromForm] UserUpdateRequestDTO userUpdateRequestDTO)
+        public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] UserUpdateRequestDTO userUpdateRequestDTO)
         {
             await _usersUpdaterService.UpdateUser(id, userUpdateRequestDTO);
 

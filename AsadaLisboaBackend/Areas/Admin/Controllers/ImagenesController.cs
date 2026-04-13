@@ -69,7 +69,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="imageRequestDTO">The ImageRequestDTO object containing the image details.</param>
         /// <returns>An ActionResult indicating the result of the create operation.</returns>
         [HttpPost("")]
-        public async Task<IActionResult> CreateImage([FromForm] ImageRequestDTO imageRequestDTO)
+        public async Task<IActionResult> CreateImage([FromBody] ImageRequestDTO imageRequestDTO)
         {
             return Created("~/api/admin/imagenes", await _imagesAdderService.CreateImage(imageRequestDTO));
         }
@@ -81,7 +81,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="ImageUpdateRequestDTO">The ImageUpdateRequestDTO object containing the updated image details.</param>
         /// <returns>An ActionResult indicating the result of the update operation.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditImage([FromRoute] Guid id, [FromForm] ImageUpdateRequestDTO ImageUpdateRequestDTO)
+        public async Task<IActionResult> EditImage([FromRoute] Guid id, [FromBody] ImageUpdateRequestDTO ImageUpdateRequestDTO)
         {
             return Ok(await _imagesUpdaterService.UpdateImage(id, ImageUpdateRequestDTO));
         }

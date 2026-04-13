@@ -31,7 +31,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="editorRequestDTO">File object with the new temporal image.</param>
         /// <returns>ActionResult containing the created temporal image url.</returns>
         [HttpPost("imagen-temp")]
-        public async Task<IActionResult> CreateTemporalImage([FromForm] EditorRequestDTO editorRequestDTO)
+        public async Task<IActionResult> CreateTemporalImage([FromBody] EditorRequestDTO editorRequestDTO)
         {
             return Created("~/api/admin/editor", await _editorsAdderService.CreateTemporalImage(editorRequestDTO));
         }

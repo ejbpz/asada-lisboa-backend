@@ -69,7 +69,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="newRequestDTO">An object containing the details of the new to be created. Cannot be null.</param>
         /// <returns>An ActionResult containing the created NewResponseDTO object.</returns>
         [HttpPost("")]
-        public async Task<ActionResult<NewResponseDTO>> CreateNew([FromForm] NewRequestDTO newRequestDTO)
+        public async Task<ActionResult<NewResponseDTO>> CreateNew([FromBody] NewRequestDTO newRequestDTO)
         {
             return Created("~/api/admin/noticias", await _newsAdderService.CreateNew(newRequestDTO));
         }
@@ -81,7 +81,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="newRequestDTO">An object containing the updated details of the new.</param>
         /// <returns>An ActionResult containing the updated NewResponseDTO object.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<NewResponseDTO>> UpdateNew([FromRoute] Guid id, [FromForm] NewRequestDTO newRequestDTO)
+        public async Task<ActionResult<NewResponseDTO>> UpdateNew([FromRoute] Guid id, [FromBody] NewRequestDTO newRequestDTO)
         {
             return Ok(await _newsUpdaterService.UpdateNew(id, newRequestDTO));
         }

@@ -52,7 +52,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="aboutUsSectionRequestDTO">The about us request data.</param>
         /// <returns>The created about us section.</returns>
         [HttpPost("")]
-        public async Task<ActionResult<AboutUsResponseDTO>> CreateAboutUsSection([FromForm] AboutUsRequestDTO aboutUsSectionRequestDTO)
+        public async Task<ActionResult<AboutUsResponseDTO>> CreateAboutUsSection([FromBody] AboutUsRequestDTO aboutUsSectionRequestDTO)
         {
             return Created("~/api/admin/nosotros", await _aboutUsSectionsAdderService.CreateAboutUsSection(aboutUsSectionRequestDTO));
         }
@@ -64,7 +64,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="aboutUsSectionRequestDTO">The updated about us section data.</param>
         /// <returns>The updated about us section.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<AboutUsResponseDTO>> UpdateAboutUsSection([FromRoute] Guid id, [FromForm] AboutUsRequestDTO aboutUsSectionRequestDTO)
+        public async Task<ActionResult<AboutUsResponseDTO>> UpdateAboutUsSection([FromRoute] Guid id, [FromBody] AboutUsRequestDTO aboutUsSectionRequestDTO)
         {
             return Ok(await _aboutUsSectionsUpdaterService.UpdateAboutUsSection(id, aboutUsSectionRequestDTO));
         }
