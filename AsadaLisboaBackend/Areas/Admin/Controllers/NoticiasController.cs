@@ -69,7 +69,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="newRequestDTO">An object containing the details of the new to be created. Cannot be null.</param>
         /// <returns>An ActionResult containing the created NewResponseDTO object.</returns>
         [HttpPost("")]
-        public async Task<ActionResult<NewResponseDTO>> CreateNew([FromBody] NewRequestDTO newRequestDTO)
+        public async Task<ActionResult<NewResponseDTO>> CreateNew([FromForm] NewRequestDTO newRequestDTO)
         {
             return Created("~/api/admin/noticias", await _newsAdderService.CreateNew(newRequestDTO));
         }
@@ -81,7 +81,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="newRequestDTO">An object containing the updated details of the new.</param>
         /// <returns>An ActionResult containing the updated NewResponseDTO object.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<NewResponseDTO>> UpdateNew([FromRoute] Guid id, [FromBody] NewRequestDTO newRequestDTO)
+        public async Task<ActionResult<NewResponseDTO>> UpdateNew([FromRoute] Guid id, [FromForm] NewRequestDTO newRequestDTO)
         {
             return Ok(await _newsUpdaterService.UpdateNew(id, newRequestDTO));
         }
@@ -93,7 +93,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="statusChangeRequestDTO">An object containing the new status identifier.</param>
         /// <returns>No content.</returns>
         [HttpPatch("cambiar-estado/{id}")]
-        public async Task<IActionResult> ChangeNewStatus([FromRoute] Guid id, [FromBody] StatusChangeRequestDTO statusChangeRequestDTO)
+        public async Task<IActionResult> ChangeNewStatus([FromRoute] Guid id, [FromForm] StatusChangeRequestDTO statusChangeRequestDTO)
         {
             await _statusesUpdaterService.ChangeStatus(id, statusChangeRequestDTO.StatusId, ObjectTypeEnum.New);
             return NoContent();

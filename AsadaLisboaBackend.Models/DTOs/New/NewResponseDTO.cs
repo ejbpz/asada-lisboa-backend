@@ -34,7 +34,7 @@ namespace AsadaLisboaBackend.Models.DTOs.New
                 Description = newModel.Description,
                 PublicationDate = newModel.PublicationDate,
                 LastEditionDate = newModel.LastEditionDate,
-                StatusName = newModel.Status!.Name ?? "Pendiente",
+                StatusName = newModel.Status!.Name ?? "",
                 Categories = newModel.Categories
                     .Select(c => c.Name)
                     .ToList(),
@@ -54,7 +54,7 @@ namespace AsadaLisboaBackend.Models.DTOs.New
                 Description = newModel.Description,
                 PublicationDate = newModel.PublicationDate,
                 LastEditionDate = newModel.LastEditionDate,
-                StatusName = newModel.Status!.Name ?? "Pendiente",
+                StatusName = newModel.Status!.Name ?? "",
                 Categories = newModel.Categories
                     .Select(c => c.Name)
                     .ToList(),

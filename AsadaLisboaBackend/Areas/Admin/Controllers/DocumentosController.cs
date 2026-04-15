@@ -69,7 +69,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="documentRequestDTO">An object containing the details of the document to be created. Cannot be null.</param>
         /// <returns>An ActionResult containing the created DocumentResponseDTO object.</returns>
         [HttpPost("")]
-        public async Task<IActionResult> CreateDocument([FromBody] DocumentRequestDTO documentRequestDTO)
+        public async Task<IActionResult> CreateDocument([FromForm] DocumentRequestDTO documentRequestDTO)
         {
             return Created("~/api/admin/documentos", await _documentsAdderService.CreateDocument(documentRequestDTO));
         }
@@ -81,7 +81,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="documentUpdateRequestDTO">An object containing the updated details of the document.</param>
         /// <returns>An ActionResult containing the updated DocumentResponseDTO object.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditDocument([FromRoute] Guid id, [FromBody] DocumentUpdateRequestDTO documentUpdateRequestDTO)
+        public async Task<IActionResult> EditDocument([FromRoute] Guid id, [FromForm] DocumentUpdateRequestDTO documentUpdateRequestDTO)
         {
             return Ok(await _documentsUpdaterService.UpdateDocument(id, documentUpdateRequestDTO));
         }
@@ -93,7 +93,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         /// <param name="statusChangeRequestDTO">An object containing the new status identifier.</param>
         /// <returns>No content.</returns>
         [HttpPatch("cambiar-estado/{id}")]
-        public async Task<IActionResult> ChangeDocumentStatus([FromRoute] Guid id, [FromBody] StatusChangeRequestDTO statusChangeRequestDTO)
+        public async Task<IActionResult> ChangeDocumentStatus([FromRoute] Guid id, [FromForm] StatusChangeRequestDTO statusChangeRequestDTO)
         {
             await _statusesUpdaterService.ChangeStatus(id, statusChangeRequestDTO.StatusId, ObjectTypeEnum.Document);
             return NoContent();

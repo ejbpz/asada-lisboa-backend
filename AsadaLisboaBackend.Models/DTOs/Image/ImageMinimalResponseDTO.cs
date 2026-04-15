@@ -6,9 +6,10 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
     {
         public Guid Id { get; set; }
         public Guid StatusId { get; set; }
-        public DateTime PublicationDate { get; set; }
+        public string Url { get; set; } = string.Empty;
         public string Slug { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
         public string FilePath { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public List<string> Categories { get; set; } = new();
@@ -21,12 +22,13 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
             return image => new ImageMinimalResponseDTO
             {
                 Id = image.Id,
+                Url = image.Url,
                 Slug = image.Slug,
                 Title = image.Title,
+                FileName = image.FileName,
                 FilePath = image.FilePath,
                 StatusId = image.StatusId,
                 Description = image.Description,
-                PublicationDate = image.PublicationDate,
                 Categories = image.Categories
                     .Select(c => c.Name)
                     .ToList(),
@@ -38,12 +40,13 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
             return new ImageMinimalResponseDTO()
             {
                 Id = image.Id,
+                Url = image.Url,
                 Slug = image.Slug,
                 Title = image.Title,
+                FileName = image.FileName,
                 FilePath = image.FilePath,
                 StatusId = image.StatusId,
                 Description = image.Description,
-                PublicationDate = image.PublicationDate,
                 Categories = image.Categories
                     .Select(c => c.Name)
                     .ToList(),

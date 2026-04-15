@@ -43,13 +43,21 @@ namespace AsadaLisboaBackend.Services.Categories
         {
             var categoriesWithoutId = await NoIdCategories(categories);
             var categoriesWithId = await IdCategories(categories);
+            
+            var names = categoriesWithoutId
+                .Select(c => c.Name.Trim().ToLower())
+                .ToList();
 
-            var names = categories.Select(c => c.Name.Trim().ToLower()).ToList();
+            var existingByName = await _categoriesGetterRepository.NoRepeatNames(names);
 
-            var existingByName = await _categoriesGetterRepository.NoRepeatNames(categories, names);
-            var toCreate = await _categoriesGetterRepository.ToCreateCategories(existingByName);
+            var existingNames = existingByName
+                .Select(c => c.Name.Trim().ToLower())
+                .ToList();
 
-            await _categoriesAdderRepository.AddCategories(toCreate);
+            var toCreate = _categoriesGetterRepository.ToCreateCategories(categoriesWithoutId, existingNames);
+
+            if (toCreate.Any())
+                await _categoriesAdderRepository.AddCategories(toCreate);
 
             var categoriesToReturn = new List<Guid>();
 

@@ -1,4 +1,5 @@
-﻿using AsadaLisboaBackend.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
@@ -16,14 +17,22 @@ namespace AsadaLisboaBackend.Repositories.Documents
 
         public async Task<Document> CreateDocument(Document newDocument)
         {
+            foreach (var category in newDocument.Categories)
+            {
+                _context.Categories.Attach(category);
+            }
+
             _context.Documents.Add(newDocument);
             var affectedRow = await _context.SaveChangesAsync();
 
             if (affectedRow < 1)
-                throw new CreateObjectException("Error al agrgrar el documento");
+                throw new CreateObjectException("Error al agregrar el documento");
 
-            return newDocument;
-
+            return await _context.Documents
+                .Include(d => d.Status)
+                .Include(d => d.Categories)
+                .Include(d => d.DocumentType)
+                .FirstAsync(d => d.Id == newDocument.Id);
         }
     }
 }

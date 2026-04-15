@@ -17,7 +17,7 @@ namespace AsadaLisboaBackend.Repositories.DocumentTypes
         {
             return _context.DocumentTypes
                 .AsNoTracking()
-                .Where(c => c.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase))
+                .Where(c => c.Extension.Equals(extension))
                 .FirstOrDefault()?.Id;
         } 
     }

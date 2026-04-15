@@ -1,7 +1,8 @@
 ﻿using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Images;
+using AsadaLisboaBackend.Services.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace AsadaLisboaBackend.Repositories.Images
 {
@@ -16,38 +17,35 @@ namespace AsadaLisboaBackend.Repositories.Images
 
         public async Task<Image> UpdateImage(Image image)
         {
-            _context.Attach(image);
+            var existingImage = await _context.Images
+                .Include(d => d.Status)
+                .Include(d => d.Categories)
+                .FirstAsync(d => d.Id == image.Id);
 
-            _context.Entry(image).Property(n => n.Url).IsModified = true;
-            _context.Entry(image).Property(n => n.Slug).IsModified = true;
-            _context.Entry(image).Property(n => n.Title).IsModified = true;
-            _context.Entry(image).Property(n => n.StatusId).IsModified = true;
-            _context.Entry(image).Property(n => n.FileName).IsModified = true;
-            _context.Entry(image).Property(n => n.FilePath).IsModified = true;
-            _context.Entry(image).Property(n => n.FileSize).IsModified = true;
-            _context.Entry(image).Property(n => n.Categories).IsModified = true;
-            _context.Entry(image).Property(n => n.Description).IsModified = true;
+            existingImage.Url = image.Url;
+            existingImage.Slug = image.Slug;
+            existingImage.Title = image.Title;
+            existingImage.StatusId = image.StatusId;
+            existingImage.FileSize = image.FileSize;
+            existingImage.FilePath = image.FilePath;
+            existingImage.FileName = image.FileName;
+            existingImage.Description = image.Description;
+
+            var newCategories = image.Categories.ToList();
+            existingImage.Categories.Clear();
+
+            foreach (var category in newCategories)
+            {
+                _context.Categories.Attach(category);
+                existingImage.Categories.Add(category);
+            }
 
             var affectedRows = await _context.SaveChangesAsync();
 
             if (affectedRows < 1)
                 throw new UpdateObjectException("Error al modificar la imagen.");
 
-            return new Image()
-            {
-                Id = image.Id,
-                Url = image.Url,
-                Slug = image.Slug,
-                Title = image.Title,
-                Status = image.Status,
-                FileName = image.FileName,
-                FilePath = image.FilePath,
-                StatusId = image.StatusId,
-                FileSize = image.FileSize,
-                Categories = image.Categories,
-                Description = image.Description,
-                PublicationDate = image.PublicationDate,
-            };
+            return existingImage;
         }
     }
 }

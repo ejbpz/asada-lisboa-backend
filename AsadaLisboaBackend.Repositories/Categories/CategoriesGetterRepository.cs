@@ -43,7 +43,7 @@ namespace AsadaLisboaBackend.Repositories.Categories
                 .ToListAsync();
         }
 
-        public async Task<List<CategoryResponseDTO>> NoRepeatNames(List<CategoryRequestDTO> categoryRequestDTO, List<string> names)
+        public async Task<List<CategoryResponseDTO>> NoRepeatNames(List<string> names)
         {
             return await _context.Categories
                 .AsNoTracking()
@@ -52,13 +52,12 @@ namespace AsadaLisboaBackend.Repositories.Categories
                 .ToListAsync();
         }
 
-        public async Task<List<Category>> ToCreateCategories(List<CategoryResponseDTO> categoryResponseDTO)
+        public List<Category> ToCreateCategories(List<CategoryResponseDTO> categoriesWithoutId, List<string> existingNames)
         {
-            return await _context.Categories
-                .AsNoTracking()
-                .Where(c => !categoryResponseDTO.Any(r => r.Name.Trim().ToLower() == c.Name.Trim().ToLower()))
-                .Select(c => new Category { Name = c.Name })
-                .ToListAsync();
+            return categoriesWithoutId
+                .Where(c => !existingNames.Contains(c.Name.Trim().ToLower()))
+                .Select(c => new Category { Id = Guid.NewGuid(), Name = c.Name.Trim() })
+                .ToList();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AsadaLisboaBackend.Services.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
@@ -15,37 +16,37 @@ namespace AsadaLisboaBackend.Repositories.Documents
 
         public async Task<Models.Document> UpdateDocument(Models.Document document)
         {
-            _context.Attach(document);
+            var existingDocument = await _context.Documents
+                .Include(d => d.Status)
+                .Include(d => d.Categories)
+                .Include(d => d.DocumentType)
+                .FirstAsync(d => d.Id == document.Id);
 
-            _context.Entry(document).Property(n => n.Title).IsModified = true;
-            _context.Entry(document).Property(n => n.Description).IsModified = true;
-            _context.Entry(document).Property(n => n.Slug).IsModified = true;
-            _context.Entry(document).Property(n => n.StatusId).IsModified = true;
-            _context.Entry(document).Property(n => n.FileSize).IsModified = true;
-            _context.Entry(document).Property(n => n.DocumentTypeId).IsModified = true;
-            _context.Entry(document).Property(n => n.Categories).IsModified = true;
+            existingDocument.Url = document.Url;
+            existingDocument.Slug = document.Slug;
+            existingDocument.Title = document.Title;
+            existingDocument.StatusId = document.StatusId;
+            existingDocument.FileSize = document.FileSize;
+            existingDocument.FilePath = document.FilePath;
+            existingDocument.FileName = document.FileName;
+            existingDocument.Description = document.Description;
+            existingDocument.DocumentTypeId = document.DocumentTypeId;
+
+            var newCategories = document.Categories.ToList();
+            existingDocument.Categories.Clear();
+
+            foreach (var category in newCategories)
+            {
+                _context.Categories.Attach(category);
+                existingDocument.Categories.Add(category);
+            }
 
             var affectedRows = await _context.SaveChangesAsync();
 
             if (affectedRows < 1)
                 throw new UpdateObjectException("Error al modificar el documento");
 
-            return new Models.Document()
-            {
-                Id = document.Id,
-                Url = document.Url,
-                Slug = document.Slug,
-                Title = document.Title,
-                Status = document.Status,
-                FileSize = document.FileSize,
-                StatusId = document.StatusId,
-                FileName = document.FileName,
-                FilePath = document.FilePath,
-                Categories = document.Categories,
-                Description = document.Description,
-                DocumentTypeId = document.DocumentTypeId,
-                PublicationDate = document.PublicationDate,
-            };
+            return existingDocument;
         }
     }
 }

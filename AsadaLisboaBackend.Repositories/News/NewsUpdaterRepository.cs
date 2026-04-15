@@ -1,4 +1,5 @@
-﻿using AsadaLisboaBackend.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
@@ -16,38 +17,35 @@ namespace AsadaLisboaBackend.Repositories.News
 
         public async Task<New> UpdateNew(Guid id, New newModel)
         {
-            _context.Attach(newModel);
+            var existingNew = await _context.News
+                .Include(d => d.Status)
+                .Include(d => d.Categories)
+                .FirstAsync(d => d.Id == id);
 
-            _context.Entry(newModel).Property(n => n.Slug).IsModified = true;
-            _context.Entry(newModel).Property(n => n.Title).IsModified = true;
-            _context.Entry(newModel).Property(n => n.StatusId).IsModified = true;
-            _context.Entry(newModel).Property(n => n.ImageUrl).IsModified = true;
-            _context.Entry(newModel).Property(n => n.FileName).IsModified = true;
-            _context.Entry(newModel).Property(n => n.FilePath).IsModified = true;
-            _context.Entry(newModel).Property(n => n.Categories).IsModified = true;
-            _context.Entry(newModel).Property(n => n.Description).IsModified = true;
-            _context.Entry(newModel).Property(n => n.LastEditionDate).IsModified = true;
+            existingNew.Slug = newModel.Slug;
+            existingNew.Title = newModel.Title;
+            existingNew.StatusId = newModel.StatusId;
+            existingNew.ImageUrl = newModel.ImageUrl;
+            existingNew.FileName = newModel.FileName;
+            existingNew.FilePath = newModel.FilePath;
+            existingNew.Description = newModel.Description;
+            existingNew.LastEditionDate = newModel.LastEditionDate;
+
+            var newCategories = newModel.Categories.ToList();
+            existingNew.Categories.Clear();
+
+            foreach (var category in newCategories)
+            {
+                _context.Categories.Attach(category);
+                existingNew.Categories.Add(category);
+            }
 
             var affectedRows = await _context.SaveChangesAsync();
 
             if (affectedRows < 1)
                 throw new UpdateObjectException("Error al modificar la noticia.");
 
-            return new New()
-            {
-                Id = id,
-                Slug = newModel.Slug,
-                Title = newModel.Title,
-                Status = newModel.Status,
-                ImageUrl = newModel.ImageUrl,
-                FileName = newModel.FileName,
-                FilePath = newModel.FilePath,
-                StatusId = newModel.StatusId,
-                Categories = newModel.Categories,
-                Description = newModel.Description,
-                LastEditionDate = newModel.LastEditionDate,
-                PublicationDate = newModel.PublicationDate,
-            };
+            return existingNew;
         }
     }
 }

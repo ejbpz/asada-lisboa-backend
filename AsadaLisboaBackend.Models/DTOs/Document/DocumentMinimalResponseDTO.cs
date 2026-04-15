@@ -6,11 +6,12 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
     {
         public Guid Id { get; set; }
         public Guid StatusId { get; set; }
+        public string Url { get; set; } = string.Empty;
         public string Slug { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-
-        public long FileSize { get; set; }
         public string DocumentTypeName { get; set; } = string.Empty;
         public List<string> Categories { get; set; } = new();
     }
@@ -22,10 +23,12 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
             return document => new DocumentMinimalResponseDTO
             {
                 Id = document.Id,
+                Url = document.Url,
                 Slug = document.Slug,
                 Title = document.Title,
+                FileName = document.FileName,
+                FilePath = document.FilePath,
                 StatusId = document.StatusId,
-                FileSize = document.FileSize,
                 Description = document.Description,
                 DocumentTypeName = document.DocumentType!.Name ?? "",
                 Categories = document.Categories
@@ -39,10 +42,12 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
             return new DocumentMinimalResponseDTO()
             {
                 Id = document.Id,
+                Url = document.Url,
                 Slug = document.Slug,
                 Title = document.Title,
+                FileName = document.FileName,
+                FilePath = document.FilePath,
                 StatusId = document.StatusId,
-                FileSize = document.FileSize,
                 Description = document.Description,
                 DocumentTypeName = document.DocumentType!.Name ?? "",
                 Categories = document.Categories

@@ -28,7 +28,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
                 Title = document.Title,
                 Description = document.Description,
                 FileSize = document.FileSize,
-                StatusName = document.Status!.Name ?? "Pendiente",
+                StatusName = document.Status!.Name ?? "",
                 DocumentTypeName = document.DocumentType!.Name ?? "",
                 Categories = document.Categories
                     .Select(c => c.Name)
@@ -46,7 +46,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
                 Title = document.Title,
                 Description = document.Description,
                 FileSize = document.FileSize,
-                StatusName = document.Status!.Name ?? "Pendiente",
+                StatusName = document.Status!.Name ?? "",
                 DocumentTypeName = document.DocumentType!.Name ?? "",
                 Categories = document.Categories
                     .Select(c => c.Name)
