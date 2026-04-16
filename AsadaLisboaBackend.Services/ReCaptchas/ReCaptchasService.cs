@@ -43,7 +43,7 @@ namespace AsadaLisboaBackend.Services.ReCaptchas
                 return false;
             }
 
-            var result = await response.Content.ReadFromJsonAsync<ReCaptchaResponse>();
+            var result = await response.Content.ReadFromJsonAsync<ReCaptchaResponseDTO>();
 
             if (result is null)
             {

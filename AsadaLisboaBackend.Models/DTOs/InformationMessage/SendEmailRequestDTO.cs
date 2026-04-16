@@ -21,7 +21,7 @@ namespace AsadaLisboaBackend.Models.DTOs.InformationMessage
         public string Subject { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El mensaje es requerido.")]
-        [StringLength(320, MinimumLength = 20, ErrorMessage = "El mensaje debe ser entre {1} y {0} caracteres.")]
+        [StringLength(320, MinimumLength = 20, ErrorMessage = "El mensaje debe ser entre {1} y {2} caracteres.")]
         public string Message { get; set; } = string.Empty;
     }
 }

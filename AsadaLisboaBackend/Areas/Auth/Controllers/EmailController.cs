@@ -1,8 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.RateLimiting;
-using AsadaLisboaBackend.Utils.OptionsPattern;
+using AsadaLisboaBackend.Models.DTOs.ReCaptcha;
 using AsadaLisboaBackend.ServiceContracts.Emails;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
 using AsadaLisboaBackend.Models.DTOs.InformationMessage;
@@ -36,12 +35,12 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// <summary>
         /// Get ReCAPTCHA confirmation.
         /// </summary>
-        /// <param name="reCaptchaRequest">ReCAPTCHA public key.</param>
+        /// <param name="reCaptchaRequestDTO">ReCAPTCHA public key.</param>
         /// <returns>ReCAPTCHA confirmation.</returns>
-        [HttpGet("re-captcha")]
-        public async Task<bool> GetReCaptcha([FromBody] string reCaptchaRequest)
+        [HttpPost("re-captcha")]
+        public async Task<bool> GetReCaptcha([FromBody] ReCaptchaRequestDTO reCaptchaRequestDTO)
         {
-            return await _reCaptchasService.ReCaptchaValidation(reCaptchaRequest);
+            return await _reCaptchasService.ReCaptchaValidation(reCaptchaRequestDTO.ReCaptchaRequest);
         }
 
         /// <summary>
