@@ -39,7 +39,7 @@ namespace AsadaLisboaBackend.Services.Categories
                 time: TimeSpan.FromMinutes(5));
         }
 
-        public async Task<List<Category>> ToCreateCategories(List<CategoryRequestDTO> categories)
+        public async Task<HashSet<Category>> ToCreateCategories(List<CategoryRequestDTO> categories)
         {
             var categoriesWithoutId = await NoIdCategories(categories);
             var categoriesWithId = await IdCategories(categories);
@@ -68,7 +68,7 @@ namespace AsadaLisboaBackend.Services.Categories
             return categoriesToReturn
                 .Distinct()
                 .Select(id => new Category { Id = id })
-                .ToList();
+                .ToHashSet();
         }
 
         private async Task<List<CategoryResponseDTO>> NoIdCategories(List<CategoryRequestDTO> categoryRequestDTO)

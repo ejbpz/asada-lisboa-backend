@@ -31,14 +31,16 @@ namespace AsadaLisboaBackend.Repositories.News
             existingNew.Description = newModel.Description;
             existingNew.LastEditionDate = newModel.LastEditionDate;
 
-            var newCategories = newModel.Categories.ToList();
-            existingNew.Categories.Clear();
+            var categoryIds = newModel.Categories
+                .Select(c => c.Id)
+                .ToList();
 
-            foreach (var category in newCategories)
-            {
-                _context.Categories.Attach(category);
-                existingNew.Categories.Add(category);
-            }
+            var categoriesFromDb = await _context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            existingNew.Categories.Clear();
+            existingNew.Categories = categoriesFromDb;
 
             var affectedRows = await _context.SaveChangesAsync();
 

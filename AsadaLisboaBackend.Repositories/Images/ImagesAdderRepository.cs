@@ -18,10 +18,15 @@ namespace AsadaLisboaBackend.Repositories.Images
 
         public async Task<Image> CreateImage(Image image)
         {
-            foreach (var category in image.Categories)
-            {
-                _context.Categories.Attach(category);
-            }
+            var categoryIds = image.Categories
+                .Select(c => c.Id)
+                .ToList();
+
+            var categoriesFromDb = await _context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            image.Categories = categoriesFromDb;
 
             _context.Images.Add(image);
             var affectedRows = await _context.SaveChangesAsync();

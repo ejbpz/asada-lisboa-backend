@@ -7,6 +7,6 @@ namespace AsadaLisboaBackend.ServiceContracts.Categories
     {
         public Task<List<CategoryResponseDTO>> GetCategories();
         public Task<List<CategoryResponseDTO>> SearchCategories(string search);
-        public Task<List<Category>> ToCreateCategories(List<CategoryRequestDTO> categories);
+        public Task<HashSet<Category>> ToCreateCategories(List<CategoryRequestDTO> categories);
     }
 }

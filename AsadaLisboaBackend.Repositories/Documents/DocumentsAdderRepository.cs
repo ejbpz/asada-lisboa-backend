@@ -17,10 +17,15 @@ namespace AsadaLisboaBackend.Repositories.Documents
 
         public async Task<Document> CreateDocument(Document newDocument)
         {
-            foreach (var category in newDocument.Categories)
-            {
-                _context.Categories.Attach(category);
-            }
+            var categoryIds = newDocument.Categories
+                .Select(c => c.Id)
+                .ToList();
+
+            var categoriesFromDb = await _context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            newDocument.Categories = categoriesFromDb;
 
             _context.Documents.Add(newDocument);
             var affectedRow = await _context.SaveChangesAsync();

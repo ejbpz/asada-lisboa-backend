@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Services.Exceptions;
+﻿using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
+using AsadaLisboaBackend.Services.Exceptions;
+using Elastic.Clients.Elasticsearch.IndexManagement;
+using Microsoft.EntityFrameworkCore;
 
 namespace AsadaLisboaBackend.Repositories.News
 {
@@ -17,10 +18,15 @@ namespace AsadaLisboaBackend.Repositories.News
 
         public async Task<New> CreateNew(New newModel)
         {
-            foreach (var category in newModel.Categories)
-            {
-                _context.Categories.Attach(category);
-            }
+            var categoryIds = newModel.Categories
+                .Select(c => c.Id)
+                .ToList();
+
+            var categoriesFromDb = await _context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            newModel.Categories = categoriesFromDb;
 
             _context.News.Add(newModel);
             var affectedRows = await _context.SaveChangesAsync();

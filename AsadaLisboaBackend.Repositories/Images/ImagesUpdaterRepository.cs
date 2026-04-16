@@ -31,14 +31,16 @@ namespace AsadaLisboaBackend.Repositories.Images
             existingImage.FileName = image.FileName;
             existingImage.Description = image.Description;
 
-            var newCategories = image.Categories.ToList();
-            existingImage.Categories.Clear();
+            var categoryIds = image.Categories
+                .Select(c => c.Id)
+                .ToList();
 
-            foreach (var category in newCategories)
-            {
-                _context.Categories.Attach(category);
-                existingImage.Categories.Add(category);
-            }
+            var categoriesFromDb = await _context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            existingImage.Categories.Clear();
+            existingImage.Categories = categoriesFromDb;
 
             var affectedRows = await _context.SaveChangesAsync();
 

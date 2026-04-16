@@ -32,14 +32,16 @@ namespace AsadaLisboaBackend.Repositories.Documents
             existingDocument.Description = document.Description;
             existingDocument.DocumentTypeId = document.DocumentTypeId;
 
-            var newCategories = document.Categories.ToList();
-            existingDocument.Categories.Clear();
+            var categoryIds = document.Categories
+                .Select(c => c.Id)
+                .ToList();
 
-            foreach (var category in newCategories)
-            {
-                _context.Categories.Attach(category);
-                existingDocument.Categories.Add(category);
-            }
+            var categoriesFromDb = await _context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            existingDocument.Categories.Clear();
+            existingDocument.Categories = categoriesFromDb;
 
             var affectedRows = await _context.SaveChangesAsync();
 

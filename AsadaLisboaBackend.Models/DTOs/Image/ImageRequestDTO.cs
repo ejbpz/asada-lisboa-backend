@@ -17,7 +17,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
 
         
         [MaxFileSize(5, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]
-        [AllowedExtensions(new string[] { ".jpg", ".jpeg", ".png", ".mp4", ".mov", ".mkv" }, ErrorMessage = "La extensión de la imagen no es válida.")]
+        [AllowedExtensions(new string[] { ".jpg", ".jpeg", ".png", ".webp", ".jfif", ".mp4", ".mov", ".mkv" }, ErrorMessage = "La extensión de la imagen no es válida.")]
         public IFormFile File { get; set; } = null!;
 
         [Required(ErrorMessage = "Debe selecionar un estado válido.")]
