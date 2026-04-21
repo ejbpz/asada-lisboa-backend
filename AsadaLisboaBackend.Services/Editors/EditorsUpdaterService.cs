@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using HtmlAgilityPack;
+using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 
@@ -38,7 +39,7 @@ namespace AsadaLisboaBackend.Services.Editors
 
                 await _fileSystems.MoveAsync(fileName, "temp", "noticias");
 
-                node.SetAttributeValue("src", $"/noticias/{fileName}");
+                node.SetAttributeValue("src", $"{Constants.DOMAIN_HOST}/noticias/{fileName}");
             }
 
             _logger.LogInformation("Cambiando imágenes de carpeta 'temp' a 'noticias'");

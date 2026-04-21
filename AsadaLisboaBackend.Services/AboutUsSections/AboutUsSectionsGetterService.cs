@@ -42,7 +42,7 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Error al obtener AboutUsSections. Página: {Page}, Tamaño: {Take}",
+                    "Error al obtener AboutUsSections. Tamaño: {Take}",
                     searchSortRequestDTO.Take
                 );
                 throw;
