@@ -35,7 +35,6 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         {
             return Ok(await _contactsGetterService.GetContacts(new SearchSortRequestDTO()
             {
-                Page = 1,
                 Take = 100,
                 Offset = 0,
                 Search = null,

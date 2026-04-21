@@ -20,8 +20,6 @@ namespace AsadaLisboaBackend.Services.Images
 
         public async Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
         {
-            searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
             return await _memoryCachesService.GetOrCreateCacheList(
                 resource: Constants.CACHE_IMAGES,
                 request: searchSortRequestDTO,

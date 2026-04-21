@@ -1,18 +1,18 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Shared;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.AboutUs;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using Microsoft.Extensions.Logging;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.AboutUsSections
 {
     public class AboutUsSectionsGetterService : IAboutUsSectionsGetterService
     {
-        private readonly IAboutUsSectionsGetterRepository _aboutUsSectionsGetterRepository;
-        private readonly ILogger<AboutUsSectionsGetterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly ILogger<AboutUsSectionsGetterService> _logger;
+        private readonly IAboutUsSectionsGetterRepository _aboutUsSectionsGetterRepository;
 
         public AboutUsSectionsGetterService(IAboutUsSectionsGetterRepository aboutUsSectionsGetterRepository, ILogger<AboutUsSectionsGetterService> logger, IMemoryCachesService memoryCachesService)
         {
@@ -25,8 +25,6 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
         {
             try
             {
-                searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
                 var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<AboutUsResponseDTO>>(
 
                     resource: Constants.CACHE_USERS,
@@ -35,8 +33,7 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
                     time: TimeSpan.FromMinutes(5));
 
                 _logger.LogInformation(
-                    "Obtención exitosa de AboutUsSections. Página: {Page}, Tamaño: {Take}",
-                    searchSortRequestDTO.Page,
+                    "Obtención exitosa de AboutUsSections. Tamaño: {Take}",
                     searchSortRequestDTO.Take
                 );
 
@@ -46,7 +43,6 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
             {
                 _logger.LogError(ex,
                     "Error al obtener AboutUsSections. Página: {Page}, Tamaño: {Take}",
-                    searchSortRequestDTO.Page,
                     searchSortRequestDTO.Take
                 );
                 throw;

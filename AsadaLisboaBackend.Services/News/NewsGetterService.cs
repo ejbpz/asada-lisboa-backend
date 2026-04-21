@@ -36,8 +36,6 @@ namespace AsadaLisboaBackend.Services.News
 
         public async Task<PageResponseDTO<NewMinimalResponseDTO>> GetNews(SearchSortRequestDTO searchSortRequestDTO)
         {
-            searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
             return await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<NewMinimalResponseDTO>>(
                 resource: Constants.CACHE_NEWS,
                 request: searchSortRequestDTO,

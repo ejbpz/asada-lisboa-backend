@@ -34,7 +34,6 @@ namespace AsadaLisboaBackend.Services.Principals
         {
             var searchSortRequestDTO = new SearchSortRequestDTO()
             {
-                Page = 1,
                 Take = 6,
                 Offset = 0,
                 Search = null,

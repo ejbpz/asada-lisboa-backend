@@ -25,8 +25,6 @@ namespace AsadaLisboaBackend.Services.Configurations
         {
             try
             {
-                searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
                 var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<ConfigurationResponseDTO>>(
 
                     resource: Constants.CACHE_CONFIGURATIONS,
@@ -35,8 +33,7 @@ namespace AsadaLisboaBackend.Services.Configurations
                     time: TimeSpan.FromMinutes(5));
 
                 _logger.LogInformation(
-                    "Obtención exitosa de configuración. Página: {Page}, Tamaño: {Take}",
-                    searchSortRequestDTO.Page,
+                    "Obtención exitosa de configuración. Tamaño: {Take}",
                     searchSortRequestDTO.Take
                 );
 
@@ -45,8 +42,7 @@ namespace AsadaLisboaBackend.Services.Configurations
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Error al obtener configuración. Página: {Page}, Tamaño: {Take}",
-                    searchSortRequestDTO.Page,
+                    "Error al obtener configuración. Tamaño: {Take}",
                     searchSortRequestDTO.Take
                 );
                 throw;

@@ -34,7 +34,6 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         {
             return Ok(await _aboutUsSectionsGetterService.GetAboutUsSections(new SearchSortRequestDTO()
             {
-                Page = 1,
                 Take = 100,
                 Offset = 0,
                 Search = null,

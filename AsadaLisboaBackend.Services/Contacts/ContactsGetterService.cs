@@ -1,11 +1,10 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Contact;
-using AsadaLisboaBackend.Models.DTOs.Shared;
-using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using AsadaLisboaBackend.RepositoryContracts.Contacts;
-using AsadaLisboaBackend.ServiceContracts.Contacts;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
-using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Models.DTOs.Shared;
+using AsadaLisboaBackend.Models.DTOs.Contact;
+using AsadaLisboaBackend.ServiceContracts.Contacts;
+using AsadaLisboaBackend.RepositoryContracts.Contacts;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
 namespace AsadaLisboaBackend.Services.Contacts
 {
@@ -24,9 +23,7 @@ namespace AsadaLisboaBackend.Services.Contacts
 
         public async Task<PageResponseDTO<ContactResponseDTO>> GetContacts(SearchSortRequestDTO searchSortRequestDTO)
         {
-            try { 
-                  searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
+            try {
                   var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<ContactResponseDTO>>
                     (
                       resource: Constants.CACHE_CONTACTS,
@@ -36,8 +33,7 @@ namespace AsadaLisboaBackend.Services.Contacts
                 
 
                 _logger.LogInformation(
-                    "Obtención exitosa de configuración. Página: {Page}, Tamaño: {Take}",
-                    searchSortRequestDTO.Page,
+                    "Obtención exitosa de configuración. Tamaño: {Take}",
                     searchSortRequestDTO.Take
                 );
 
@@ -47,8 +43,7 @@ namespace AsadaLisboaBackend.Services.Contacts
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Error al obtener contacto. Página: {Page}, Tamaño: {Take}",
-                    searchSortRequestDTO.Page,
+                    "Error al obtener contacto. Tamaño: {Take}",
                     searchSortRequestDTO.Take
                 );
                 throw;

@@ -21,8 +21,6 @@ namespace AsadaLisboaBackend.Services.Documents
 
         public async Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
         {
-            searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
             return await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<DocumentMinimalResponseDTO>>(
                 resource: Constants.CACHE_DOCUMENTS,
                 request: searchSortRequestDTO, 

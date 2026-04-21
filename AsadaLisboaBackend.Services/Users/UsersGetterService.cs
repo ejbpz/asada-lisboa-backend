@@ -24,8 +24,6 @@ namespace AsadaLisboaBackend.Services.Users
 
         public async Task<PageResponseDTO<UserResponseDTO>> GetUsers(SearchSortRequestDTO searchSortRequestDTO)
         {
-            searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
             return await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<UserResponseDTO>>(
                 resource: Constants.CACHE_USERS,
                 request: searchSortRequestDTO,
@@ -35,8 +33,6 @@ namespace AsadaLisboaBackend.Services.Users
 
         public async Task<PageResponseDTO<UserResponseDTO>> GetPublicUsers(SearchSortRequestDTO searchSortRequestDTO)
         {
-            searchSortRequestDTO.Offset = (Math.Max(searchSortRequestDTO.Page, 1) - 1) * searchSortRequestDTO.Take;
-
             var usersList = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<UserResponseDTO>>(
                 resource: Constants.CACHE_USERS,
                 request: searchSortRequestDTO,
