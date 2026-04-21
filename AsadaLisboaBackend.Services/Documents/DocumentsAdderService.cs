@@ -51,12 +51,11 @@ namespace AsadaLisboaBackend.Services.Documents
 
             try
             {
-                url = await _fileSystems.SaveAsync(documentRequestDTO.File, "documents");
+                var slug = GenerateSlug.New(documentRequestDTO.Title, documentId);
+                url = await _fileSystems.SaveAsync(documentRequestDTO.File, "documentos", slug);
 
                 var fileName = Path.GetFileName(url);
-                var filePath = $"documents/{fileName}";
-
-                var slug = GenerateSlug.New(documentRequestDTO.Title, documentId);
+                var filePath = $"documentos/{fileName}";
 
                 var status = await _statusesGetterRepository.GetStatus(documentRequestDTO.StatusId);
 
@@ -95,10 +94,11 @@ namespace AsadaLisboaBackend.Services.Documents
                 //Add to ElasticSearch
                 var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO                   
                 {
-                    Id = document.Id,
                     Type = "Documento",
-                    Title = document.Title,
-                    Description = document.Description,
+                    Id = documentCreated.Id,
+                    Slug = documentCreated.Slug,
+                    Title = documentCreated.Title,
+                    Description = documentCreated.Description,
                     
                 };
                 await _elastic.IndexAsync(doc);
@@ -110,7 +110,7 @@ namespace AsadaLisboaBackend.Services.Documents
                 if (!string.IsNullOrEmpty(url) && !string.IsNullOrWhiteSpace(url))
                 {
                     var fileName = Path.GetFileName(url);
-                    await _fileSystems.DeleteAsync(fileName, "documents");
+                    await _fileSystems.DeleteAsync(fileName, "documentos");
                 }
 
                 _logger.LogError("Error al crear el documento. Se eliminó el archivo subido con éxito.");

@@ -4,7 +4,7 @@ namespace AsadaLisboaBackend.ServiceContracts.FileSystems
 {
     public interface IFileSystemsManager
     {
-        Task<string> SaveAsync(IFormFile file, string folder);
+        Task<string> SaveAsync(IFormFile file, string folder, string? customName = null);
         Task MoveAsync(string fileName, string sourceFolder, string destinationFolder);
         Task DeleteAsync(string fileName, string folder);
         bool Exists(string fileName, string folder);

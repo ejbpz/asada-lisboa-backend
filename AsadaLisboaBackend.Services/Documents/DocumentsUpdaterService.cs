@@ -64,7 +64,7 @@ namespace AsadaLisboaBackend.Services.Documents
 
             try
             {
-                newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documents");
+                newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
 
                 var newFileName = Path.GetFileName(newUrl);
 
@@ -73,7 +73,7 @@ namespace AsadaLisboaBackend.Services.Documents
 
                 document.Url = newUrl;
                 document.FileName = newFileName;
-                document.FilePath = $"documents/{newFileName}";
+                document.FilePath = $"documentos/{newFileName}";
                 document.FileSize = documentUpdateRequestDTO.File.Length;
             }
             catch
@@ -81,7 +81,7 @@ namespace AsadaLisboaBackend.Services.Documents
                 if (!string.IsNullOrEmpty(newUrl) && string.IsNullOrWhiteSpace(newUrl))
                 {
                     var fileName = Path.GetFileName(newUrl);
-                    await _fileSystems.DeleteAsync(fileName, "documents");
+                    await _fileSystems.DeleteAsync(fileName, "documentos");
                 }
 
                 _logger.LogError("Error al actualizar el documento con id {DocumentId}.", id);
@@ -105,10 +105,11 @@ namespace AsadaLisboaBackend.Services.Documents
 
             var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
             {
-                Id = document.Id,
                 Type = "Documento",
-                Title = document.Title,
-                Description = document.Description,
+                Id = documentUpdated.Id,
+                Slug = documentUpdated.Slug,
+                Title = documentUpdated.Title,
+                Description = documentUpdated.Description,
 
             };
             await _elastic.IndexAsync(doc);

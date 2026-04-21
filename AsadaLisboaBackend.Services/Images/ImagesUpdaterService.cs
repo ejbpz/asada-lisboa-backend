@@ -62,7 +62,7 @@ namespace AsadaLisboaBackend.Services.Images
 
             try
             {
-                newUrl = await _fileSystems.SaveAsync(imageUpdateRequestDTO.File, "images");
+                newUrl = await _fileSystems.SaveAsync(imageUpdateRequestDTO.File, "imagenes", image.Slug);
 
                 var newFileName = Path.GetFileName(newUrl);
 
@@ -71,7 +71,7 @@ namespace AsadaLisboaBackend.Services.Images
 
                 image.Url = newUrl;
                 image.FileName = newFileName;
-                image.FilePath = $"images/{newFileName}";
+                image.FilePath = $"imagenes/{newFileName}";
                 image.FileSize = imageUpdateRequestDTO.File.Length;
             }
             catch
@@ -79,7 +79,7 @@ namespace AsadaLisboaBackend.Services.Images
                 if (!string.IsNullOrEmpty(newUrl) && !string.IsNullOrWhiteSpace(newUrl))
                 {
                     var fileName = Path.GetFileName(newUrl);
-                    await _fileSystems.DeleteAsync(fileName, "images");
+                    await _fileSystems.DeleteAsync(fileName, "imagenes");
                 }
 
                 _logger.LogError("Error al actualizar la imagen con id {DocumentId}.", id);
@@ -95,11 +95,11 @@ namespace AsadaLisboaBackend.Services.Images
             //Add to ElasticSearch
             var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
             {
-                Id = image.Id,
                 Type = "Imagen",
-                Title = image.Title,
-                Description = image.Description,
-                Slug = image.Slug,
+                Id = imageUpdated.Id,
+                Slug = imageUpdated.Slug,
+                Title = imageUpdated.Title,
+                Description = imageUpdated.Description,
             };
             await _elastic.IndexAsync(imag);
 

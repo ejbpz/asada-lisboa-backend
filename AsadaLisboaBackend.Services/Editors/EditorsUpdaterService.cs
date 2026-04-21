@@ -36,12 +36,12 @@ namespace AsadaLisboaBackend.Services.Editors
 
                 var fileName = Path.GetFileName(src);
 
-                await _fileSystems.MoveAsync(fileName, "temp", "news");
+                await _fileSystems.MoveAsync(fileName, "temp", "noticias");
 
-                node.SetAttributeValue("src", $"/news/{fileName}");
+                node.SetAttributeValue("src", $"/noticias/{fileName}");
             }
 
-            _logger.LogInformation("Cambiando imágenes de carpeta 'temp' a 'news'");
+            _logger.LogInformation("Cambiando imágenes de carpeta 'temp' a 'noticias'");
             return doc.DocumentNode.OuterHtml;
         }
     }

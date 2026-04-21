@@ -48,12 +48,11 @@ namespace AsadaLisboaBackend.Services.Images
 
             try
             {
-                url = await _fileSystems.SaveAsync(imageRequestDTO.File, "images");
+                var slug = GenerateSlug.New(imageRequestDTO.Title, imageId);
+                url = await _fileSystems.SaveAsync(imageRequestDTO.File, "imagenes", slug);
 
                 var fileName = Path.GetFileName(url);
-                var filePath = $"images/{fileName}";
-
-                var slug = GenerateSlug.New(imageRequestDTO.Title, imageId);
+                var filePath = $"imagenes/{fileName}";
 
                 var status = await _statusesGetterRepository.GetStatus(imageRequestDTO.StatusId);
 
@@ -82,11 +81,11 @@ namespace AsadaLisboaBackend.Services.Images
                 //Add to ElasticSearch
                 var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
                 {
-                    Id = image.Id,
                     Type = "Imagen",
-                    Title = image.Title,
-                    Description = image.Description,
-                    Slug = image.Slug,
+                    Id = imageCreated.Id,
+                    Slug = imageCreated.Slug,
+                    Title = imageCreated.Title,
+                    Description = imageCreated.Description,
                 };
                 await _elastic.IndexAsync(imag);
 
@@ -97,7 +96,7 @@ namespace AsadaLisboaBackend.Services.Images
                 if (!string.IsNullOrEmpty(url) && !string.IsNullOrWhiteSpace(url))
                 {
                     var fileName = Path.GetFileName(url);
-                    await _fileSystems.DeleteAsync(fileName, "images");
+                    await _fileSystems.DeleteAsync(fileName, "imagenes");
                 }
 
                 _logger.LogError("Error al crear la imagen. Se eliminó la imagen subida con éxito.");

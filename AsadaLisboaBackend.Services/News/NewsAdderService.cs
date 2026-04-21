@@ -17,6 +17,7 @@ namespace AsadaLisboaBackend.Services.News
 {
     public class NewsAdderService : INewsAdderService
     {
+        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<NewsAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -24,7 +25,6 @@ namespace AsadaLisboaBackend.Services.News
         private readonly IEditorsUpdaterService _editorsUpdaterService;
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
-        private readonly ElasticsearchClient _elastic;
 
         public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorsUpdaterService editorsUpdaterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsAdderService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
         {
@@ -46,14 +46,16 @@ namespace AsadaLisboaBackend.Services.News
             string fileName = string.Empty;
             string filePath = string.Empty;
 
+            string slug = GenerateSlug.New(newRequestDTO.Title, id);
+
             if (newRequestDTO.File is not null && newRequestDTO.File.Length > 0)
             {
-                imageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "news");
+                imageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "noticias", slug);
                 fileName = Path.GetFileName(imageUrl);
             }
 
             if(!string.IsNullOrEmpty(imageUrl) && !string.IsNullOrWhiteSpace(imageUrl) && !string.IsNullOrEmpty(fileName) && !string.IsNullOrWhiteSpace(fileName))
-                filePath = $"news/{fileName}";
+                filePath = $"noticias/{fileName}";
 
             var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
 
@@ -65,15 +67,15 @@ namespace AsadaLisboaBackend.Services.News
             {
                 Id = id,
                 StatusId = status.Id,
-                ImageUrl = imageUrl,
-                FileName = fileName,
+                Slug = slug,
                 FilePath = filePath,
+                FileName = fileName,
+                ImageUrl = imageUrl,
                 Description = content,
                 Categories = categories,
                 Title = newRequestDTO.Title,
                 PublicationDate = DateTime.UtcNow,
                 LastEditionDate = DateTime.UtcNow,
-                Slug = GenerateSlug.New(newRequestDTO.Title, id),
             };
 
             var created = await _newsAdderRepository.CreateNew(newModel);
@@ -91,11 +93,11 @@ namespace AsadaLisboaBackend.Services.News
             //Add to ElasticSearch
             var news = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
             {
-                Id = newModel.Id,
+                Id = created.Id,
                 Type = "Noticias",
-                Title = newModel.Title,
-                Description = newModel.Description,
-                Slug = newModel.Slug,
+                Slug = created.Slug,
+                Title = created.Title,
+                Description = created.Description,
             };
             await _elastic.IndexAsync(news);
 

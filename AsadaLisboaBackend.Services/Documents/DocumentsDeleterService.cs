@@ -40,7 +40,7 @@ namespace AsadaLisboaBackend.Services.Documents
             }
 
             if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
-                await _fileSystems.DeleteAsync(document.FileName, "document");
+                await _fileSystems.DeleteAsync(document.FileName, "documentos");
 
             await _documentsDeleterRespository.DeleteDocument(id);
 

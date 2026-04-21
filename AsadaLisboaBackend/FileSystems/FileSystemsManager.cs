@@ -1,20 +1,32 @@
 ﻿using AsadaLisboaBackend.ServiceContracts.FileSystems;
-using AsadaLisboaBackend.Services.Editors;
-using System.IO;
 
 namespace AsadaLisboaBackend.FileSystems
 {
+    /// <summary>
+    /// Service class to manage file system.
+    /// </summary>
     public class FileSystemsManager : IFileSystemsManager
     {
         private readonly IWebHostEnvironment _env;
-        private readonly ILogger<EditorsAdderService> _logger;
+        private readonly ILogger<FileSystemsManager> _logger;
 
-        public FileSystemsManager(IWebHostEnvironment env, ILogger<EditorsAdderService> logger)
+        /// <summary>
+        /// Constructor for FileSystemsManager.
+        /// </summary>
+        /// <param name="env">Environment variables from the system.</param>
+        /// <param name="logger">Trace user excecutions.</param>
+        public FileSystemsManager(IWebHostEnvironment env, ILogger<FileSystemsManager> logger)
         {
             _env = env;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Delete a file from a folder.
+        /// </summary>
+        /// <param name="fileName">Name of the file, with extension.</param>
+        /// <param name="folder">Folder where the file is saved.</param>
+        /// <returns>No content.</returns>
         public Task DeleteAsync(string fileName, string folder)
         {
             var path = Path.Combine(GetPhysicalPath(folder), fileName);
@@ -26,12 +38,26 @@ namespace AsadaLisboaBackend.FileSystems
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Check if the file exists.
+        /// </summary>
+        /// <param name="fileName">Name of the file, with extension.</param>
+        /// <param name="folder">Folder where the file is saved.</param>
+        /// <returns>True or false, depends on the file in the folder.</returns>
         public bool Exists(string fileName, string folder)
         {
             var path = Path.Combine(GetPhysicalPath(folder), fileName);
             return File.Exists(path);
         }
 
+        /// <summary>
+        /// Moves a file from a folder to another.
+        /// </summary>        
+        /// <param name="fileName">Name of the file, with extension.</param>
+        /// <param name="sourceFolder">Folder where the file is saved.</param>
+        /// <param name="destinationFolder">Folder where the file is going to be.</param>
+        /// <returns>No content.</returns>
+        /// <exception cref="FileNotFoundException">Exception when the file is not found.</exception>
         public Task MoveAsync(string fileName, string sourceFolder, string destinationFolder)
         {
             var sourcePath = Path.Combine(GetPhysicalPath(sourceFolder), fileName);
@@ -54,13 +80,23 @@ namespace AsadaLisboaBackend.FileSystems
             return Task.CompletedTask;
         }
 
-        public async Task<string> SaveAsync(IFormFile file, string folder)
+        /// <summary>
+        /// Save a file in an specific folder.
+        /// </summary>
+        /// <param name="file">File to be saved.</param>
+        /// <param name="folder">Folder where the files is going to be saved.</param>
+        /// <param name="customName">Slug or a custom name to the file.</param>
+        /// <returns>File new url.</returns>
+        /// <exception cref="ArgumentException">File given is not valid.</exception>
+        public async Task<string> SaveAsync(IFormFile file, string folder, string? customName = null)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Archivo inválido.");
 
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            var fileName = $"{Guid.NewGuid()}{extension}";
+            var fileName = string.IsNullOrWhiteSpace(customName)
+                ? $"{Guid.NewGuid()}{extension}"
+                : $"{customName}{extension}";
 
             var physicalFolder = GetPhysicalPath(folder);
 

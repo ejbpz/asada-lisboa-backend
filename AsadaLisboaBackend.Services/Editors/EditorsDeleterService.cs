@@ -18,7 +18,7 @@ namespace AsadaLisboaBackend.Services.Editors
 
         public async Task DeletePrincipalImage(string fileName)
         {
-            await _fileSystems.DeleteAsync(fileName, "news");
+            await _fileSystems.DeleteAsync(fileName, "noticias");
             _logger.LogInformation($"Imagen principal '{fileName}' eliminada correctamente.");
         }
 
@@ -28,7 +28,7 @@ namespace AsadaLisboaBackend.Services.Editors
             doc.LoadHtml(html);
 
             var nodeCollection = doc.DocumentNode
-                .SelectNodes("//img[contains(@src, '/news/')]");
+                .SelectNodes("//img[contains(@src, '/noticias/')]");
 
             if (nodeCollection is null)
                 return;
@@ -41,7 +41,7 @@ namespace AsadaLisboaBackend.Services.Editors
 
             foreach (var fileName in fileNames)
             {
-                await _fileSystems.DeleteAsync(fileName, "news");
+                await _fileSystems.DeleteAsync(fileName, "noticias");
                 _logger.LogInformation($"Imagen de contenido '{fileName}' eliminada correctamente.");
             }
         }
@@ -52,13 +52,13 @@ namespace AsadaLisboaBackend.Services.Editors
             oldDoc.LoadHtml(oldHtml);
 
             var oldNodes = oldDoc.DocumentNode
-                .SelectNodes("//img[contains(@src, '/news/')]");
+                .SelectNodes("//img[contains(@src, '/noticias/')]");
 
             var newDoc = new HtmlDocument();
             newDoc.LoadHtml(newHtml);
 
             var newNodes = newDoc.DocumentNode
-                .SelectNodes("//img[contains(@src, '/news/')]");
+                .SelectNodes("//img[contains(@src, '/noticias/')]");
 
             if (oldNodes is null)
                 return;
@@ -77,7 +77,7 @@ namespace AsadaLisboaBackend.Services.Editors
 
             foreach (var fileName in notRelatedFileNames)
             {
-                await _fileSystems.DeleteAsync(fileName, "news");
+                await _fileSystems.DeleteAsync(fileName, "noticias");
                 _logger.LogInformation($"Imagen no utilizada '{fileName}' eliminada correctamente.");
             }
         }

@@ -4,6 +4,7 @@ using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Editors;
@@ -49,16 +50,18 @@ namespace AsadaLisboaBackend.Services.News
             var fileName = existingNew.FileName;
             var filePath = existingNew.FilePath;
 
+            existingNew.Slug = GenerateSlug.New(newRequestDTO.Title, id);
+
             if (newRequestDTO.File is not null)
             {
-                var newImageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "news");
+                var newImageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "noticias", existingNew.Slug);
 
                 if (!string.IsNullOrEmpty(existingNew.FileName) && !string.IsNullOrWhiteSpace(existingNew.FileName))
-                    await _fileSystems.DeleteAsync(existingNew.FileName, "news");
+                    await _fileSystems.DeleteAsync(existingNew.FileName, "noticias");
 
                 imageUrl = newImageUrl;
                 fileName = Path.GetFileName(imageUrl);
-                filePath = $"news/{fileName}";
+                filePath = $"noticias/{fileName}";
             }
 
             var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(newRequestDTO.Description);
@@ -99,11 +102,11 @@ namespace AsadaLisboaBackend.Services.News
             //Add to ElasticSearch
             var news = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
             {
-                Id = newModel.Id,
+                Id = created.Id,
                 Type = "Noticias",
-                Title = newModel.Title,
-                Description = newModel.Description,
-                Slug = newModel.Slug,
+                Slug = created.Slug,
+                Title = created.Title,
+                Description = created.Description,
             };
             await _elastic.IndexAsync(news);
 

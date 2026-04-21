@@ -40,7 +40,7 @@ namespace AsadaLisboaBackend.Services.Images
             }
 
             if (!string.IsNullOrEmpty(image.FileName) && !string.IsNullOrWhiteSpace(image.FileName))
-                await _fileSystems.DeleteAsync(image.FileName, "images");
+                await _fileSystems.DeleteAsync(image.FileName, "imagenes");
 
             await _imagesDeleterRepository.DeleteImage(id);
 
