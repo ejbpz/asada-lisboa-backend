@@ -9,17 +9,17 @@ namespace AsadaLisboaBackend.Services.Statuses
 {
     public class StatusesUpdaterService : IStatusesUpdaterService
     {
-        private readonly IStatusesGetterRepository _statusesGetterRepository;
-        private readonly IStatusesUpdaterRepository _statusesUpdaterRepository;
         private readonly ILogger<StatusesUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly IStatusesGetterRepository _statusesGetterRepository;
+        private readonly IStatusesUpdaterRepository _statusesUpdaterRepository;
 
         public StatusesUpdaterService(IStatusesGetterRepository statusesGetterRepository, IStatusesUpdaterRepository statusesUpdaterRepository, ILogger<StatusesUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _statusesGetterRepository = statusesGetterRepository;
-            _statusesUpdaterRepository = statusesUpdaterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _statusesGetterRepository = statusesGetterRepository;
+            _statusesUpdaterRepository = statusesUpdaterRepository;
         }
 
         public async Task ChangeStatus(Guid objectId, Guid statusId, ObjectTypeEnum objectType)

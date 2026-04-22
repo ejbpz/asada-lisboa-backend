@@ -34,6 +34,7 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PageResponseDTO<ImageResponseDTO>>> GetImages([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
         {
+            searchSortRequestDTO.IsPublic = true;
             return Ok(await _imagesGetterService.GetImages(searchSortRequestDTO));
         }
 

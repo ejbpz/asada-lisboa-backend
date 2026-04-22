@@ -24,6 +24,18 @@ namespace AsadaLisboaBackend.Repositories.Images
                 .Include(i => i.Status)
                 .Include(i => i.Categories);
 
+            if (searchSortRequestDTO.IsPublic)
+            {
+                query = query.Where(i =>
+                    i.Status != null &&
+                    i.Status.Name.Trim().ToLower() == "publicado");
+            }
+
+            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "status")
+            {
+                searchSortRequestDTO.FilterBy = null;
+            }
+
             // Search
             if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
             {

@@ -22,9 +22,21 @@ namespace AsadaLisboaBackend.Repositories.Documents
         {
             IQueryable<Models.Document> query = _context.Documents
                    .AsNoTracking()
-                   .Include(i => i.Status)
-                   .Include(i => i.Categories)
-                   .Include(i => i.DocumentType);
+                   .Include(d => d.Status)
+                   .Include(d => d.Categories)
+                   .Include(d => d.DocumentType);
+
+            if (searchSortRequestDTO.IsPublic)
+            {
+                query = query.Where(d =>
+                    d.Status != null &&
+                    d.Status.Name.Trim().ToLower() == "publicado");
+            }
+
+            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "status")
+            {
+                searchSortRequestDTO.FilterBy = null;
+            }
 
             // Search
             if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
@@ -33,33 +45,33 @@ namespace AsadaLisboaBackend.Repositories.Documents
 
                 query = searchSortRequestDTO.FilterBy?.ToLower() switch
                 {
-                    "status" => query.Where(i =>
-                        i.Status != null &&
-                        EF.Functions.Like(i.Status.Name, $"%{search}%")),
+                    "status" => query.Where(d =>
+                        d.Status != null &&
+                        EF.Functions.Like(d.Status.Name, $"%{search}%")),
 
-                    "type" => query.Where(i =>
-                    i.DocumentType != null &&
-                    EF.Functions.Like(i.DocumentType.Name, $"%{search}%")),
+                    "type" => query.Where(d =>
+                    d.DocumentType != null &&
+                    EF.Functions.Like(d.DocumentType.Name, $"%{search}%")),
 
-                    "category" => query.Where(i =>
-                        i.Categories.Any(c =>
+                    "category" => query.Where(d =>
+                        d.Categories.Any(c =>
                             EF.Functions.Like(c.Name, $"%{search}%"))),
 
-                    _ => query.Where(i =>
-                        EF.Functions.Like(i.Title, $"%{search}%")),
+                    _ => query.Where(d =>
+                        EF.Functions.Like(d.Title, $"%{search}%")),
                 };
             }
 
             // Sort
             query = (searchSortRequestDTO.SortBy?.ToLower(), searchSortRequestDTO.SortDirection?.ToLower()) switch
             {
-                ("date", "desc") => query.OrderByDescending(i => i.PublicationDate),
-                ("date", _) => query.OrderBy(i => i.PublicationDate),
+                ("date", "desc") => query.OrderByDescending(d => d.PublicationDate),
+                ("date", _) => query.OrderBy(d => d.PublicationDate),
 
-                ("title", "desc") => query.OrderByDescending(i => i.Title),
-                ("title", _) => query.OrderBy(i => i.Title),
+                ("title", "desc") => query.OrderByDescending(d => d.Title),
+                ("title", _) => query.OrderBy(d => d.Title),
 
-                _ => query.OrderByDescending(i => i.PublicationDate)
+                _ => query.OrderByDescending(d => d.PublicationDate)
             };
 
             return new PageResponseDTO<DocumentMinimalResponseDTO>()
@@ -80,7 +92,7 @@ namespace AsadaLisboaBackend.Repositories.Documents
                     .Include(d => d.Status)
                     .Include(d => d.Categories)
                     .Include(d => d.DocumentType)
-                    .FirstOrDefaultAsync(i => i.Id == id);
+                    .FirstOrDefaultAsync(d => d.Id == id);
 
             if (document is null)
                 throw new NotFoundException("El documento seleccionada no existe.");
@@ -95,7 +107,7 @@ namespace AsadaLisboaBackend.Repositories.Documents
                     .Include(d => d.Status)
                     .Include(d => d.Categories)
                     .Include(d => d.DocumentType)
-                    .FirstOrDefaultAsync(i => i.Slug == slug);
+                    .FirstOrDefaultAsync(d => d.Slug == slug);
 
             if (document is null)
                 throw new NotFoundException("El documento seleccionada no existe.");

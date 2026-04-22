@@ -34,6 +34,7 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PageResponseDTO<NewResponseDTO>>> GetNews([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
         {
+            searchSortRequestDTO.IsPublic = true;
             return Ok(await _newsGetterService.GetNews(searchSortRequestDTO));
         }
 

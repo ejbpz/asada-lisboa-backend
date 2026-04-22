@@ -52,6 +52,18 @@ namespace AsadaLisboaBackend.Repositories.News
                 .Include(n => n.Status)
                 .Include(n => n.Categories);
 
+            if (searchSortRequestDTO.IsPublic)
+            {
+                query = query.Where(n =>
+                    n.Status != null &&
+                    n.Status.Name.Trim().ToLower() == "publicado");
+            }
+
+            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "status")
+            {
+                searchSortRequestDTO.FilterBy = null;
+            }
+
             // Search
             if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
             {

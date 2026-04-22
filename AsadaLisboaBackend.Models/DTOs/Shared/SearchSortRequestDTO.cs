@@ -10,5 +10,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Shared
         public string SortBy { get; set; } = "name";
         public string SortDirection { get; set; } = "asc";
         public int Take { get; set; } = Constants.PAGINATION_SIZE;
+
+        public bool IsPublic { get; set; }
     }
 }

@@ -1,22 +1,22 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Status;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Status;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
-using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Services.Statuses
 {
     public class StatusesGetterService : IStatusesGetterService
     {
-        private readonly IStatusesGetterRepository _statusesGetterRepository;
         private readonly ILogger<StatusesGetterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly IStatusesGetterRepository _statusesGetterRepository;
         public StatusesGetterService(IStatusesGetterRepository statusesGetterRepository, ILogger<StatusesGetterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _statusesGetterRepository = statusesGetterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _statusesGetterRepository = statusesGetterRepository;
         }
 
         public async Task<List<StatusResponseDTO>> GetStatuses()

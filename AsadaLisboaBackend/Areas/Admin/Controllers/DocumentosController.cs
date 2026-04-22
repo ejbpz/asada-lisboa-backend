@@ -49,6 +49,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PageResponseDTO<DocumentResponseDTO>>> GetDocuments([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
         {
+            searchSortRequestDTO.IsPublic = false;
             return Ok(await _documentsGetterService.GetDocuments(searchSortRequestDTO));
         }
 
