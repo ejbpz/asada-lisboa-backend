@@ -40,6 +40,7 @@ namespace AsadaLisboaBackend.Areas.Admin.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PageResponseDTO<UserResponseDTO>>> GetUsers([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
         {
+            searchSortRequestDTO.IsPublic = false;
             return Ok(await _usersGetterService.GetUsers(searchSortRequestDTO));
         }
 

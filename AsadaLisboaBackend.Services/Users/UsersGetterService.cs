@@ -31,20 +31,6 @@ namespace AsadaLisboaBackend.Services.Users
                 time: TimeSpan.FromMinutes(5));
         }
 
-        public async Task<PageResponseDTO<UserResponseDTO>> GetPublicUsers(SearchSortRequestDTO searchSortRequestDTO)
-        {
-            var usersList = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<UserResponseDTO>>(
-                resource: Constants.CACHE_USERS,
-                request: searchSortRequestDTO,
-                create: () => _usersGetterRepository.GetUsers(searchSortRequestDTO),
-                time: TimeSpan.FromMinutes(5));
-
-            usersList.Data = usersList.Data.Where(u => u.Charge != "Administrador")
-                .ToList();
-
-            return usersList;
-        }
-
         public async Task<UserDetailResponseDTO?> GetUser(Guid id)
         {
             var user = await _memoryCachesService.GetOrCreateCache<UserDetailResponseDTO?>(

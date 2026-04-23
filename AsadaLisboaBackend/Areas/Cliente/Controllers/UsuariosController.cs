@@ -29,12 +29,12 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         /// <summary>
         /// Get a paginated list of users based on the provided search and sort criteria.
         /// </summary>
-        /// <param name="searchSortRequestDTO">Object containing search, sorting and pagination.</param>
         /// <returns>ActionResult containing a PageResponseDTO of UserResponseDTO objects that match with SearchSortRequestDTO.</returns>
         [HttpGet("")]
-        public async Task<ActionResult<PageResponseDTO<UserResponseDTO>>> GetUsers([FromQuery] SearchSortRequestDTO searchSortRequestDTO)
+        public async Task<ActionResult<List<UserResponseDTO>>> GetUsers()
         {
-            return Ok(await _usersGetterService.GetPublicUsers(searchSortRequestDTO));
+            var searchSortRequestDTO = new SearchSortRequestDTO() { Take = 100, IsPublic = true };
+            return Ok((await _usersGetterService.GetUsers(searchSortRequestDTO)).Data);
         }
     }
 }

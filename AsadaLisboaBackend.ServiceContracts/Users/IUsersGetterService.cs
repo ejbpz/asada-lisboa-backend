@@ -6,7 +6,6 @@ namespace AsadaLisboaBackend.ServiceContracts.Users
     public interface IUsersGetterService
     {
         public Task<PageResponseDTO<UserResponseDTO>> GetUsers(SearchSortRequestDTO searchSortRequestDTO);
-        public Task<PageResponseDTO<UserResponseDTO>> GetPublicUsers(SearchSortRequestDTO searchSortRequestDTO);
         public Task<UserDetailResponseDTO?> GetUser(Guid id);
     }
 }

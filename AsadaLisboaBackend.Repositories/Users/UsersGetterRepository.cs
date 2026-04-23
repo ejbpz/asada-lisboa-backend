@@ -22,6 +22,18 @@ namespace AsadaLisboaBackend.Repositories.Users
                 .AsNoTracking()
                 .Include(u => u.Charge);
 
+            if (searchSortRequestDTO.IsPublic)
+            {
+                query = query.Where(u =>
+                    u.Charge != null &&
+                    u.Charge.Name.Trim().ToLower() != "administrador");
+            }
+
+            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "charge")
+            {
+                searchSortRequestDTO.FilterBy = null;
+            }
+
             // Search
             if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
             {
