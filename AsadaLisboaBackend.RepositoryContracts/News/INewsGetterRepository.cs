@@ -8,5 +8,6 @@ namespace AsadaLisboaBackend.RepositoryContracts.News
         public Task<PageResponseDTO<NewMinimalResponseDTO>> GetNews(SearchSortRequestDTO searchSortRequestDTO);
         public Task<NewResponseDTO> GetNewBySlug(string slug);
         public Task<NewResponseDTO> GetNew(Guid id);
+        public Task<List<NewMinimalResponseDTO>> GetRecommendedNews(string slug);
     }
 }

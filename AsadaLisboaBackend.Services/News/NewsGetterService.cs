@@ -42,5 +42,14 @@ namespace AsadaLisboaBackend.Services.News
                 create: () => _newsGetterRepository.GetNews(searchSortRequestDTO),
                 time: TimeSpan.FromMinutes(5));
         }
+
+        public async Task<List<NewMinimalResponseDTO>> GetRecommendedNews(string slug)
+        {
+            return await _memoryCachesService.GetOrCreateCacheList<List<NewMinimalResponseDTO>>(
+                resource: $"{Constants.CACHE_NEWS}-{slug}",
+                request: slug,
+                create: () => _newsGetterRepository.GetRecommendedNews(slug),
+                time: TimeSpan.FromMinutes(5));
+        }
     }
 }

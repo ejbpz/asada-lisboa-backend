@@ -106,5 +106,68 @@ namespace AsadaLisboaBackend.Repositories.News
                     .ToListAsync(),
             };
         }
+
+
+        public async Task<List<NewMinimalResponseDTO>> GetRecommendedNews(string slug)
+        {
+            var newData = await GetNewBySlug(slug);
+
+            if (newData is null)
+                throw new NotFoundException("Error al obtener noticia.");
+
+            var take = 8;
+
+            var categoriesIds = await _context.News
+                .Where(n => n.Id == newData.Id)
+                .SelectMany(n => n.Categories.Select(nc => nc.Id))
+                .ToListAsync();
+
+            var relatedNews = new List<NewMinimalResponseDTO>();
+
+            if (categoriesIds.Any())
+            {
+                relatedNews = await _context.News
+                    .Where(n => n.Id != newData.Id)
+                    .Select(n => new
+                    {
+                        News = n,
+                        MatchCount = n.Categories
+                            .Count(nc => categoriesIds.Contains(nc.Id))
+                    })
+                    .Where(x => x.MatchCount > 0)
+                    .OrderByDescending(x => x.MatchCount)
+                    .ThenByDescending(x => x.News.LastEditionDate)
+                    .Take(take)
+                    .Select(x => x.News)
+                    .Select(NewExtensions.MapNewMinimalResponseDTO())
+                    .ToListAsync();
+            }
+
+            if (relatedNews.Count < take)
+            {
+                var missing = take - relatedNews.Count;
+
+                var searchShortRequestDTO = new SearchSortRequestDTO()
+                {
+                    IsPublic = true,
+                    Take = take * 2,
+                    Offset = 0,
+                };
+
+                var fallbackRaw = (await GetNews(searchShortRequestDTO)).Data;
+                var existingIds = new HashSet<Guid>(relatedNews.Select(n => n.Id));
+
+                existingIds.Add(newData.Id);
+
+                var fallbackFiltered = fallbackRaw
+                    .Where(n => !existingIds.Contains(n.Id))
+                    .Take(missing)
+                    .ToList();
+
+                relatedNews.AddRange(fallbackFiltered);
+            }
+
+            return relatedNews;
+        }
     }
 }
