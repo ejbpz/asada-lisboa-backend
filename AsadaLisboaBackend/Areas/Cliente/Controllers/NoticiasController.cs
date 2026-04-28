@@ -48,5 +48,16 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         {
             return Ok(await _newsGetterService.GetNewBySlug(slug));
         }
+
+        /// <summary>
+        /// Retrieves recommended news by the new slug.
+        /// </summary>
+        /// <param name="slug">The unique slug that identifies the news item to retrieve. Cannot be null or empty.</param>
+        /// <returns>An list of news recommended by the categories of the main new.</returns>
+        [HttpGet("recomendaciones/{slug}")]
+        public async Task<ActionResult<List<NewMinimalResponseDTO>>> GetRecommendedNews([FromRoute] string slug)
+        {
+            return Ok(await _newsGetterService.GetRecommendedNews(slug));
+        }
     }
 }
