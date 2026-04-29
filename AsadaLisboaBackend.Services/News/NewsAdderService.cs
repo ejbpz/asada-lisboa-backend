@@ -94,12 +94,15 @@ namespace AsadaLisboaBackend.Services.News
             var news = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
             {
                 Id = created.Id,
-                Type = "Noticias",
+                Type = "noticias",
                 Slug = created.Slug,
                 Title = created.Title,
                 Description = created.Description,
             };
-            await _elastic.IndexAsync(news);
+            var response = await _elastic.IndexAsync(news, i => i
+                   .Index("contenido")
+                   .Id(news.Id.ToString())
+               );
 
             return created.ToNewResponseDTO();
         }
