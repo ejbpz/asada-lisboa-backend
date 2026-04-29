@@ -44,7 +44,7 @@ namespace AsadaLisboaBackend.Services.Documents
 
             await _documentsDeleterRespository.DeleteDocument(id);
 
-            await _elastic.DeleteAsync<Document>(id, d => d.Index("documentos"));
+            await _elastic.DeleteAsync<Document>(id, d => d.Index("contenido"));
 
 
             _memoryCachesService.RemoveById(Constants.CACHE_DOCUMENTS, document.Id);

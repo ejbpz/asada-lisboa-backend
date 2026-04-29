@@ -92,16 +92,29 @@ namespace AsadaLisboaBackend.Services.Documents
                 _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
 
                 //Add to ElasticSearch
-                var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO                   
+                var doc = new Models.DTOs.SearchGlobal.SearchGlobalDocument
                 {
-                    Type = "Documento",
+                    Type = "documento",
                     Id = documentCreated.Id,
                     Slug = documentCreated.Slug,
                     Title = documentCreated.Title,
                     Description = documentCreated.Description,
-                    
+
                 };
-                await _elastic.IndexAsync(doc);
+
+
+                var response = await _elastic.IndexAsync(doc, i => i
+                    .Index("contenido")
+                    .Id(doc.Id.ToString())
+                );
+
+
+                if (!response.IsValidResponse)
+                {
+                    _logger.LogError(response.DebugInformation);
+
+                    throw new ApplicationException("Error al indexar en elasticsearch.");
+                }
 
                 return documentCreated.ToDocumentResponseDTO();
             }

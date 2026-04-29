@@ -45,7 +45,7 @@ namespace AsadaLisboaBackend.Services.Images
             await _imagesDeleterRepository.DeleteImage(id);
 
             // Eliminar del índice
-            await _elastic.DeleteAsync<Image>(id, d => d.Index("imagenes"));
+            await _elastic.DeleteAsync<Image>(id, d => d.Index("contenido"));
 
             _memoryCachesService.RemoveById(Constants.CACHE_IMAGES, image.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);

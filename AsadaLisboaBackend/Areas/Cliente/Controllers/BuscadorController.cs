@@ -28,12 +28,12 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         /// <summary>
         /// Retrieve the data from news, documents and/or images.
         /// </summary>
-        /// <param name="query">Query to search into documents, images and news.</param>
+        /// <param name="request">Query to search into documents, images and news.</param>
         /// <returns>ActionResult for List of SearchGlobalDocument.</returns>
         [HttpGet("")]
-        public async Task<ActionResult<List<SearchGlobalDocument>>> Search([FromQuery] string query)
+        public async Task<ActionResult<List<SearchGlobalDocument>>> Search([FromQuery] SearchGlobalRequestDTO request)
         {
-            return Ok(await _searchGlobalService.Search(query));
+            return Ok(await _searchGlobalService.Search(request));
         }
 
     }

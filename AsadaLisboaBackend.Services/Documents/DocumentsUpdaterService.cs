@@ -105,7 +105,7 @@ namespace AsadaLisboaBackend.Services.Documents
 
             var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
             {
-                Type = "Documento",
+                Type = "documento",
                 Id = documentUpdated.Id,
                 Slug = documentUpdated.Slug,
                 Title = documentUpdated.Title,
