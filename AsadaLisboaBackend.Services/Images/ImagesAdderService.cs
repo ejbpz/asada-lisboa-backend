@@ -81,13 +81,16 @@ namespace AsadaLisboaBackend.Services.Images
                 //Add to ElasticSearch
                 var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
                 {
-                    Type = "Imagen",
+                    Type = "imagen",
                     Id = imageCreated.Id,
                     Slug = imageCreated.Slug,
                     Title = imageCreated.Title,
                     Description = imageCreated.Description,
                 };
-                await _elastic.IndexAsync(imag);
+                var response = await _elastic.IndexAsync(imag, i => i
+                     .Index("contenido")
+                     .Id(imag.Id.ToString())
+                 );
 
                 return imageCreated.ToImageResponseDTO();
             }
