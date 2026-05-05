@@ -11,6 +11,8 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
 
         public long FileSize { get; set; }
         public DateTime PublicationDate { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
 
         public Guid StatusId { get; set; }
         public string StatusName { get; set; } = string.Empty;
@@ -28,6 +30,8 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
                 StatusId = document.StatusId,
                 Slug = document.Slug,
                 Title = document.Title,
+                FileName = document.FileName,
+                FilePath = document.FilePath,
                 FileSize = document.FileSize,
                 Description = document.Description,
                 PublicationDate = document.PublicationDate,                
@@ -48,6 +52,8 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
                 Slug = document.Slug,
                 Title = document.Title,
                 FileSize = document.FileSize,
+                FileName = document.FileName,
+                FilePath = document.FilePath,
                 Description = document.Description,
                 PublicationDate = document.PublicationDate,               
                 StatusName = document.Status?.Name ?? "",

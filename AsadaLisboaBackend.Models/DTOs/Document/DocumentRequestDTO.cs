@@ -8,11 +8,11 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
     public class DocumentRequestDTO
     {
         [Required(ErrorMessage = "El titulo es requerido.")]
-        [StringLength(50)]
+        [StringLength(200)]
         public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La descripción es requerida.")]
-        [StringLength(100)]
+        [StringLength(500)]
         public string Description { get; set; } = string.Empty;
 
         [MaxFileSize(15, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]

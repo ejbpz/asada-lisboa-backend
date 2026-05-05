@@ -61,47 +61,44 @@ namespace AsadaLisboaBackend.Services.Documents
 
             document.Categories = await _categoriesGetterService.ToCreateCategories(documentUpdateRequestDTO.Categories);
 
-            if (documentUpdateRequestDTO.File is null || documentUpdateRequestDTO.File.Length <= 0)
+            if (documentUpdateRequestDTO.File is not null && documentUpdateRequestDTO.File.Length > 0)
             {
-                _logger.LogError("Archivo no proporcionado para actualizar el documento con id {DocumentId}.", id);
-                throw new NotFoundException("Error al actualizar el documento.");
-            }
+                string? newUrl = string.Empty;
 
-            string? newUrl = string.Empty;
-
-            try
-            {
-                newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
-
-                var newFileName = Path.GetFileName(newUrl);
-
-                if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath) && document.FilePath != newUrl)
-                    File.Delete(document.FilePath);
-
-                document.Url = newUrl;
-                document.FileName = newFileName;
-                document.FilePath = $"documentos/{newFileName}";
-                document.FileSize = documentUpdateRequestDTO.File.Length;
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty(newUrl) && string.IsNullOrWhiteSpace(newUrl))
+                try
                 {
-                    var fileName = Path.GetFileName(newUrl);
-                    await _fileSystems.DeleteAsync(fileName, "documentos");
+                    newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
+
+                    var newFileName = Path.GetFileName(newUrl);
+
+                    if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath) && document.FilePath != newUrl)
+                        File.Delete(document.FilePath);
+
+                    document.Url = newUrl;
+                    document.FileName = newFileName;
+                    document.FilePath = $"documentos/{newFileName}";
+                    document.FileSize = documentUpdateRequestDTO.File.Length;
+                }
+                catch
+                {
+                    if (!string.IsNullOrEmpty(newUrl) && string.IsNullOrWhiteSpace(newUrl))
+                    {
+                        var fileName = Path.GetFileName(newUrl);
+                        await _fileSystems.DeleteAsync(fileName, "documentos");
+                    }
+
+                    _logger.LogError("Error al actualizar el documento con id {DocumentId}.", id);
+                    throw new CreateObjectException("Error al actualizar el documento.");
                 }
 
-                _logger.LogError("Error al actualizar el documento con id {DocumentId}.", id);
-                throw new CreateObjectException("Error al actualizar el documento.");
+                var extension = Path.GetExtension(newUrl);
+                var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
+
+                if (documentTypeId is null || !documentTypeId.HasValue)
+                    throw new NotFoundException("Tipo de documento no soportado.");
+
+                document.DocumentTypeId = documentTypeId.Value;
             }
-
-            var extension = Path.GetExtension(newUrl);
-            var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
-
-            if (documentTypeId is null || !documentTypeId.HasValue)
-                throw new NotFoundException("Tipo de documento no soportado.");
-
-            document.DocumentTypeId = documentTypeId.Value;
 
             var documentUpdated = await _documentUpdateRespository.UpdateDocument(document);
 
