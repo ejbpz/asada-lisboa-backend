@@ -59,38 +59,35 @@ namespace AsadaLisboaBackend.Services.Images
 
             image.Categories = await _categoriesGetterService.ToCreateCategories(imageUpdateRequestDTO.Categories);
 
-            if (imageUpdateRequestDTO.File is null || imageUpdateRequestDTO.File.Length <= 0)
+            if (imageUpdateRequestDTO.File is not null && imageUpdateRequestDTO.File.Length > 0)
             {
-                _logger.LogError("Nueva imagen nula para el id: {id}.", id);
-                throw new ArgumentNullException("Error al actualizar la imagen.");
-            }
+                string? newUrl = string.Empty;
 
-            string? newUrl = string.Empty;
-
-            try
-            {
-                newUrl = await _fileSystems.SaveAsync(imageUpdateRequestDTO.File, "imagenes", image.Slug);
-
-                var newFileName = Path.GetFileName(newUrl);
-
-                if (!string.IsNullOrEmpty(image.FilePath) && !string.IsNullOrWhiteSpace(image.FilePath) && File.Exists(image.FilePath) && image.FilePath != newUrl)
-                    File.Delete(image.FilePath);
-
-                image.Url = newUrl;
-                image.FileName = newFileName;
-                image.FilePath = $"imagenes/{newFileName}";
-                image.FileSize = imageUpdateRequestDTO.File.Length;
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty(newUrl) && !string.IsNullOrWhiteSpace(newUrl))
+                try
                 {
-                    var fileName = Path.GetFileName(newUrl);
-                    await _fileSystems.DeleteAsync(fileName, "imagenes");
-                }
+                    newUrl = await _fileSystems.SaveAsync(imageUpdateRequestDTO.File, "imagenes", image.Slug);
 
-                _logger.LogError("Error al actualizar la imagen con id {DocumentId}.", id);
-                throw new CreateObjectException("Error al actualizar la imagen.");
+                    var newFileName = Path.GetFileName(newUrl);
+
+                    if (!string.IsNullOrEmpty(image.FilePath) && !string.IsNullOrWhiteSpace(image.FilePath) && File.Exists(image.FilePath) && image.FilePath != newUrl)
+                        File.Delete(image.FilePath);
+
+                    image.Url = newUrl;
+                    image.FileName = newFileName;
+                    image.FilePath = $"imagenes/{newFileName}";
+                    image.FileSize = imageUpdateRequestDTO.File.Length;
+                }
+                catch
+                {
+                    if (!string.IsNullOrEmpty(newUrl) && !string.IsNullOrWhiteSpace(newUrl))
+                    {
+                        var fileName = Path.GetFileName(newUrl);
+                        await _fileSystems.DeleteAsync(fileName, "imagenes");
+                    }
+
+                    _logger.LogError("Error al actualizar la imagen con id {DocumentId}.", id);
+                    throw new CreateObjectException("Error al actualizar la imagen.");
+                }
             }
 
             var imageUpdated = await _imagesUpdaterRepository.UpdateImage(image);

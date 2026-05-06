@@ -19,7 +19,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
         [AllowedExtensions(new string[] { ".jpg", ".jpeg", ".png", ".webp", ".jfif", ".mp4", ".mov", ".mkv" }, ErrorMessage = "La extensión de la imagen no es válida.")]
         public IFormFile? File { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Debe selecionar un estado válido.")]
+        [Required(ErrorMessage = "Debe selecionar un estado válido.")]
         public Guid StatusId { get; set; }
 
         public List<CategoryRequestDTO> Categories { get; set; } = new();
