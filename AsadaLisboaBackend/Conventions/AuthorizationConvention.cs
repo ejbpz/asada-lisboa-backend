@@ -1,4 +1,6 @@
 ﻿using AsadaLisboaBackend.Utils;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -18,28 +20,55 @@ namespace AsadaLisboaBackend.Conventions
         {
             foreach (var controller in application.Controllers)
             {
-                if (!controller.RouteValues.TryGetValue("area", out var area) || (area != "Admin"))
+                var areaAttribute = controller.Attributes
+                    .OfType<AreaAttribute>()
+                    .FirstOrDefault();
+
+                if (areaAttribute?.RouteValue != "Admin")
                     continue;
 
-                foreach (var controllerActions in controller.Actions)
+                foreach (var action in controller.Actions)
                 {
-                    var httpMethods = controllerActions.Selectors
-                        .SelectMany(selector => selector.ActionConstraints ?? [])
-                        .OfType<HttpMethodActionConstraint>()
-                        .SelectMany(constraint => constraint.HttpMethods)
-                        .ToList();
+                    // if there's already an AuthorizeAttribute, skip this action
+                    var hasAuthorize =
+                        action.Attributes.OfType<AuthorizeAttribute>().Any() ||
+                        controller.Attributes.OfType<AuthorizeAttribute>().Any();
 
-                    if (!httpMethods.Any())
+                    if (hasAuthorize)
                         continue;
 
-                    if (httpMethods.Contains("GET", StringComparer.OrdinalIgnoreCase))
-                        controllerActions.Filters.Add(new AuthorizeFilter(Constants.ROLE_LECTOR));
+                    var methods = action.Selectors
+                        .SelectMany(s => s.ActionConstraints ?? [])
+                        .OfType<HttpMethodActionConstraint>()
+                        .SelectMany(c => c.HttpMethods)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
 
-                    else if (httpMethods.Contains("POST", StringComparer.OrdinalIgnoreCase) || httpMethods.Contains("PUT", StringComparer.OrdinalIgnoreCase) || httpMethods.Contains("PATCH",  StringComparer.OrdinalIgnoreCase))
-                        controllerActions.Filters.Add(new AuthorizeFilter(Constants.ROLE_EDITOR));
+                    if (!methods.Any())
+                        continue;
 
-                    else if (httpMethods.Contains("DELETE", StringComparer.OrdinalIgnoreCase))
-                        controllerActions.Filters.Add(new AuthorizeFilter(Constants.ROLE_ADMINISTRADOR));
+                    string? policy = null;
+
+                    if (methods.Contains("DELETE", StringComparer.OrdinalIgnoreCase))
+                    {
+                        policy = Constants.ROLE_ADMINISTRADOR;
+                    }
+                    else if (
+                        methods.Contains("POST", StringComparer.OrdinalIgnoreCase) ||
+                        methods.Contains("PUT", StringComparer.OrdinalIgnoreCase) ||
+                        methods.Contains("PATCH", StringComparer.OrdinalIgnoreCase))
+                    {
+                        policy = Constants.ROLE_EDITOR;
+                    }
+                    else if (methods.Contains("GET", StringComparer.OrdinalIgnoreCase))
+                    {
+                        policy = Constants.ROLE_LECTOR;
+                    }
+
+                    if (policy is not null)
+                    {
+                        action.Filters.Add(new AuthorizeFilter(policy));
+                    }
                 }
             }
         }

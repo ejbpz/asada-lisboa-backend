@@ -56,7 +56,7 @@ namespace AsadaLisboaBackend.ServicesExtension
                         ValidateIssuerSigningKey = true, // Check if it's the signed key.
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtOptions:KEY"] ?? "")) // Obtain the key to verify the signing key.
                     };
-    });
+                });
 
             return services;
         }

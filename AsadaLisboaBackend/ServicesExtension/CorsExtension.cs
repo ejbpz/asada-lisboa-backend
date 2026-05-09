@@ -18,8 +18,8 @@ namespace AsadaLisboaBackend.ServicesExtension
             {
                 options.AddDefaultPolicy(policyBuilder => {
                     policyBuilder.WithOrigins(Constants.CLIENT_HOST)
-                        .WithMethods(Constants.ALLOWED_HTTP_METHODS)
-                        .WithHeaders(Constants.ALLOWED_HTTP_HEADERS);
+                        .WithMethods(Constants.ALLOWED_HTTP_METHODS) // ["GET", "POST", "PUT", "DELETE", "PATCH"]
+                        .WithHeaders(Constants.ALLOWED_HTTP_HEADERS); // ["Content-Type", "Authorization", "x-version", "Accept", "Origin", "X-Requested-With"]
                 });
             });
 

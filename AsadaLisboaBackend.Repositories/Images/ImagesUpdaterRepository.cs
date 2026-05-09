@@ -1,8 +1,8 @@
-﻿using AsadaLisboaBackend.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Images;
-using AsadaLisboaBackend.Services.Exceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace AsadaLisboaBackend.Repositories.Images
 {

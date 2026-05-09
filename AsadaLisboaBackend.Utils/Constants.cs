@@ -17,7 +17,7 @@
         public const string DOMAIN_RECAPTCHA = "https://www.google.com/recaptcha/api/siteverify";
 
         public const string ROLE_LECTOR = "Lector";
-        public const string ROLE_EDITOR = "Editor";
+        public const string ROLE_EDITOR = "Escritor";
         public const string ROLE_ADMINISTRADOR = "Administrador";
 
         public const string CACHE_NEWS = "news";

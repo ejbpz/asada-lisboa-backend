@@ -1,14 +1,12 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Account;
-using AsadaLisboaBackend.Models.DTOs.User;
-using AsadaLisboaBackend.Models.IdentityModels;
-using AsadaLisboaBackend.RepositoryContracts.Charges;
-using AsadaLisboaBackend.ServiceContracts.Accounts;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Services.MemoryCaches;
-using AsadaLisboaBackend.Utils;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Account;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Models.IdentityModels;
+using AsadaLisboaBackend.ServiceContracts.Accounts;
+using AsadaLisboaBackend.RepositoryContracts.Charges;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
 namespace AsadaLisboaBackend.Services.Accounts
 {
