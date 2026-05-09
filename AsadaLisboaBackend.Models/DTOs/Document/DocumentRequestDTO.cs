@@ -16,7 +16,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
         public string Description { get; set; } = string.Empty;
 
         [MaxFileSize(15, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]
-        [AllowedExtensions(new string[] { ".pdf", ".docx", ".xlsx", ".csv", ".txt", ".zip" }, ErrorMessage = "La extensión del documento no es válida.")]
+        [AllowedExtensions(new string[] { ".pdf", ".docx", ".doc", ".xlsx", ".xls", ".csv", ".txt", ".zip" }, ErrorMessage = "La extensión del documento no es válida.")]
         public IFormFile? File { get; set; }
 
         [Required(ErrorMessage = "Debe selecionar un estado válido.")]
