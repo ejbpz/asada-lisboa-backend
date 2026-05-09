@@ -17,11 +17,11 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
 
         [MaxFileSize(15, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]
         [AllowedExtensions(new string[] { ".pdf", ".docx", ".xlsx", ".csv", ".txt", ".zip" }, ErrorMessage = "La extensión del documento no es válida.")]
-        public IFormFile File { get; set; } = null!;
+        public IFormFile? File { get; set; }
 
         [Required(ErrorMessage = "Debe selecionar un estado válido.")]
         public Guid StatusId { get; set; }
 
-        public List<CategoryRequestDTO> Categories { get; set; } = new();
+        public List<CategoryRequestDTO?> Categories { get; set; } = new();
     }
 }

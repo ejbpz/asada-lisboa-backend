@@ -25,7 +25,7 @@ namespace AsadaLisboaBackend.Services.Principals
             _documentsGetterService = documentsGetterService;
         }
 
-        public async Task<PrincipalRequestDTO> GetPrincipalInformation()
+        public async Task<PrincipalResponseDTO> GetPrincipalInformation()
         {
             var searchSortRequestDTO = new SearchSortRequestDTO()
             {
@@ -36,7 +36,7 @@ namespace AsadaLisboaBackend.Services.Principals
 
             _logger.LogInformation("Información principal obtenida correctamente.");
 
-            return new PrincipalRequestDTO()
+            return new PrincipalResponseDTO()
             {
                 News = (await _newsGetterService.GetNews(searchSortRequestDTO)).Data,
                 Images = (await _imagesGetterService.GetImages(searchSortRequestDTO)).Data,

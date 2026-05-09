@@ -4,7 +4,7 @@ using AsadaLisboaBackend.Models.DTOs.Document;
 
 namespace AsadaLisboaBackend.Models.DTOs.Principal
 {
-    public class PrincipalRequestDTO
+    public class PrincipalResponseDTO
     {
         public List<NewMinimalResponseDTO> News { get; set; } = new List<NewMinimalResponseDTO>();
         public List<ImageMinimalResponseDTO> Images { get; set; } = new List<ImageMinimalResponseDTO>();

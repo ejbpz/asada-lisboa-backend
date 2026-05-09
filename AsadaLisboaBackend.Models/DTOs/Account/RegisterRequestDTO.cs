@@ -25,7 +25,7 @@ namespace AsadaLisboaBackend.Models.DTOs.Account
         public string Email { get; set; } = string.Empty;
 
         [RegularExpression(Constants.PHONE_REGEX, ErrorMessage = "Formato incorrecto para un número telefónico.")]
-        public string? PhoneNumber { get; set; } = null;
+        public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Contraseña es requerida.")]
         [RegularExpression(Constants.PASSWORD_REGEX, ErrorMessage = "No corresponde a un formato de contraseña.")]

@@ -4,6 +4,6 @@ namespace AsadaLisboaBackend.ServiceContracts.Principals
 {
     public interface IPrincipalsGetterService
     {
-        public Task<PrincipalRequestDTO> GetPrincipalInformation();
+        public Task<PrincipalResponseDTO> GetPrincipalInformation();
     }
 }

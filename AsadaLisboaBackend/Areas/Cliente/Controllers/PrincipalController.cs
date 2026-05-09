@@ -30,7 +30,7 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
         /// </summary>
         /// <returns>An ActionResult containing the main content.</returns>
         [HttpGet("")]
-        public async Task<ActionResult<PrincipalRequestDTO>> GetPrincipalInformation()
+        public async Task<ActionResult<PrincipalResponseDTO>> GetPrincipalInformation()
         {
             return Ok(await _principalsGetterService.GetPrincipalInformation());
         }

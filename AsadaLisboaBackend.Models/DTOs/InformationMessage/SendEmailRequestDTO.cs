@@ -14,7 +14,7 @@ namespace AsadaLisboaBackend.Models.DTOs.InformationMessage
         public string Email { get; set; } = string.Empty;
 
         [RegularExpression(Constants.PHONE_REGEX, ErrorMessage = "No corresponde a un formato de teléfono celular.")]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "El asunto del mensaje es requerido.")]
         [StringLength(50, MinimumLength = 5, ErrorMessage = "El asunto del mensaje debe ser entre {1} y {0} caracteres.")]

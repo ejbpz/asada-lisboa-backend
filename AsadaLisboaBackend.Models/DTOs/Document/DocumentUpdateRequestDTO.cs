@@ -22,6 +22,6 @@ namespace AsadaLisboaBackend.Models.DTOs.Document
         [Required(ErrorMessage = "Debe selecionar un estado válido.")]
         public Guid StatusId { get; set; }
 
-        public List<CategoryRequestDTO> Categories { get; set; } = new();
+        public List<CategoryRequestDTO?> Categories { get; set; } = new();
     }
 }
