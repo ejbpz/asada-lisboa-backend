@@ -10,14 +10,14 @@
         public const string DOMAIN_HOST = "http://localhost:5199";
         public const string CLIENT_HOST = "http://localhost:4200";
 
-        public const string EMAIL_REGEX = @"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$";
         public const string PHONE_REGEX = @"^(?:\d{8}|\d{4}-\d{4}|(?:\d{2}-){3}\d{2})$";
+        public const string EMAIL_REGEX = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$";
         public const string PASSWORD_REGEX = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&\.*]).{8,}$";
 
         public const string DOMAIN_RECAPTCHA = "https://www.google.com/recaptcha/api/siteverify";
 
         public const string ROLE_LECTOR = "Lector";
-        public const string ROLE_EDITOR = "Escritor";
+        public const string ROLE_ESCRITOR = "Escritor";
         public const string ROLE_ADMINISTRADOR = "Administrador";
 
         public const string CACHE_NEWS = "news";

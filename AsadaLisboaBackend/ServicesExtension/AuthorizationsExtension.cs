@@ -16,8 +16,8 @@ namespace AsadaLisboaBackend.ServicesExtension
         {
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Constants.ROLE_LECTOR, p => p.RequireRole(Constants.ROLE_LECTOR, Constants.ROLE_EDITOR, Constants.ROLE_ADMINISTRADOR));
-                options.AddPolicy(Constants.ROLE_EDITOR, p => p.RequireRole(Constants.ROLE_EDITOR, Constants.ROLE_ADMINISTRADOR));
+                options.AddPolicy(Constants.ROLE_LECTOR, p => p.RequireRole(Constants.ROLE_LECTOR, Constants.ROLE_ESCRITOR, Constants.ROLE_ADMINISTRADOR));
+                options.AddPolicy(Constants.ROLE_ESCRITOR, p => p.RequireRole(Constants.ROLE_ESCRITOR, Constants.ROLE_ADMINISTRADOR));
                 options.AddPolicy(Constants.ROLE_ADMINISTRADOR, p => p.RequireRole(Constants.ROLE_ADMINISTRADOR));
             });
             return services;

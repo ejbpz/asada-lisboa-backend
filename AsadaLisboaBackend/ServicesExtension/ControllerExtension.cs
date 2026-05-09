@@ -1,4 +1,5 @@
 ﻿using AsadaLisboaBackend.Conventions;
+using AsadaLisboaBackend.Models.Filters.ActionFilter;
 
 namespace AsadaLisboaBackend.ServicesExtension
 {
@@ -16,6 +17,7 @@ namespace AsadaLisboaBackend.ServicesExtension
         {
             services.AddControllers(options =>
             {
+                options.Filters.Add<TrimStringFilter>();
                 options.Conventions.Add(new AuthorizationConvention());
             });
 

@@ -58,7 +58,7 @@ namespace AsadaLisboaBackend.Conventions
                         methods.Contains("PUT", StringComparer.OrdinalIgnoreCase) ||
                         methods.Contains("PATCH", StringComparer.OrdinalIgnoreCase))
                     {
-                        policy = Constants.ROLE_EDITOR;
+                        policy = Constants.ROLE_ESCRITOR;
                     }
                     else if (methods.Contains("GET", StringComparer.OrdinalIgnoreCase))
                     {
