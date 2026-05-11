@@ -50,7 +50,19 @@ namespace AsadaLisboaBackend.Services.Images
 
             image.Title = imageUpdateRequestDTO.Title;
 
+            if (imageUpdateRequestDTO.StatusId == Guid.Empty)
+            {
+                _logger.LogError("StatusId no puede ser vacío.");
+                throw new ArgumentException("StatusId inválido.");
+            }
+
             var status = await _statusesGetterRepository.GetStatus(imageUpdateRequestDTO.StatusId);
+
+            if (status is null) 
+            {
+                _logger.LogError("Status con {StatusId}, no encontrado.", imageUpdateRequestDTO.StatusId);
+                throw new NotFoundException("Status no encontrado.");
+            }
 
             image.StatusId = status.Id;
             image.Description = imageUpdateRequestDTO.Description;

@@ -52,8 +52,19 @@ namespace AsadaLisboaBackend.Services.Documents
 
             document.Title = documentUpdateRequestDTO.Title;
 
+            if (documentUpdateRequestDTO.StatusId == Guid.Empty)
+            {
+                _logger.LogError("StatusId no puede ser vacío.");
+                throw new ArgumentException("StatusId inválido.");
+            }
+
             var status = await _statusesGetterRepository.GetStatus(documentUpdateRequestDTO.StatusId);
 
+            if (status is null)
+            {
+                _logger.LogError("Status no encontrado con id: {Id}.", documentUpdateRequestDTO.StatusId);
+                throw new NotFoundException("Status no encontrado.");
+            }
             document.StatusId = documentUpdateRequestDTO.StatusId;
             document.Description = documentUpdateRequestDTO.Description;
 

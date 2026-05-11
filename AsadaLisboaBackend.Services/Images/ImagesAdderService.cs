@@ -54,7 +54,19 @@ namespace AsadaLisboaBackend.Services.Images
                 var fileName = Path.GetFileName(url);
                 var filePath = $"imagenes/{fileName}";
 
+                if (imageRequestDTO.StatusId == Guid.Empty)
+                {
+                    _logger.LogError("StatusId no puede ser vacío.");
+                    throw new ArgumentException("StatusId inválido.");
+                }
+
                 var status = await _statusesGetterRepository.GetStatus(imageRequestDTO.StatusId);
+                
+                if (status is null)
+                {
+                    _logger.LogError("Status no encontrado con id: {Id}.", imageRequestDTO.StatusId);
+                    throw new NotFoundException("Status no encontrado.");
+                }
 
                 var categories = await _categoriesGetterService.ToCreateCategories(imageRequestDTO.Categories);
 

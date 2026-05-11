@@ -63,9 +63,21 @@ namespace AsadaLisboaBackend.Services.News
 
             var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(cleanHtml);
 
-            var categories = await _categoriesGetterService.ToCreateCategories(newRequestDTO.Categories);
+            if (newRequestDTO.StatusId == Guid.Empty)
+            {
+                _logger.LogError("StatusId no puede ser vacío.");
+                throw new ArgumentException("StatusId inválido.");
+            }
 
             var status = await _statusesGetterRepository.GetStatus(newRequestDTO.StatusId);
+
+            if (status is null)
+            {
+                _logger.LogError("Status no encontrado con id: {Id}.", newRequestDTO.StatusId);
+                throw new NotFoundException("Status no encontrado.");
+            }
+
+            var categories = await _categoriesGetterService.ToCreateCategories(newRequestDTO.Categories);
 
             var newModel = new New()
             {

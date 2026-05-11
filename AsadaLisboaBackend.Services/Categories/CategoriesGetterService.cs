@@ -75,7 +75,7 @@ namespace AsadaLisboaBackend.Services.Categories
         {
             var noIdCategoriesList = categoryRequestDTO
                  .Where(c => c.Id.HasValue != true)
-                 .Select(c => new CategoryResponseDTO { Name = c.Name })
+                 .Select(c => new CategoryResponseDTO { Name = c.Name ?? "" })
                  .ToList();
 
             await Task.CompletedTask;
@@ -86,7 +86,7 @@ namespace AsadaLisboaBackend.Services.Categories
         {
             var noIdCategoriesList = categoryRequestDTO
                  .Where(c => c.Id.HasValue == true)
-                 .Select(c => new CategoryResponseDTO { Id = c.Id!.Value, Name = c.Name })
+                 .Select(c => new CategoryResponseDTO { Id = c.Id!.Value, Name = c.Name ?? ""})
                  .ToList();
 
             await Task.CompletedTask;

@@ -3,12 +3,12 @@ using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
-using AsadaLisboaBackend.Utils.HtmlSanitizer;
 using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Utils.HtmlSanitizer;
 using AsadaLisboaBackend.Utils.SlugGeneration;
 using AsadaLisboaBackend.ServiceContracts.News;
-using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.RepositoryContracts.News;
+using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
@@ -71,9 +71,22 @@ namespace AsadaLisboaBackend.Services.News
             var content = await _editorsUpdaterService.ChangeHtmlImagesFolder(cleanHtml);
             await _editorsDeleterService.DeleteUnusedImages(existingNew.Description, newRequestDTO.Description);
 
-            var categories = await _categoriesGetterService.ToCreateCategories(newRequestDTO.Categories);
+            if (newRequestDTO.StatusId == Guid.Empty)
+            {
+                _logger.LogError("StatusId no puede ser vacío.");
+                throw new ArgumentException("StatusId inválido.");
+            }
 
             var status = await _statusesGetterRepository.GetStatus(newRequestDTO.StatusId);
+
+            if (status is null)
+            {
+                _logger.LogError("Status con {StatusId}, no encontrado.", newRequestDTO.StatusId);
+                throw new NotFoundException("Status no encontrado.");
+            }
+
+            var categories = await _categoriesGetterService.ToCreateCategories(newRequestDTO.Categories);
+
 
             var newModel = new New()
             {

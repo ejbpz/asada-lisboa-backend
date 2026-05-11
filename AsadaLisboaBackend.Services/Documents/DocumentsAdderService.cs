@@ -57,7 +57,19 @@ namespace AsadaLisboaBackend.Services.Documents
                 var fileName = Path.GetFileName(url);
                 var filePath = $"documentos/{fileName}";
 
+                if(documentRequestDTO.StatusId == Guid.Empty)
+                {
+                    _logger.LogError("StatusId no puede ser vacío.");
+                    throw new ArgumentException("StatusId inválido.");
+                }
+
                 var status = await _statusesGetterRepository.GetStatus(documentRequestDTO.StatusId);
+
+                if (status is null)
+                {
+                    _logger.LogError("Status no encontrado con id: {Id}.", documentRequestDTO.StatusId);
+                    throw new NotFoundException("Status no encontrado.");
+                }
 
                 var categories = await _categoriesGetterService.ToCreateCategories(documentRequestDTO.Categories);
 

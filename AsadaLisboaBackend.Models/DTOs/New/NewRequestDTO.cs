@@ -24,6 +24,6 @@ namespace AsadaLisboaBackend.Models.DTOs.New
         [Required(ErrorMessage = "El estado de la noticia es requerido.")]
         public Guid StatusId { get; set; }
 
-        public List<CategoryRequestDTO?> Categories { get; set; } = new();
+        public List<CategoryRequestDTO> Categories { get; set; } = new();
     }
 }

@@ -18,6 +18,12 @@ namespace AsadaLisboaBackend.Services.Editors
 
         public async Task<EditorResponseDTO> CreateTemporalImage(EditorRequestDTO editorRequestDTO)
         {
+            if(editorRequestDTO.File == null)
+            {
+                _logger.LogWarning("No se ha proporcionado ningún archivo para crear la imagen temporal.");
+                throw new ArgumentException("El archivo no puede ser nulo.", nameof(editorRequestDTO.File));
+            }
+
             var url = await _fileSystemsManager.SaveAsync(editorRequestDTO.File, "temp");
 
             _logger.LogInformation("Imagen temporal agregada en esta URL: {Url}", url);

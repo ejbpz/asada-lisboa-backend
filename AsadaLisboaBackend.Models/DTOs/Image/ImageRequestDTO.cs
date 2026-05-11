@@ -23,6 +23,6 @@ namespace AsadaLisboaBackend.Models.DTOs.Image
         [Required(ErrorMessage = "Debe selecionar un estado válido.")]
         public Guid StatusId { get; set; }
 
-        public List<CategoryRequestDTO?> Categories { get; set; } = new();
+        public List<CategoryRequestDTO> Categories { get; set; } = new();
     }
 }

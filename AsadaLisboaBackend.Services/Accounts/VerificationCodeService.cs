@@ -37,8 +37,14 @@ namespace AsadaLisboaBackend.Services.Accounts
             await _emailsSenderService.SendVerificationCode(user.FirstName, email, encodedToken);
         }
 
-        public async Task ConfirmEmailAsync(string email, string token)
+        public async Task ConfirmEmailAsync(string? email, string? token)
         {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+            {
+                _logger.LogError("Email o token de verificación no proporcionado.");
+                throw new ArgumentException("Email y token son requeridos.");
+            }
+
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user is null)
