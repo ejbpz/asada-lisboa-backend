@@ -1,23 +1,22 @@
-﻿using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.MemoryCaches;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
+using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
 namespace AsadaLisboaBackend.Services.AboutUsSections
 {
     public class AboutUsSectionsDeleterService : IAboutUsSectionsDeleterService
     {
-        private readonly IAboutUsSectionsDeleterRepository _aboutUsSectionsDeleterRepository;
         private readonly ILogger<AboutUsSectionsDeleterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly IAboutUsSectionsDeleterRepository _aboutUsSectionsDeleterRepository;
 
         public AboutUsSectionsDeleterService(IAboutUsSectionsDeleterRepository aboutUsSectionsDeleterRepository, ILogger<AboutUsSectionsDeleterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _aboutUsSectionsDeleterRepository = aboutUsSectionsDeleterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _aboutUsSectionsDeleterRepository = aboutUsSectionsDeleterRepository;
         }
 
         public async Task DeleteAboutUsSection(Guid id)

@@ -10,15 +10,15 @@ namespace AsadaLisboaBackend.Services.Contacts
 {
     public class ContactsGetterService : IContactsGetterService
     {
-        private readonly IContactsGetterRepository _contactsGetterRepository;
         private readonly ILogger<ContactsGetterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly IContactsGetterRepository _contactsGetterRepository;
 
         public ContactsGetterService(IContactsGetterRepository contactsGetterRepository, ILogger<ContactsGetterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _contactsGetterRepository = contactsGetterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _contactsGetterRepository = contactsGetterRepository;
         }
 
         public async Task<PageResponseDTO<ContactResponseDTO>> GetContacts(SearchSortRequestDTO searchSortRequestDTO)

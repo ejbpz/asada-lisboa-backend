@@ -1,24 +1,24 @@
-﻿using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Models.DTOs.AboutUs;
-using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
-using Microsoft.Extensions.Logging;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Models.DTOs.AboutUs;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
+using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
 namespace AsadaLisboaBackend.Services.AboutUsSections
 {
     public class AboutUsSectionsAdderService : IAboutUsSectionsAdderService
     {
-        private readonly IAboutUsSectionsAdderRepository _aboutUsSectionsAdderRepository;
-        private readonly ILogger<AboutUsSectionsAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly ILogger<AboutUsSectionsAdderService> _logger;
+        private readonly IAboutUsSectionsAdderRepository _aboutUsSectionsAdderRepository;
 
         public AboutUsSectionsAdderService(IAboutUsSectionsAdderRepository aboutUsSectionsAdderRepository, ILogger<AboutUsSectionsAdderService> logger, IMemoryCachesService memoryCachesService)
         {
-            _aboutUsSectionsAdderRepository = aboutUsSectionsAdderRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _aboutUsSectionsAdderRepository = aboutUsSectionsAdderRepository;
         }
 
         public async Task<AboutUsResponseDTO> CreateAboutUsSection(AboutUsRequestDTO aboutUsRequestDTO)
@@ -33,7 +33,7 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
 
             var aboutUsCreate = await _aboutUsSectionsAdderRepository.CreateAboutUsSection(aboutUsSection);
 
-            _logger.LogInformation("Sobre nosotros creada");
+            _logger.LogInformation("Sección \"sobre nosotros\" creada");
 
             _memoryCachesService.ChangeVersion(Constants.CACHE_ABOUT_US);
 

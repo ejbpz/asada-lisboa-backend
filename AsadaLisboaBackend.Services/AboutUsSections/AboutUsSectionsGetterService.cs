@@ -27,7 +27,7 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
             {
                 var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<AboutUsResponseDTO>>(
 
-                    resource: Constants.CACHE_USERS,
+                    resource: Constants.CACHE_ABOUT_US,
                     request: searchSortRequestDTO,
                     create: () => _aboutUsSectionsGetterRepository.GetAboutUsSections(searchSortRequestDTO),
                     time: TimeSpan.FromMinutes(5));

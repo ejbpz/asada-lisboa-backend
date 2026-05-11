@@ -1,24 +1,24 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Contact;
+﻿using Microsoft.Extensions.Logging;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models.DTOs.Contact;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
-using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Services.Exceptions;
 
 namespace AsadaLisboaBackend.Services.Contacts
 {
     public class ContactsUpdaterService : IContactsUpdaterService
     {
-        private readonly IContactsUpdaterRepository _contactsUpdaterRepository;
         private readonly ILogger<ContactsUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly IContactsUpdaterRepository _contactsUpdaterRepository;
 
         public ContactsUpdaterService(IContactsUpdaterRepository contactsUpdaterRepository, ILogger<ContactsUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _contactsUpdaterRepository = contactsUpdaterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _contactsUpdaterRepository = contactsUpdaterRepository;
         }
 
         public async Task<ContactResponseDTO> UpdateContact(Guid id, ContactRequestDTO contactsRequestDTO)

@@ -10,15 +10,15 @@ namespace AsadaLisboaBackend.Services.AboutUsSections
 {
     public class AboutUsSectionsUpdaterService : IAboutUsSectionsUpdaterService
     {
-        private readonly IAboutUsSectionsUpdaterRepository _aboutUsSectionsUpdaterRepository;
-        private readonly ILogger<AboutUsSectionsUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly ILogger<AboutUsSectionsUpdaterService> _logger;
+        private readonly IAboutUsSectionsUpdaterRepository _aboutUsSectionsUpdaterRepository;
 
         public AboutUsSectionsUpdaterService(IAboutUsSectionsUpdaterRepository aboutUsSectionsUpdaterRepository, ILogger<AboutUsSectionsUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
-            _aboutUsSectionsUpdaterRepository = aboutUsSectionsUpdaterRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _aboutUsSectionsUpdaterRepository = aboutUsSectionsUpdaterRepository;
         }
 
         public async Task<AboutUsResponseDTO> UpdateAboutUsSection(Guid id, AboutUsRequestDTO aboutUsRequestDTO)

@@ -1,25 +1,24 @@
-﻿using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Models.DTOs.Configuration;
-using AsadaLisboaBackend.Models.DTOs.Contact;
-using AsadaLisboaBackend.RepositoryContracts.Contacts;
-using AsadaLisboaBackend.ServiceContracts.Contacts;
-using Microsoft.Extensions.Logging;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Models.DTOs.Contact;
+using AsadaLisboaBackend.ServiceContracts.Contacts;
+using AsadaLisboaBackend.RepositoryContracts.Contacts;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
 namespace AsadaLisboaBackend.Services.Contacts
 {
     public class ContactsAdderService : IContactsAdderService
     {
-        private readonly IContactsAdderRepository _contactsAdderRepository;
         private readonly ILogger<ContactsAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
+        private readonly IContactsAdderRepository _contactsAdderRepository;
 
         public ContactsAdderService(IContactsAdderRepository contactsAdderRepository, ILogger<ContactsAdderService> logger, IMemoryCachesService memoryCachesService)
         {
-            _contactsAdderRepository = contactsAdderRepository;
             _logger = logger;
             _memoryCachesService = memoryCachesService;
+            _contactsAdderRepository = contactsAdderRepository;
         }
 
         public async Task<ContactResponseDTO> CreateContact(ContactRequestDTO contactRequestDTO)
