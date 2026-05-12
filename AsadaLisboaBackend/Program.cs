@@ -45,14 +45,12 @@ builder.Services.CorsRegistration();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseRateLimiter();
-
 app.UseExceptionHandler();
-
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+
     app.UseSwaggerUI(c =>
     {
         c.InjectStylesheet("/css/swagger-styles.css");
@@ -65,16 +63,21 @@ var config = app.Services
     .Get<DefaultUserOptions>();
 
 if (config is not null && config.RUN)
+{
     await app.Services.SeedAdminUserAsync();
+}
 
 app.UseSerilogRequestLogging();
 
 app.UseHsts();
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
 app.UseCors();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
