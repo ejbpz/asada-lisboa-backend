@@ -38,8 +38,6 @@ builder.Services.AuthorizationsRegistration();
 
 builder.Services.SerilogRegistration(builder.Host);
 
-builder.Services.ElasticSearchRegistration(builder.Configuration);
-
 builder.Services.CorsRegistration();
 
 var app = builder.Build();

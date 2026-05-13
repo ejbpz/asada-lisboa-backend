@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
@@ -12,17 +11,15 @@ namespace AsadaLisboaBackend.Services.Documents
 {
     public class DocumentsDeleterService: IDocumentsDeleterService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<DocumentsDeleterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
         private readonly IDocumentsGetterRepository _documentsGetterRespository;
         private readonly IDocumentsDeleterRepository _documentsDeleterRespository;
 
-        public DocumentsDeleterService(IFileSystemsManager fileSystems, ILogger<DocumentsDeleterService> logger, IDocumentsDeleterRepository documentsDeleterRespository, IDocumentsGetterRepository documentsGetterRespository, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public DocumentsDeleterService(IFileSystemsManager fileSystems, ILogger<DocumentsDeleterService> logger, IDocumentsDeleterRepository documentsDeleterRespository, IDocumentsGetterRepository documentsGetterRespository, IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _documentsGetterRespository = documentsGetterRespository;
@@ -43,11 +40,6 @@ namespace AsadaLisboaBackend.Services.Documents
                 await _fileSystems.DeleteAsync(document.FileName, "documentos");
 
             await _documentsDeleterRespository.DeleteDocument(id);
-
-            await _elastic.DeleteAsync<Document>(id, d => d
-                .Index("documentos")
-                .Refresh(Refresh.True)
-            );
 
             _memoryCachesService.RemoveById(Constants.CACHE_DOCUMENTS, document.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
