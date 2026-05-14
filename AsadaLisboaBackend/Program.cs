@@ -1,4 +1,5 @@
 using Serilog;
+using AsadaLisboaBackend.Seeders;
 using AsadaLisboaBackend.Middlewares;
 using AsadaLisboaBackend.ServicesExtension;
 using AsadaLisboaBackend.Utils.OptionsPattern;
@@ -65,6 +66,8 @@ if (config is not null && config.RUN)
     await app.Services.SeedAdminUserAsync();
 }
 
+await ApplicationDbSeeder.SeedAsync(app.Services);
+
 app.UseSerilogRequestLogging();
 
 app.UseHsts();
@@ -81,5 +84,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();

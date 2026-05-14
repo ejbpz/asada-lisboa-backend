@@ -35,4 +35,11 @@
     <ProjectReference Include="..\AsadaLisboaBackend.Utils\AsadaLisboaBackend.Utils.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\documentos\" />
+    <Folder Include="wwwroot\imagenes\" />
+    <Folder Include="wwwroot\noticias\" />
+    <Folder Include="wwwroot\temp\" />
+  </ItemGroup>
+
 </Project>
