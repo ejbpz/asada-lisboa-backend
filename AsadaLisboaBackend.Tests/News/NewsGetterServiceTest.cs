@@ -1,12 +1,12 @@
-﻿using AsadaLisboaBackend.Models.DTOs.New;
+﻿using Moq;
+using AutoFixture;
+using FluentAssertions;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Services.News;
+using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.News;
-using AsadaLisboaBackend.Utils;
-using AutoFixture;
-using FluentAssertions;
-using Moq;
 
 namespace AsadaLisboaBackend.Tests.News
 {
