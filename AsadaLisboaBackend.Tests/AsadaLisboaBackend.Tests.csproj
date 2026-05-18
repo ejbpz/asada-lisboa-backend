@@ -22,6 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AsadaLisboaBackend.RepositoryContracts\AsadaLisboaBackend.RepositoryContracts.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.ServiceContracts\AsadaLisboaBackend.ServiceContracts.csproj" />
+    <ProjectReference Include="..\AsadaLisboaBackend.Services\AsadaLisboaBackend.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
