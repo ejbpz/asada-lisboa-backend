@@ -1,21 +1,22 @@
-﻿using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Models.DTOs.Category;
-using AsadaLisboaBackend.Models.DTOs.New;
-using AsadaLisboaBackend.Models.DTOs.Status;
-using AsadaLisboaBackend.RepositoryContracts.News;
-using AsadaLisboaBackend.RepositoryContracts.Statuses;
-using AsadaLisboaBackend.ServiceContracts.Categories;
-using AsadaLisboaBackend.ServiceContracts.Editors;
-using AsadaLisboaBackend.ServiceContracts.FileSystems;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Services.News;
-using AsadaLisboaBackend.Utils;
-using AutoFixture;
-using FluentAssertions;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
+using AutoFixture;
+using FluentAssertions;
+using Elastic.Clients.Elasticsearch;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Services.News;
+using AsadaLisboaBackend.Models.DTOs.New;
+using AsadaLisboaBackend.Models.DTOs.Status;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Models.DTOs.Category;
+using AsadaLisboaBackend.ServiceContracts.Editors;
+using AsadaLisboaBackend.RepositoryContracts.News;
+using AsadaLisboaBackend.ServiceContracts.Categories;
+using AsadaLisboaBackend.ServiceContracts.FileSystems;
+using AsadaLisboaBackend.RepositoryContracts.Statuses;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
 namespace AsadaLisboaBackend.Tests.News
 {
@@ -25,6 +26,7 @@ namespace AsadaLisboaBackend.Tests.News
 
         private readonly Mock<IFileSystemsManager> _fileSystemsMock;
         private readonly Mock<ILogger<NewsAdderService>> _loggerMock;
+        private readonly Mock<ElasticsearchClient> _elasticSearchClientMock;
         private readonly Mock<INewsAdderRepository> _newsAdderRepositoryMock;
         private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
         private readonly Mock<IEditorsUpdaterService> _editorsUpdaterServiceMock;
@@ -46,6 +48,7 @@ namespace AsadaLisboaBackend.Tests.News
 
             _fileSystemsMock = new Mock<IFileSystemsManager>();
             _loggerMock = new Mock<ILogger<NewsAdderService>>();
+            _elasticSearchClientMock = new Mock<ElasticsearchClient>();
             _newsAdderRepositoryMock = new Mock<INewsAdderRepository>();
             _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
             _editorsUpdaterServiceMock = new Mock<IEditorsUpdaterService>();
@@ -60,7 +63,7 @@ namespace AsadaLisboaBackend.Tests.News
                 _fileSystemsMock.Object,
                 _loggerMock.Object,
                 _memoryCachesServiceMock.Object,
-                null!
+                _elasticSearchClientMock.Object
             );
         }
 
