@@ -63,9 +63,15 @@ namespace AsadaLisboaBackend.Services.Accounts
 
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
+            if (!result.Succeeded)
+            {
+                _logger.LogError("Error al confirmar el email del usuario.");
+                throw new UpdateObjectException("Error al actualizar el usuario.");
+            }
+
             user.EmailConfirmed = true;
             user.IsActive = true;
-            
+
             await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)

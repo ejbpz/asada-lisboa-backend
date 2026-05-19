@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Text.Json;
+using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AsadaLisboaBackend.Utils;
@@ -23,10 +24,10 @@ namespace AsadaLisboaBackend.Services.ReCaptchas
 
         public async Task<bool> ReCaptchaValidation(string reCaptchaRequest)
         {
-            if (string.IsNullOrEmpty(reCaptchaRequest) && string.IsNullOrWhiteSpace(reCaptchaRequest))
+            if (string.IsNullOrEmpty(reCaptchaRequest) || string.IsNullOrWhiteSpace(reCaptchaRequest))
                 throw new ArgumentNullException("El reCaptcha ha sido nulo.");
 
-            if (string.IsNullOrEmpty(_reCaptchaOptions.SECRET_KEY) && string.IsNullOrWhiteSpace(_reCaptchaOptions.SECRET_KEY))
+            if (string.IsNullOrEmpty(_reCaptchaOptions.SECRET_KEY) || string.IsNullOrWhiteSpace(_reCaptchaOptions.SECRET_KEY))
                 throw new ArgumentNullException("Error con el proveedor del correos.");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string>()
@@ -43,15 +44,26 @@ namespace AsadaLisboaBackend.Services.ReCaptchas
                 return false;
             }
 
-            var result = await response.Content.ReadFromJsonAsync<ReCaptchaResponseDTO>();
-
-            if (result is null)
+            try
             {
-                _logger.LogError("Error al validar ReCAPTCHA, respuesta no pudo ser deserializada");
+                var result = await response.Content
+                    .ReadFromJsonAsync<ReCaptchaResponseDTO>();
+
+                if (result is null)
+                {
+                    _logger.LogError("Error al validar ReCAPTCHA, respuesta no pudo ser deserializada");
+                    return false;
+                }
+
+                return result.Success;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex,
+                    "Error al deserializar la respuesta de ReCAPTCHA");
+
                 return false;
             }
-
-            return result.Success;
         }
     }
 }

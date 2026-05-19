@@ -31,7 +31,13 @@ namespace AsadaLisboaBackend.Services.Users
                 throw new NotFoundException("Usuario inexistente.");
             }
 
-            await _userManager.DeleteAsync(user);
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                _logger.LogError("Error al eliminar el usuario con id {UserId}.", id);
+                throw new InvalidOperationException("Error al eliminar el usuario.");
+            }
 
             _memoryCachesService.RemoveById(Constants.CACHE_USERS, user.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_USERS);
