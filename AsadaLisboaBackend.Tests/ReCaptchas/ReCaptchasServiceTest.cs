@@ -1,13 +1,13 @@
-﻿using AsadaLisboaBackend.Services.ReCaptchas;
-using AsadaLisboaBackend.Tests.Helpers;
-using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Utils.OptionsPattern;
-using FluentAssertions;
+﻿using System.Net;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Net;
-using System.Text;
+using FluentAssertions;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Tests.Helpers;
+using AsadaLisboaBackend.Services.ReCaptchas;
+using AsadaLisboaBackend.Utils.OptionsPattern;
 
 namespace AsadaLisboaBackend.Tests.ReCaptchas
 {
