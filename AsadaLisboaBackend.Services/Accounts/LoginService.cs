@@ -47,7 +47,13 @@ namespace AsadaLisboaBackend.Services.Accounts
             user.RefreshToken = autenticationResponse.RefreshToken;
             user.RefreshTokenExpiration = autenticationResponse.RefreshTokenExpiration;
 
-            await _userManager.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+            {
+                _logger.LogError("Error al actualizar el usuario con el correo {Email}.", loginRequestDTO.Email);
+                throw new UpdateObjectException("Error al actualizar el usuario.");
+            }
 
             return autenticationResponse;
         }
