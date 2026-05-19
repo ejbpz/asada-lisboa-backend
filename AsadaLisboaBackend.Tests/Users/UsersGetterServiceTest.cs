@@ -1,13 +1,13 @@
-﻿using AsadaLisboaBackend.Models.DTOs.Shared;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using FluentAssertions;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Services.Users;
 using AsadaLisboaBackend.Models.DTOs.User;
+using AsadaLisboaBackend.Models.DTOs.Shared;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Services.Users;
-using AsadaLisboaBackend.Utils;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace AsadaLisboaBackend.Tests.Users
 {
