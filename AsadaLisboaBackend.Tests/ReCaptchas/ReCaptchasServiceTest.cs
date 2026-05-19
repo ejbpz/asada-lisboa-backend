@@ -24,7 +24,7 @@ namespace AsadaLisboaBackend.Tests.ReCaptchas
             HttpResponseMessage response,
             string secretKey = "SECRET_KEY")
         {
-            var handler = new MockHttpMessageHandler(
+            var handler = new MockHttpMessageHandlerHelper(
                 (_, _) => Task.FromResult(response));
 
             var httpClient = new HttpClient(handler);
@@ -184,7 +184,7 @@ namespace AsadaLisboaBackend.Tests.ReCaptchas
             // Arrange
             HttpRequestMessage? capturedRequest = null;
 
-            var handler = new MockHttpMessageHandler((request, _) =>
+            var handler = new MockHttpMessageHandlerHelper((request, _) =>
             {
                 capturedRequest = request;
 

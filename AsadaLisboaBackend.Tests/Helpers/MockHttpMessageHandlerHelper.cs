@@ -1,10 +1,10 @@
 ﻿namespace AsadaLisboaBackend.Tests.Helpers
 {
-    public class MockHttpMessageHandler : HttpMessageHandler
+    public class MockHttpMessageHandlerHelper : HttpMessageHandler
     {
         private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _handler;
 
-        public MockHttpMessageHandler(
+        public MockHttpMessageHandlerHelper(
             Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handler)
         {
             _handler = handler;
