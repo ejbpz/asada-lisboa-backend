@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using FluentAssertions;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Images;
@@ -27,22 +26,17 @@ namespace AsadaLisboaBackend.Tests.Services.Images
         private readonly Mock<ICategoriesGetterService> _categoriesServiceMock = new Mock<ICategoriesGetterService>();
         private readonly Mock<IStatusesGetterRepository> _statusRepositoryMock = new Mock<IStatusesGetterRepository>();
 
-        private readonly Mock<ElasticsearchClient> _elasticMock;
-
         private readonly ImagesAdderService _service;
 
         public ImagesAdderServiceTests()
         {
-            _elasticMock = new Mock<ElasticsearchClient>();
-
             _service = new ImagesAdderService(
                 _imagesRepositoryMock.Object,
                 _fileSystemsMock.Object,
                 _categoriesServiceMock.Object,
                 _statusRepositoryMock.Object,
                 _loggerMock.Object,
-                _memoryCacheMock.Object,
-                _elasticMock.Object
+                _memoryCacheMock.Object
             );
         }
 
