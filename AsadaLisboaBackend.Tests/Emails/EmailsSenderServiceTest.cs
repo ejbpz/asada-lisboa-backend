@@ -1,14 +1,14 @@
-﻿using AsadaLisboaBackend.Models.DTOs.InformationMessage;
-using AsadaLisboaBackend.Services.Emails;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Utils.OptionsPattern;
-using FluentAssertions;
+﻿using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Resend;
-using System.Net;
+using FluentAssertions;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Services.Emails;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Utils.OptionsPattern;
+using AsadaLisboaBackend.Models.DTOs.InformationMessage;
 
 namespace AsadaLisboaBackend.Tests.Emails
 {
