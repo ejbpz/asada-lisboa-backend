@@ -1,18 +1,18 @@
-﻿using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Models.DTOs.Account;
-using AsadaLisboaBackend.Models.DTOs.Charge;
-using AsadaLisboaBackend.Models.IdentityModels;
-using AsadaLisboaBackend.RepositoryContracts.Charges;
-using AsadaLisboaBackend.ServiceContracts.Accounts;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
-using AsadaLisboaBackend.Services.Accounts;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Utils;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
+using Moq;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Moq;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Services.Accounts;
+using AsadaLisboaBackend.Models.DTOs.Charge;
+using AsadaLisboaBackend.Models.DTOs.Account;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Models.IdentityModels;
+using AsadaLisboaBackend.ServiceContracts.Accounts;
+using AsadaLisboaBackend.RepositoryContracts.Charges;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
 namespace AsadaLisboaBackend.Tests.Accounts
 {
