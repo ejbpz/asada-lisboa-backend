@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using AutoFixture;
 using FluentAssertions;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.News;
@@ -34,8 +33,6 @@ namespace AsadaLisboaBackend.Tests.News
         private readonly Mock<ICategoriesGetterService> _categoriesGetterServiceMock;
         private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
 
-        private readonly Mock<ElasticsearchClient> _elasticMock;
-
         private readonly NewsUpdaterService _service;
 
         public NewsUpdaterServiceTests()
@@ -57,7 +54,6 @@ namespace AsadaLisboaBackend.Tests.News
             _categoriesGetterServiceMock = new Mock<ICategoriesGetterService>();
             _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
 
-            _elasticMock = new Mock<ElasticsearchClient>();
 
             _service = new NewsUpdaterService(
                 _newsUpdaterRepositoryMock.Object,
@@ -68,8 +64,7 @@ namespace AsadaLisboaBackend.Tests.News
                 _categoriesGetterServiceMock.Object,
                 _fileSystemsMock.Object,
                 _loggerMock.Object,
-                _memoryCachesServiceMock.Object,
-                _elasticMock.Object
+                _memoryCachesServiceMock.Object
             );
         }
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
@@ -18,7 +17,6 @@ namespace AsadaLisboaBackend.Services.News
 {
     public class NewsAdderService : INewsAdderService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<NewsAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -27,10 +25,9 @@ namespace AsadaLisboaBackend.Services.News
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorsUpdaterService editorsUpdaterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsAdderService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public NewsAdderService(INewsAdderRepository newsAdderRepository, IEditorsUpdaterService editorsUpdaterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsAdderService> logger, IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _newsAdderRepository = newsAdderRepository;
@@ -105,25 +102,6 @@ namespace AsadaLisboaBackend.Services.News
             _logger.LogInformation("Noticia con id {Id} creada exitosamente.", created.Id);
 
             _memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
-
-            // Add to ElasticSearch
-            if(status.Name.Trim().ToLower() == "publicado")
-            {
-                var news = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
-                {
-                    Id = created.Id,
-                    Type = "Noticia",
-                    Slug = created.Slug,
-                    Title = created.Title,
-                    Description = created.Description,
-                };
-
-                await _elastic.IndexAsync(news, i => i
-                    .Index("noticias")
-                    .Id(news.Id)
-                    .Refresh(Refresh.True)
-                );
-            }
 
             return created.ToNewResponseDTO();
         }

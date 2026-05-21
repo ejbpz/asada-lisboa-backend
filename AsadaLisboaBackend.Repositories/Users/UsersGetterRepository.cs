@@ -1,10 +1,10 @@
-﻿using AsadaLisboaBackend.Models.DatabaseContext;
+﻿using Microsoft.EntityFrameworkCore;
 using AsadaLisboaBackend.Models.DTOs.Role;
-using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.User;
+using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.IdentityModels;
+using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace AsadaLisboaBackend.Repositories.Users
 {
@@ -43,10 +43,10 @@ namespace AsadaLisboaBackend.Repositories.Users
                 query = searchSortRequestDTO.FilterBy switch
                 {
                     "charge" => query.Where(u =>
-                        EF.Functions.Like(u.Charge!.Name ?? "", $"%{search}%")),
+                        EF.Functions.ILike(u.Charge!.Name ?? "", $"%{search}%")),
 
                     _ => query.Where(u =>
-                        EF.Functions.Like((u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName), $"%{search}%")),
+                        EF.Functions.ILike((u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName), $"%{search}%")),
                 };
             }
 

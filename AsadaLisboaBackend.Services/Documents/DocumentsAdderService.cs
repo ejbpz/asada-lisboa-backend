@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DTOs.Document;
@@ -16,7 +15,6 @@ namespace AsadaLisboaBackend.Services.Documents
 {
     public class DocumentsAdderService: IDocumentsAdderService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<DocumentsAdderService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -25,10 +23,9 @@ namespace AsadaLisboaBackend.Services.Documents
         private readonly IStatusesGetterRepository _statusesGetterRepository;
         private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
 
-        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IDocumentTypesGetterRepository documentTypesGetterRepository, IFileSystemsManager fileSystems, ILogger<DocumentsAdderService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IDocumentTypesGetterRepository documentTypesGetterRepository, IFileSystemsManager fileSystems, ILogger<DocumentsAdderService> logger, IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _categoriesGetterService = categoriesGetterService;
@@ -102,26 +99,6 @@ namespace AsadaLisboaBackend.Services.Documents
                 _logger.LogInformation("Documento creado exitosamente con id: {DocumentId}", documentCreated.Id);
 
                 _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
-
-                // Add to ElasticSearch
-                if (status.Name.Trim().ToLower() == "publicado")
-                {
-                    var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
-                    {
-                        Type = "Documento",
-                        Id = documentCreated.Id,
-                        Slug = documentCreated.Slug,
-                        Title = documentCreated.Title,
-                        Description = documentCreated.Description,
-
-                    };
-
-                    await _elastic.IndexAsync(doc, i => i
-                        .Index("documentos")
-                        .Id(doc.Id)
-                        .Refresh(Refresh.True)
-                    );
-                }
 
                 return documentCreated.ToDocumentResponseDTO();
             }

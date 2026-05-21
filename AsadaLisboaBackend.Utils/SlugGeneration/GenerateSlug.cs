@@ -16,11 +16,9 @@ namespace AsadaLisboaBackend.Utils.SlugGeneration
             slug = Regex.Replace(slug, @"-+", "-");
             slug = slug.Trim('-'); 
 
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-
             var shortId = id.ToString("N")[..6];
 
-            return $"{slug}-{timestamp}-{shortId}";
+            return $"{slug}-{shortId}";
         }
     }
 }

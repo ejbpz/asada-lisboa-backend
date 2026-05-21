@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using AutoFixture;
 using FluentAssertions;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Images;
@@ -30,14 +29,11 @@ namespace AsadaLisboaBackend.Tests.Services.Images
         private readonly Mock<IImagesUpdaterRepository> _imagesUpdaterRepositoryMock = new Mock<IImagesUpdaterRepository>();
         private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
 
-        private readonly Mock<ElasticsearchClient> _elasticMock;
-
         private readonly ImagesUpdaterService _service;
 
         public ImagesUpdaterServiceTest()
         {
             _fixture = new Fixture();
-            _elasticMock = new Mock<ElasticsearchClient>();
 
             _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
                 .ForEach(b => _fixture.Behaviors.Remove(b));
@@ -52,8 +48,7 @@ namespace AsadaLisboaBackend.Tests.Services.Images
                 categoriesGetterService: _categoriesGetterServiceMock.Object,
                 statusesGetterRepository: _statusesGetterRepositoryMock.Object,
                 logger: _loggerMock.Object,
-                memoryCachesService: _memoryCachesServiceMock.Object,
-                elastic: _elasticMock.Object
+                memoryCachesService: _memoryCachesServiceMock.Object
             );
         }
 

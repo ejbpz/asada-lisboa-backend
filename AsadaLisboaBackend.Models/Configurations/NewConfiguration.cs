@@ -10,9 +10,9 @@ namespace AsadaLisboaBackend.Models.Configurations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Slug).IsRequired().HasMaxLength(200);
-            builder.Property(x => x.ImageUrl).IsRequired().HasMaxLength(200);
+            builder.Property(x => x.ImageUrl).IsRequired();
             builder.Property(x => x.Title).IsRequired().HasMaxLength(200);
-            builder.Property(x => x.Description).IsRequired().HasColumnType("nvarchar(max)");
+            builder.Property(x => x.Description).IsRequired().HasColumnType("text").HasMaxLength(5000);
             builder.Property(x => x.PublicationDate).IsRequired();
             builder.Property(x => x.LastEditionDate).IsRequired();
 

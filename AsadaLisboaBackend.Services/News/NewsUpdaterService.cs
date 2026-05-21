@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
@@ -18,7 +17,6 @@ namespace AsadaLisboaBackend.Services.News
 {
     public class NewsUpdaterService : INewsUpdaterService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<NewsUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -29,10 +27,9 @@ namespace AsadaLisboaBackend.Services.News
         private readonly ICategoriesGetterService _categoriesGetterService;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorsUpdaterService editorsUpdaterService, IEditorsDeleterService editorsDeleterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public NewsUpdaterService(INewsUpdaterRepository newsUpdaterRepository, INewsGetterRepository newsGetterRepository, IEditorsUpdaterService editorsUpdaterService, IEditorsDeleterService editorsDeleterService, IStatusesGetterRepository statusesGetterRepository, ICategoriesGetterService categoriesGetterService, IFileSystemsManager fileSystems, ILogger<NewsUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _newsGetterRepository = newsGetterRepository;
@@ -121,30 +118,6 @@ namespace AsadaLisboaBackend.Services.News
 
             _memoryCachesService.RemoveById(Constants.CACHE_NEWS, created.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
-
-            // Update to ElasticSearch
-            if (status.Name.Trim().ToLower() == "publicado")
-            {
-                var news = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
-                {
-                    Id = created.Id,
-                    Type = "Noticia",
-                    Slug = created.Slug,
-                    Title = created.Title,
-                    Description = created.Description,
-                };
-
-                await _elastic.IndexAsync(news, i => i
-                    .Index("noticias")
-                    .Id(news.Id)
-                    .Refresh(Refresh.True)
-                );
-            } else { 
-                await _elastic.DeleteAsync<New>(id, d => d
-                    .Index("noticias")
-                    .Refresh(Refresh.True)
-                );
-            }
 
             return created.ToNewResponseDTO();
         }

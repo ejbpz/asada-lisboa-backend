@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.SlugGeneration;
@@ -17,7 +15,6 @@ namespace AsadaLisboaBackend.Services.Images
 {
     public class ImagesUpdaterService : IImagesUpdaterService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<ImagesUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -26,10 +23,9 @@ namespace AsadaLisboaBackend.Services.Images
         private readonly IImagesUpdaterRepository _imagesUpdaterRepository;
         private readonly IStatusesGetterRepository _statusesGetterRepository;
 
-        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<ImagesUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public ImagesUpdaterService(ApplicationDbContext applicationDbContext, IFileSystemsManager fileSystems, IImagesUpdaterRepository imagesUpdaterRepository, IImagesGetterRepository imagesGetterRespository, ICategoriesGetterService categoriesGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<ImagesUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _categoriesGetterService = categoriesGetterService;
@@ -107,30 +103,6 @@ namespace AsadaLisboaBackend.Services.Images
 
             _memoryCachesService.RemoveById(Constants.CACHE_IMAGES, imageUpdated.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);
-
-            // Update to ElasticSearch
-            if (status.Name.Trim().ToLower() == "publicado")
-            {
-                var imag = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
-                {
-                    Type = "Imagen",
-                    Id = imageUpdated.Id,
-                    Slug = imageUpdated.Slug,
-                    Title = imageUpdated.Title,
-                    Description = imageUpdated.Description,
-                };
-
-                await _elastic.IndexAsync(imag, i => i
-                    .Index("imagenes")
-                    .Id(imag.Id)
-                    .Refresh(Refresh.True)
-                );
-            } else {
-                await _elastic.DeleteAsync<New>(id, d => d
-                    .Index("imagenes")
-                    .Refresh(Refresh.True)
-                );
-            }
 
             return imageUpdated.ToImageResponseDTO();
         }

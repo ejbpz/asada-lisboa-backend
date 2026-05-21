@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using AsadaLisboaBackend.Models.DTOs.SearchGlobal;
-using AsadaLisboaBackend.ServiceContracts.SearchGlobal;
+using AsadaLisboaBackend.Models.DTOs.Search;
+using AsadaLisboaBackend.ServiceContracts.Searches;
 
 namespace AsadaLisboaBackend.Areas.Cliente.Controllers
 {
@@ -14,26 +14,26 @@ namespace AsadaLisboaBackend.Areas.Cliente.Controllers
     [Route("api/[area]/[controller]")]
     public class BuscadorController : ControllerBase
     {
-        private readonly ISearchGlobalService _searchGlobalService;
+        private readonly ISearchesGetterService _searchesGetterService;
 
         /// <summary>
         /// Constructor for BuscadorController.
         /// </summary>
-        /// <param name="searchGlobalService">Service for getting search data.</param>
-        public BuscadorController(ISearchGlobalService searchGlobalService)
+        /// <param name="searchesGetterService">Service for getting search data.</param>
+        public BuscadorController(ISearchesGetterService searchesGetterService)
         {
-            _searchGlobalService = searchGlobalService;
+            _searchesGetterService = searchesGetterService;
         }
 
         /// <summary>
         /// Retrieve the data from news, documents and/or images.
         /// </summary>
         /// <param name="query">Query to search into documents, images and news.</param>
-        /// <returns>ActionResult for List of SearchGlobalDocument.</returns>
+        /// <returns>ActionResult for List of SearchResponseDTO.</returns>
         [HttpGet("")]
-        public async Task<ActionResult<List<SearchGlobalDocument>>> Search([FromQuery] string query)
+        public async Task<ActionResult<List<SearchResponseDTO>>> Search([FromQuery] string query)
         {
-            return Ok(await _searchGlobalService.Search(query));
+            return Ok(await _searchesGetterService.Search(query));
         }
 
     }

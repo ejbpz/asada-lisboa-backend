@@ -45,14 +45,14 @@ namespace AsadaLisboaBackend.Repositories.Images
                 {
                     "status" => query.Where(i =>
                         i.Status != null &&
-                        EF.Functions.Like(i.Status.Name, $"%{search}%")),
+                        EF.Functions.ILike(i.Status.Name, $"%{search}%")),
 
                     "category" => query.Where(i =>
                         i.Categories.Any(c =>
-                            EF.Functions.Like(c.Name, $"%{search}%"))),
+                            EF.Functions.ILike(c.Name, $"%{search}%"))),
 
                     _ => query.Where(i =>
-                        EF.Functions.Like(i.Title, $"%{search}%")),
+                        EF.Functions.ILike(i.Title, $"%{search}%")),
                 };
             }
 

@@ -18,7 +18,7 @@ namespace AsadaLisboaBackend.ServicesExtension
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("AsadaLisboaDB"));
+                options.UseNpgsql(configuration.GetConnectionString("AsadaLisboaDB"));
             });
 
             return services;
