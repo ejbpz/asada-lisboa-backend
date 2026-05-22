@@ -18,11 +18,11 @@ namespace AsadaLisboaBackend.Seeders
         {
             if (await context.Images.AnyAsync())
                 return;
-
-            var images = ImagesSeedData.Get();
+            
+            var categories = await context.Categories.ToListAsync();
+            var images = ImagesSeedData.Get(categories);
 
             await context.Images.AddRangeAsync(images);
-
             await context.SaveChangesAsync();
         }
     }

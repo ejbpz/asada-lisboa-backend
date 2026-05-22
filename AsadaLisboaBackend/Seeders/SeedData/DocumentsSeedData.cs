@@ -11,8 +11,25 @@ public static class DocumentsSeedData
     /// Gets the list of seed documents.
     /// </summary>
     /// <returns>A list of seed documents.</returns>
-    public static List<Document> Get()
+    public static List<Document> Get(List<Category> categories)
     {
+        var proyectosEjecutados = categories.First(x => x.Id == Guid.Parse("03E622EC-438B-49F3-8C53-3A3873651C16"));
+        var estadosFinancieros = categories.First(x => x.Id == Guid.Parse("6DA5CF2D-E946-43ED-A092-D5B4C9282FFA"));
+        var tanquePrincipal = categories.First(x => x.Id == Guid.Parse("3643CD9F-99FE-4873-85F9-2A7B6B4DAC28"));
+        var pozoPrincipal = categories.First(x => x.Id == Guid.Parse("F62ED863-70D4-446B-9088-10EFD6CB6C77"));
+        var lineamientos = categories.First(x => x.Id == Guid.Parse("77607C99-2ED1-4B8E-89CC-CCC7C6344E53"));
+        var sugerencias = categories.First(x => x.Id == Guid.Parse("2B3B492D-E243-4FC8-8217-03EA9998A201"));
+        var solicitudes = categories.First(x => x.Id == Guid.Parse("BA84F8AC-EAD7-4CB3-83B4-77238DF95884"));
+        var reglamentos = categories.First(x => x.Id == Guid.Parse("93CA9020-78FD-4080-8D57-469EB05D9DC3"));
+        var colindancia = categories.First(x => x.Id == Guid.Parse("783E94BC-4748-4223-A150-8892354B865B"));
+        var hidrantes = categories.First(x => x.Id == Guid.Parse("560841FB-884B-45F6-9A09-18D4641B7AF5"));
+        var convenios = categories.First(x => x.Id == Guid.Parse("5AA04636-CD02-4184-BBE0-603A2E785988"));
+        var medidores = categories.First(x => x.Id == Guid.Parse("64C63C8A-20E2-487D-A365-815E20978E81"));
+        var informes = categories.First(x => x.Id == Guid.Parse("81F11C15-3556-40BE-8074-A6BE7A5D5AB4"));
+        var examenes = categories.First(x => x.Id == Guid.Parse("CEB0BB8A-0414-474C-B378-46491B4C08E8"));
+        var estudios = categories.First(x => x.Id == Guid.Parse("B2DBCF36-FDDF-4752-B39D-B31F61E704A3"));
+        var dudas = categories.First(x => x.Id == Guid.Parse("71B9C756-B148-4E0F-A5C7-09A8A7AA209E"));
+
         return new()
         {
             new ()
@@ -27,7 +44,11 @@ public static class DocumentsSeedData
                 FileName = "balance-general-2022-017b65.pdf",
                 FilePath = "documentos/balance-general-2022-017b65.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    estadosFinancieros
+                },
             },
             new ()
             {
@@ -41,7 +62,11 @@ public static class DocumentsSeedData
                 FileName = "balance-general-2023-0f9113.pdf",
                 FilePath = "documentos/balance-general-2023-0f9113.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    estadosFinancieros
+                },
             },
             new ()
             {
@@ -55,7 +80,12 @@ public static class DocumentsSeedData
                 FileName = "estudio-de-demanda-del-pozo-61d28a.docx",
                 FilePath = "documentos/estudio-de-demanda-del-pozo-61d28a.docx",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745")
+                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    estudios
+                }
             },
             new ()
             {
@@ -69,7 +99,12 @@ public static class DocumentsSeedData
                 FileName = "informe-ejecutivo-anual-contable-2022-4d0d90.pdf",
                 FilePath = "documentos/informe-ejecutivo-anual-contable-2022-4d0d90.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes,
+                    estadosFinancieros
+                },
             },
             new ()
             {
@@ -83,7 +118,12 @@ public static class DocumentsSeedData
                 FileName = "informe-ejecutivo-anual-contable-2023-86300c.pdf",
                 FilePath = "documentos/informe-ejecutivo-anual-contable-2023-86300c.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes,
+                    estadosFinancieros
+                },
             },
             new ()
             {
@@ -97,7 +137,12 @@ public static class DocumentsSeedData
                 FileName = "informe-fiscal-2022-ad0bc6.pdf",
                 FilePath = "documentos/informe-fiscal-2022-ad0bc6.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes,
+                    estadosFinancieros
+                },
             },
             new ()
             {
@@ -111,13 +156,18 @@ public static class DocumentsSeedData
                 FileName = "informe-fiscal-2023-asamblea-general-ordinaria-y-extraordinaria-bc52f2.pdf",
                 FilePath = "documentos/informe-fiscal-2023-asamblea-general-ordinaria-y-extraordinaria-bc52f2.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes,
+                    estadosFinancieros
+                },
             },
             new ()
             {
                 Id = Guid.Parse("7893c468-2309-4433-b9d7-87fa7ae84da6"),
                 Slug = "informe-plan-de-trabajo-e-inversin-2023-7893c4",
-                Title = "Informe Plan de Trabajo  e Inversión 2023",
+                Title = "Informe Plan de Trabajo e Inversión 2023",
                 PublicationDate = DateTime.Parse("2023-12-01T00:00:00Z").ToUniversalTime(),
                 Description = "Plan de trabajo e inversión con objetivos y proyectos correspondientes al período 2023.",
                 FileSize = 129260,
@@ -125,7 +175,12 @@ public static class DocumentsSeedData
                 FileName = "informe-plan-de-trabajo-e-inversin-2023-7893c4.pdf",
                 FilePath = "documentos/informe-plan-de-trabajo-e-inversin-2023-7893c4.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes,
+                    proyectosEjecutados
+                },
             },
             new ()
             {
@@ -139,7 +194,11 @@ public static class DocumentsSeedData
                 FileName = "informe-presidencial-2022-64cfb6.pdf",
                 FilePath = "documentos/informe-presidencial-2022-64cfb6.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes
+                },
             },
             new ()
             {
@@ -153,7 +212,11 @@ public static class DocumentsSeedData
                 FileName = "informe-presidencial-2023-465590.pdf",
                 FilePath = "documentos/informe-presidencial-2023-465590.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    informes,
+                },
             },
             new ()
             {
@@ -167,7 +230,12 @@ public static class DocumentsSeedData
                 FileName = "informe-tesorera-2022-52c966.pdf",
                 FilePath = "documentos/informe-tesorera-2022-52c966.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    estadosFinancieros,
+                    informes
+                },
             },
             new ()
             {
@@ -181,7 +249,11 @@ public static class DocumentsSeedData
                 FileName = "lineamiento-para-consumo-estimado-99058f.pdf",
                 FilePath = "documentos/lineamiento-para-consumo-estimado-99058f.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    lineamientos
+                },
             },
             new ()
             {
@@ -195,7 +267,11 @@ public static class DocumentsSeedData
                 FileName = "perfil-del-pozo-principal-ad5f4c.docx",
                 FilePath = "documentos/perfil-del-pozo-principal-ad5f4c.docx",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745")
+                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                },
             },
             new ()
             {
@@ -209,7 +285,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-exmenes-bacteriolgicos-julio-2023-c4cafc.pdf",
                 FilePath = "documentos/pozo-principal-exmenes-bacteriolgicos-julio-2023-c4cafc.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    examenes
+                },
             },
             new ()
             {
@@ -223,7 +304,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-exmenes-fsico-qumicos-julio-2023-0b9ad5.pdf",
                 FilePath = "documentos/pozo-principal-exmenes-fsico-qumicos-julio-2023-0b9ad5.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    examenes
+                },
             },
             new ()
             {
@@ -237,7 +323,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-abril-2020-829dc3.doc",
                 FilePath = "documentos/pozo-principal-informe-abril-2020-829dc3.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -251,7 +342,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-abril-2021-1f1ef6.pdf",
                 FilePath = "documentos/pozo-principal-informe-abril-2021-1f1ef6.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -265,7 +361,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-agosto-2015-27ea06.doc",
                 FilePath = "documentos/pozo-principal-informe-agosto-2015-27ea06.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -279,7 +380,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-diciembre-2019-96ecb1.doc",
                 FilePath = "documentos/pozo-principal-informe-diciembre-2019-96ecb1.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -293,7 +399,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-enero-2021-0b6287.docx",
                 FilePath = "documentos/pozo-principal-informe-enero-2021-0b6287.docx",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745")
+                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -307,7 +418,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-febrero-2020-d4c383.doc",
                 FilePath = "documentos/pozo-principal-informe-febrero-2020-d4c383.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -321,7 +437,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-julio-2017-con-cmara-b040e2.docx",
                 FilePath = "documentos/pozo-principal-informe-julio-2017-con-cmara-b040e2.docx",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745")
+                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -335,7 +456,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-julio-2017-276b8a.doc",
                 FilePath = "documentos/pozo-principal-informe-julio-2017-276b8a.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -349,7 +475,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-julio-2023-19ea3e.docx",
                 FilePath = "documentos/pozo-principal-informe-julio-2023-19ea3e.docx",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745")
+                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -363,7 +494,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-junio-2019-6a20c4.doc",
                 FilePath = "documentos/pozo-principal-informe-junio-2019-6a20c4.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -377,7 +513,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-junio-2020-aeedb7.doc",
                 FilePath = "documentos/pozo-principal-informe-junio-2020-aeedb7.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -391,7 +532,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-junio-2021-188454.docx",
                 FilePath = "documentos/pozo-principal-informe-junio-2021-188454.docx",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745")
+                DocumentTypeId = Guid.Parse("9029EB69-0E77-4CF6-8622-C7902D565745"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -405,7 +551,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-marzo-2019-7ac743.doc",
                 FilePath = "documentos/pozo-principal-informe-marzo-2019-7ac743.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -419,7 +570,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-noviembre-2020-6c066e.doc",
                 FilePath = "documentos/pozo-principal-informe-noviembre-2020-6c066e.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -433,7 +589,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-setiembre-2019-cce54b.doc",
                 FilePath = "documentos/pozo-principal-informe-setiembre-2019-cce54b.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -447,7 +608,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-informe-setiembre-2020-c1418e.doc",
                 FilePath = "documentos/pozo-principal-informe-setiembre-2020-c1418e.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    informes
+                },
             },
             new ()
             {
@@ -461,7 +627,12 @@ public static class DocumentsSeedData
                 FileName = "pozo-principal-resultados-anlisis-de-agua-43a310.pdf",
                 FilePath = "documentos/pozo-principal-resultados-anlisis-de-agua-43a310.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    pozoPrincipal,
+                    examenes
+                },
             },
             new ()
             {
@@ -475,7 +646,11 @@ public static class DocumentsSeedData
                 FileName = "reglamento-asadas-2020-41bb72.pdf",
                 FilePath = "documentos/reglamento-asadas-2020-41bb72.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    reglamentos
+                },
             },
             new ()
             {
@@ -489,7 +664,11 @@ public static class DocumentsSeedData
                 FileName = "reglamento-tcnico-prestacin-de-servicios-953897.doc",
                 FilePath = "documentos/reglamento-tcnico-prestacin-de-servicios-953897.doc",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7")
+                DocumentTypeId = Guid.Parse("1FA5211F-F4EA-42D1-8C5E-DEE71D9A75A7"),
+                Categories = new List<Category>
+                {
+                    reglamentos
+                },
             },
             new ()
             {
@@ -503,7 +682,12 @@ public static class DocumentsSeedData
                 FileName = "rendicin-de-cuentas-informe-tesorera-2023-988afb.pdf",
                 FilePath = "documentos/rendicin-de-cuentas-informe-tesorera-2023-988afb.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    estadosFinancieros,
+                    informes
+                },
             },
             new ()
             {
@@ -517,7 +701,11 @@ public static class DocumentsSeedData
                 FileName = "resultados-revisin-hidrantes-bomberos-2014-f195d8.pdf",
                 FilePath = "documentos/resultados-revisin-hidrantes-bomberos-2014-f195d8.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    hidrantes
+                },
             },
             new ()
             {
@@ -531,7 +719,11 @@ public static class DocumentsSeedData
                 FileName = "resultados-revisin-hidrantes-bomberos-2017-a09dff.pdf",
                 FilePath = "documentos/resultados-revisin-hidrantes-bomberos-2017-a09dff.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    hidrantes
+                },
             },
             new ()
             {
@@ -545,7 +737,11 @@ public static class DocumentsSeedData
                 FileName = "resultados-revisin-hidrantes-bomberos-2019-4f29e2.pdf",
                 FilePath = "documentos/resultados-revisin-hidrantes-bomberos-2019-4f29e2.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    hidrantes
+                },
             },
             new ()
             {
@@ -559,7 +755,11 @@ public static class DocumentsSeedData
                 FileName = "resultados-revisin-hidrantes-bomberos-2020-4a6c5c.pdf",
                 FilePath = "documentos/resultados-revisin-hidrantes-bomberos-2020-4a6c5c.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    hidrantes
+                },
             },
             new ()
             {
@@ -573,7 +773,12 @@ public static class DocumentsSeedData
                 FileName = "convenio-de-instalacin-de-medidores-adicionales-092827.pdf",
                 FilePath = "documentos/convenio-de-instalacin-de-medidores-adicionales-092827.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    convenios,
+                    medidores
+                },
             },
             new ()
             {
@@ -587,7 +792,12 @@ public static class DocumentsSeedData
                 FileName = "machote-para-dudas-y-sugerencias-5385af.pdf",
                 FilePath = "documentos/machote-para-dudas-y-sugerencias-5385af.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    dudas,
+                    sugerencias
+                },
             },
             new ()
             {
@@ -601,7 +811,11 @@ public static class DocumentsSeedData
                 FileName = "solicitud-para-cambio-de-nombre-en-recibo-de-agua-1fd759.pdf",
                 FilePath = "documentos/solicitud-para-cambio-de-nombre-en-recibo-de-agua-1fd759.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    solicitudes
+                },
             },
             new ()
             {
@@ -615,7 +829,11 @@ public static class DocumentsSeedData
                 FileName = "solicitud-para-derechos-de-agua-9b64cc.pdf",
                 FilePath = "documentos/solicitud-para-derechos-de-agua-9b64cc.pdf",
                 StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
-                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8")
+                DocumentTypeId = Guid.Parse("D8FBE9B6-1A5E-41EA-98EA-E6641A6047C8"),
+                Categories = new List<Category>
+                {
+                    solicitudes
+                },
             },
         };
     }

@@ -11,8 +11,25 @@ namespace AsadaLisboaBackend.Seeders.SeedData
         /// Gets the list of seed images.
         /// </summary>
         /// <returns>A list of seed images.</returns>
-        public static List<Image> Get()
+        public static List<Image> Get(List<Category> categories)
         {
+            var proyectosEjecutados = categories.First(x => x.Id == Guid.Parse("03E622EC-438B-49F3-8C53-3A3873651C16"));
+            var estadosFinancieros = categories.First(x => x.Id == Guid.Parse("6DA5CF2D-E946-43ED-A092-D5B4C9282FFA"));
+            var tanquePrincipal = categories.First(x => x.Id == Guid.Parse("3643CD9F-99FE-4873-85F9-2A7B6B4DAC28"));
+            var pozoPrincipal = categories.First(x => x.Id == Guid.Parse("F62ED863-70D4-446B-9088-10EFD6CB6C77"));
+            var lineamientos = categories.First(x => x.Id == Guid.Parse("77607C99-2ED1-4B8E-89CC-CCC7C6344E53"));
+            var sugerencias = categories.First(x => x.Id == Guid.Parse("2B3B492D-E243-4FC8-8217-03EA9998A201"));
+            var solicitudes = categories.First(x => x.Id == Guid.Parse("BA84F8AC-EAD7-4CB3-83B4-77238DF95884"));
+            var reglamentos = categories.First(x => x.Id == Guid.Parse("93CA9020-78FD-4080-8D57-469EB05D9DC3"));
+            var colindancia = categories.First(x => x.Id == Guid.Parse("783E94BC-4748-4223-A150-8892354B865B"));
+            var hidrantes = categories.First(x => x.Id == Guid.Parse("560841FB-884B-45F6-9A09-18D4641B7AF5"));
+            var convenios = categories.First(x => x.Id == Guid.Parse("5AA04636-CD02-4184-BBE0-603A2E785988"));
+            var medidores = categories.First(x => x.Id == Guid.Parse("64C63C8A-20E2-487D-A365-815E20978E81"));
+            var informes = categories.First(x => x.Id == Guid.Parse("81F11C15-3556-40BE-8074-A6BE7A5D5AB4"));
+            var examenes = categories.First(x => x.Id == Guid.Parse("CEB0BB8A-0414-474C-B378-46491B4C08E8"));
+            var estudios = categories.First(x => x.Id == Guid.Parse("B2DBCF36-FDDF-4752-B39D-B31F61E704A3"));
+            var dudas = categories.First(x => x.Id == Guid.Parse("71B9C756-B148-4E0F-A5C7-09A8A7AA209E"));
+
             return new()
             {
                 new ()
@@ -27,6 +44,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-1-0adb10.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 376521,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -40,6 +60,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-10-fb23f6.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 342095,
+                    Categories = new List<Category> {
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -53,6 +76,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-11-080414.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 446386,
+                    Categories = new List<Category> {
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -66,6 +92,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-12-f26ea7.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 426119,
+                    Categories = new List<Category> {
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -79,6 +108,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-2-eec94e.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 393401,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -92,6 +124,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-3-490634.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 460463,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -105,6 +140,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-4-4a77d6.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 325167,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -118,6 +156,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-5-a74df3.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 392362,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -131,6 +172,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-6-321e39.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 394471,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -144,6 +188,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-7-f460d3.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 349382,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -157,6 +204,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-8-30400b.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 337325,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -170,6 +220,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/colindancia-9-2fe204.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 369350,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
                 },
                 new ()
                 {
@@ -183,6 +236,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/estado-financieros-2020-y-2021-1-6ba3d0.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 602601,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -196,6 +252,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/estado-financieros-2020-y-2021-2-cd1bff.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 384048,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -209,6 +268,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/estado-financieros-2020-y-2021-3-7c0882.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 537098,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -222,6 +284,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/estado-financieros-2020-y-2021-4-64619c.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 390431,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -235,6 +300,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/notas-estado-financieros-diciembre-2021-1-074d01.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 596413,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -248,6 +316,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/notas-estado-financieros-diciembre-2021-2-f135ea.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 502266,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -261,6 +332,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/notas-estado-financieros-diciembre-2021-3-131c0b.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 541386,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -274,6 +348,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/notas-estado-financieros-diciembre-2021-4-423aca.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 526033,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -287,6 +364,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/notas-estado-financieros-diciembre-2021-5-074ae7.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 312965,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
                 },
                 new ()
                 {
@@ -300,6 +380,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/pozo-principal-1-c3c544.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 303360,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
                 },
                 new ()
                 {
@@ -313,6 +396,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/pozo-principal-2-910d17.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 277839,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
                 },
                 new ()
                 {
@@ -326,6 +412,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/pozo-principal-3-4d03b9.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 318122,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
                 },
                 new ()
                 {
@@ -339,6 +428,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/pozo-principal-4-1b5cc3.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 301913,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
                 },
                 new ()
                 {
@@ -352,6 +444,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-aire-acondicionado-1-74c65e.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 144260,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -365,6 +460,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-aire-acondicionado-2-699938.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 326298,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -378,6 +476,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-aire-acondicionado-3-588aeb.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 340549,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -391,6 +492,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-aire-acondicionado-4-f7fbda.jpg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 105526,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -404,6 +508,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-instalacin-de-techo-1-fa2110.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 183632,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -417,6 +524,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-instalacin-malla-1-61bc9d.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 480329,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -430,6 +540,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-instalacin-malla-2-6e0021.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 362839,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -443,6 +556,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-instalacin-malla-3-805717.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 448603,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -456,6 +572,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-instalacin-malla-4-4a699f.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 530056,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -469,6 +588,10 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-medidor-de-agua-turbina-bar-meter-1-502511.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 476938,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        medidores
+                    }
                 },
                 new ()
                 {
@@ -482,6 +605,10 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-medidor-de-agua-turbina-bar-meter-2-c8d70e.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 242456,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        medidores
+                    }
                 },
                 new ()
                 {
@@ -495,6 +622,10 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-medidor-de-agua-turbina-bar-meter-3-dc215b.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 198718,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        medidores
+                    }
                 },
                 new ()
                 {
@@ -508,6 +639,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-1-984c5e.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 185994,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -521,6 +655,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-2-086b1c.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 224575,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -534,6 +671,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-3-1d5bf8.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 448585,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -547,6 +687,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-4-219b4a.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 280688,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -560,6 +703,11 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-prueba-de-pozo-principal-1-5d4ff3.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 161705,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
                 },
                 new ()
                 {
@@ -573,6 +721,11 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-prueba-de-pozo-principal-2-5fe11d.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 262796,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
                 },
                 new ()
                 {
@@ -586,6 +739,11 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-prueba-de-pozo-principal-3-071b31.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 252464,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
                 },
                 new ()
                 {
@@ -599,6 +757,11 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-prueba-de-pozo-principal-4-ab2d35.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 245846,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
                 },
                 new ()
                 {
@@ -612,6 +775,11 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-prueba-de-pozo-principal-5-a2f617.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 255876,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
                 },
                 new ()
                 {
@@ -625,6 +793,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-recoleccin-1-c3566a.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 407363,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -638,6 +809,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-recoleccin-2-514b28.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 422083,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
                 new ()
                 {
@@ -651,6 +825,9 @@ namespace AsadaLisboaBackend.Seeders.SeedData
                     FilePath = "imagenes/proyecto-transformadores-de-electricidad-1-b1ec69.jpeg",
                     StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
                     FileSize = 316078,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
                 },
             };
         }

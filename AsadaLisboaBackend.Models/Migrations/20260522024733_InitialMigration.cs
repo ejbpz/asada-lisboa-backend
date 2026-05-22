@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AsadaLisboaBackend.Models.Migrations
 {
     /// <inheritdoc />
-    public partial class PostgresInit : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -47,7 +47,7 @@ namespace AsadaLisboaBackend.Models.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -185,7 +185,7 @@ namespace AsadaLisboaBackend.Models.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Slug = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     PublicationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
@@ -218,7 +218,7 @@ namespace AsadaLisboaBackend.Models.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Slug = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     PublicationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
@@ -248,7 +248,7 @@ namespace AsadaLisboaBackend.Models.Migrations
                     Description = table.Column<string>(type: "text", maxLength: 5000, nullable: false),
                     PublicationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastEditionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ImageUrl = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ImageUrl = table.Column<string>(type: "text", nullable: false),
                     FileName = table.Column<string>(type: "text", nullable: false),
                     FilePath = table.Column<string>(type: "text", nullable: false),
                     StatusId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -452,14 +452,23 @@ namespace AsadaLisboaBackend.Models.Migrations
                     { new Guid("3643cd9f-99fe-4873-85f9-2a7b6b4dac28"), "Tanque Principal" },
                     { new Guid("560841fb-884b-45f6-9a09-18d4641b7af5"), "Hidrantes" },
                     { new Guid("5aa04636-cd02-4184-bbe0-603a2e785988"), "Convenios" },
+                    { new Guid("5dcb6ba5-0084-4420-8c7e-152df55f8b0b"), "Recibos" },
+                    { new Guid("64c63c8a-20e2-487d-a365-815e20978e81"), "Medidores" },
                     { new Guid("6da5cf2d-e946-43ed-a092-d5b4c9282ffa"), "Estados Financieros" },
+                    { new Guid("712b5566-24bb-4681-9b7d-e636bdc2ab8e"), "Asamblea Ordinaria" },
                     { new Guid("71b9c756-b148-4e0f-a5c7-09a8a7aa209e"), "Dudas" },
                     { new Guid("77607c99-2ed1-4b8e-89cc-ccc7c6344e53"), "Lineamientos" },
                     { new Guid("783e94bc-4748-4223-a150-8892354b865b"), "Colindancia" },
                     { new Guid("81f11c15-3556-40be-8074-a6be7a5d5ab4"), "Informes" },
+                    { new Guid("82bc31fd-3438-4b17-8216-a77c863bfb19"), "SINPE Móvil" },
+                    { new Guid("88af46be-8e2e-4451-a746-ee0864e7145a"), "Ahorro" },
                     { new Guid("93ca9020-78fd-4080-8d57-469eb05d9dc3"), "Reglamentos" },
+                    { new Guid("a12d2ab5-24d2-420c-90d2-2cc3468a33f3"), "Evento" },
                     { new Guid("b2dbcf36-fddf-4752-b39d-b31f61e704a3"), "Estudios" },
                     { new Guid("ba84f8ac-ead7-4cb3-83b4-77238df95884"), "Solicitudes" },
+                    { new Guid("be75e73d-145e-41b1-b3ac-149abc0ade06"), "Mantenimiento" },
+                    { new Guid("c5d3b3b3-e69b-48d9-93a5-a4803af196eb"), "Asamblea Extraordinaria" },
+                    { new Guid("cc1f685c-356e-46ec-a027-3c570fdc6009"), "Reciclaje" },
                     { new Guid("ceb0bb8a-0414-474c-b378-46491b4c08e8"), "Exámenes" },
                     { new Guid("f62ed863-70d4-446b-9088-10efd6cb6c77"), "Pozo Principal" }
                 });

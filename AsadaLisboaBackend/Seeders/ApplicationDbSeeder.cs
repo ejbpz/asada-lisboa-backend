@@ -23,6 +23,7 @@ namespace AsadaLisboaBackend.Seeders
 
             await DocumentSeeder.SeedAsync(context);
             await ImageSeeder.SeedAsync(context);
+            await NewSeeder.SeedAsync(context);
         }
     }
 }

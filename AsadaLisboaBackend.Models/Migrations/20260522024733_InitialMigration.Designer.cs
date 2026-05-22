@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AsadaLisboaBackend.Models.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260512225155_PostgresInit")]
-    partial class PostgresInit
+    [Migration("20260522024733_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,8 +89,7 @@ namespace AsadaLisboaBackend.Models.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -104,6 +103,46 @@ namespace AsadaLisboaBackend.Models.Migrations
                         {
                             Id = new Guid("03e622ec-438b-49f3-8c53-3a3873651c16"),
                             Name = "Proyectos Ejecutados"
+                        },
+                        new
+                        {
+                            Id = new Guid("a12d2ab5-24d2-420c-90d2-2cc3468a33f3"),
+                            Name = "Evento"
+                        },
+                        new
+                        {
+                            Id = new Guid("88af46be-8e2e-4451-a746-ee0864e7145a"),
+                            Name = "Ahorro"
+                        },
+                        new
+                        {
+                            Id = new Guid("5dcb6ba5-0084-4420-8c7e-152df55f8b0b"),
+                            Name = "Recibos"
+                        },
+                        new
+                        {
+                            Id = new Guid("cc1f685c-356e-46ec-a027-3c570fdc6009"),
+                            Name = "Reciclaje"
+                        },
+                        new
+                        {
+                            Id = new Guid("82bc31fd-3438-4b17-8216-a77c863bfb19"),
+                            Name = "SINPE Móvil"
+                        },
+                        new
+                        {
+                            Id = new Guid("be75e73d-145e-41b1-b3ac-149abc0ade06"),
+                            Name = "Mantenimiento"
+                        },
+                        new
+                        {
+                            Id = new Guid("712b5566-24bb-4681-9b7d-e636bdc2ab8e"),
+                            Name = "Asamblea Ordinaria"
+                        },
+                        new
+                        {
+                            Id = new Guid("c5d3b3b3-e69b-48d9-93a5-a4803af196eb"),
+                            Name = "Asamblea Extraordinaria"
                         },
                         new
                         {
@@ -154,6 +193,11 @@ namespace AsadaLisboaBackend.Models.Migrations
                         {
                             Id = new Guid("5aa04636-cd02-4184-bbe0-603a2e785988"),
                             Name = "Convenios"
+                        },
+                        new
+                        {
+                            Id = new Guid("64c63c8a-20e2-487d-a365-815e20978e81"),
+                            Name = "Medidores"
                         },
                         new
                         {
@@ -351,8 +395,7 @@ namespace AsadaLisboaBackend.Models.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -638,8 +681,7 @@ namespace AsadaLisboaBackend.Models.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -678,8 +720,7 @@ namespace AsadaLisboaBackend.Models.Migrations
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("LastEditionDate")
                         .HasColumnType("timestamp with time zone");
