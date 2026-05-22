@@ -14,7 +14,7 @@
         public const string EMAIL_REGEX = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$";
         public const string PASSWORD_REGEX = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&\.*]).{8,}$";
 
-        public const string DOMAIN_RECAPTCHA = "https://www.google.com/recaptcha/api/siteverify";
+        public const string DOMAIN_RECAPTCHA = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
         public const string ROLE_LECTOR = "Lector";
         public const string ROLE_ESCRITOR = "Escritor";

@@ -75,12 +75,11 @@ namespace AsadaLisboaBackend.Services.Documents
 
                 try
                 {
-                    newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
-
-                    var newFileName = Path.GetFileName(newUrl);
-
-                    if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath) && document.FilePath != newUrl)
+                    if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
                         File.Delete(document.FilePath);
+                    
+                    newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
+                    var newFileName = Path.GetFileName(newUrl);
 
                     document.Url = newUrl;
                     document.FileName = newFileName;

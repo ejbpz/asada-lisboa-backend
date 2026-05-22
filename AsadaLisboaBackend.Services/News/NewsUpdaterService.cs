@@ -1,17 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
-using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Models;
+﻿using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
-using AsadaLisboaBackend.Services.Exceptions;
-using AsadaLisboaBackend.Utils.HtmlSanitizer;
-using AsadaLisboaBackend.Utils.SlugGeneration;
-using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.RepositoryContracts.News;
-using AsadaLisboaBackend.ServiceContracts.Editors;
-using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
+using AsadaLisboaBackend.ServiceContracts.Categories;
+using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.ServiceContracts.News;
+using AsadaLisboaBackend.Services.Exceptions;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Utils.HtmlSanitizer;
+using AsadaLisboaBackend.Utils.SlugGeneration;
+using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AsadaLisboaBackend.Services.News
 {
@@ -58,10 +59,10 @@ namespace AsadaLisboaBackend.Services.News
 
             if (newRequestDTO.File is not null)
             {
-                var newImageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "noticias", existingNew.Slug);
+                if (!string.IsNullOrEmpty(existingNew.FilePath) && File.Exists(existingNew.FilePath))
+                    File.Delete(existingNew.FilePath);
 
-                if (!string.IsNullOrEmpty(existingNew.FileName) && !string.IsNullOrWhiteSpace(existingNew.FileName))
-                    await _fileSystems.DeleteAsync(existingNew.FileName, "noticias");
+                var newImageUrl = await _fileSystems.SaveAsync(newRequestDTO.File, "noticias", existingNew.Slug);
 
                 imageUrl = newImageUrl;
                 fileName = Path.GetFileName(imageUrl);
@@ -106,20 +107,20 @@ namespace AsadaLisboaBackend.Services.News
                 PublicationDate = existingNew.PublicationDate,
             };
 
-            var created = await _newsUpdaterRepository.UpdateNew(id, newModel);
+            var updated = await _newsUpdaterRepository.UpdateNew(id, newModel);
 
-            if (created is null)
+            if (updated is null)
             {
                 _logger.LogError("Error al actualizar la noticia con id {Id}", id);
-                throw new CreateObjectException("Error al crear la noticia.");
+                throw new UpdateObjectException("Error al actualizar la noticia.");
             }
 
-            _logger.LogInformation("Noticia con id {Id} actualizada correctamente", created.Id);
+            _logger.LogInformation("Noticia con id {Id} actualizada correctamente", updated.Id);
 
-            _memoryCachesService.RemoveById(Constants.CACHE_NEWS, created.Id);
+            _memoryCachesService.RemoveById(Constants.CACHE_NEWS, updated.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
 
-            return created.ToNewResponseDTO();
+            return updated.ToNewResponseDTO();
         }
     }
 }

@@ -73,13 +73,12 @@ namespace AsadaLisboaBackend.Services.Images
 
                 try
                 {
-                    newUrl = await _fileSystems.SaveAsync(imageUpdateRequestDTO.File, "imagenes", image.Slug);
-
-                    var newFileName = Path.GetFileName(newUrl);
-
-                    if (!string.IsNullOrEmpty(image.FilePath) && !string.IsNullOrWhiteSpace(image.FilePath) && File.Exists(image.FilePath) && image.FilePath != newUrl)
+                    if (!string.IsNullOrEmpty(image.FilePath) && File.Exists(image.FilePath))
                         File.Delete(image.FilePath);
 
+                    newUrl = await _fileSystems.SaveAsync(imageUpdateRequestDTO.File, "imagenes", image.Slug);
+                    var newFileName = Path.GetFileName(newUrl);
+                    
                     image.Url = newUrl;
                     image.FileName = newFileName;
                     image.FilePath = $"imagenes/{newFileName}";
