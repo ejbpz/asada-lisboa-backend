@@ -38,7 +38,7 @@ namespace AsadaLisboaBackend.Services.Emails
                 {
                     From = "Acme <onboarding@resend.dev>",
                     To = new[] { email },
-                    Subject = "Token restaurar contraseña",
+                    Subject = "Token restauración de contraseña para usuario.",
                     Template = new EmailMessageTemplate()
                     {
                         TemplateId = new Guid( "994eedad-8199-45ca-8fcf-57eb3e257e9f" ),
@@ -58,8 +58,11 @@ namespace AsadaLisboaBackend.Services.Emails
         {
             var variables = new Dictionary<string, object>()
             {
+                { "USER_EMAIL", sendEmailRequestDTO.Email },
                 { "USER_NAME", sendEmailRequestDTO.FullName },
                 { "CONTACT_MESSAGE", sendEmailRequestDTO.Message },
+                { "CONTACT_SUBJECT", sendEmailRequestDTO.Subject },
+                { "USER_PHONE", sendEmailRequestDTO.PhoneNumber ?? "" },
             };
 
             var response = await _resend.EmailSendAsync(
@@ -101,7 +104,7 @@ namespace AsadaLisboaBackend.Services.Emails
                 {
                     From = "Acme <onboarding@resend.dev>",
                     To = new[] { email },
-                    Subject = "Token confirmación correo electrónico",
+                    Subject = "Token confirmación correo electrónico de usuario.",
                     Template = new EmailMessageTemplate()
                     {
                         TemplateId = new Guid("a807f333-12ae-4b12-9e00-e5e3ecb02f2b"),
