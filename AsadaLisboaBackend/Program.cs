@@ -40,10 +40,13 @@ builder.Services.AuthorizationsRegistration();
 builder.Services.SerilogRegistration(builder.Host);
 
 builder.Services.CorsRegistration();
+builder.Services.ForwardedHeadersRegistration();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -56,6 +59,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+await ApplicationDbSeeder.SeedAsync(app.Services);
+
 var config = app.Services
     .GetRequiredService<IConfiguration>()
     .GetSection("DefaultUserOptions")
@@ -65,8 +70,6 @@ if (config is not null && config.RUN)
 {
     await app.Services.SeedAdminUserAsync();
 }
-
-await ApplicationDbSeeder.SeedAsync(app.Services);
 
 app.UseSerilogRequestLogging();
 
@@ -84,6 +87,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();
