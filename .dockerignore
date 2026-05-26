@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+
+# Environment
+.env
+.env.*
+
+# IDEs
+.vs
+.vscode
+.idea
+
+# Build artifacts
+**/bin
+**/obj
+**/out
+**/publish
+
+# Logs
+**/logs
+*.log
+
+# Tests / coverage
+TestResults
+coverage
+.coverage
+.coveragexml
+
+# Node
+node_modules
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local history
+.history
+.localhistory
+
+# Runtime/generated files
+AsadaLisboaBackend/wwwroot/temp/
