@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
@@ -17,7 +16,6 @@ namespace AsadaLisboaBackend.Services.Documents
 {
     public class DocumentsUpdaterService : IDocumentsUpdaterService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<DocumentsUpdaterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
@@ -27,10 +25,9 @@ namespace AsadaLisboaBackend.Services.Documents
         private readonly IDocumentsUpdaterRepository _documentUpdateRespository;
         private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
 
-        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService, IDocumentTypesGetterRepository documentTypesGetterRepository, IStatusesGetterRepository statusesGetterRepository, ILogger<DocumentsUpdaterService> logger, IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public DocumentsUpdaterService(IFileSystemsManager fileSystems, IDocumentsGetterRepository documentGetterRepository, IDocumentsUpdaterRepository documentUpdateRespository, ICategoriesGetterService categoriesGetterService, IDocumentTypesGetterRepository documentTypesGetterRepository, IStatusesGetterRepository statusesGetterRepository, ILogger<DocumentsUpdaterService> logger, IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _categoriesGetterService = categoriesGetterService;
@@ -78,12 +75,11 @@ namespace AsadaLisboaBackend.Services.Documents
 
                 try
                 {
-                    newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
-
-                    var newFileName = Path.GetFileName(newUrl);
-
-                    if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath) && document.FilePath != newUrl)
+                    if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
                         File.Delete(document.FilePath);
+                    
+                    newUrl = await _fileSystems.SaveAsync(documentUpdateRequestDTO.File, "documentos", document.Slug);
+                    var newFileName = Path.GetFileName(newUrl);
 
                     document.Url = newUrl;
                     document.FileName = newFileName;
@@ -117,30 +113,6 @@ namespace AsadaLisboaBackend.Services.Documents
             _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
 
             _logger.LogInformation("Documento con id {DocumentId} actualizado correctamente.", documentUpdated.Id);
-
-            if (status.Name.Trim().ToLower() == "publicado")
-            {
-                var doc = new Models.DTOs.SearchGlobal.SearchGlobalResponseDTO
-                {
-                    Type = "Documento",
-                    Id = documentUpdated.Id,
-                    Slug = documentUpdated.Slug,
-                    Title = documentUpdated.Title,
-                    Description = documentUpdated.Description,
-
-                };
-
-                await _elastic.IndexAsync(doc, i => i
-                    .Index("documentos")
-                    .Id(doc.Id)
-                    .Refresh(Refresh.True)
-                );
-            } else {
-                await _elastic.DeleteAsync<New>(id, d => d
-                    .Index("documentos")
-                    .Refresh(Refresh.True)
-                );
-            }
 
             return documentUpdated.ToDocumentResponseDTO();
         }

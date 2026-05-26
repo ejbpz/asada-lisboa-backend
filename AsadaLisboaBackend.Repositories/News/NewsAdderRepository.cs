@@ -1,9 +1,8 @@
-﻿using AsadaLisboaBackend.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using AsadaLisboaBackend.Models;
+using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
-using AsadaLisboaBackend.Services.Exceptions;
-using Elastic.Clients.Elasticsearch.IndexManagement;
-using Microsoft.EntityFrameworkCore;
 
 namespace AsadaLisboaBackend.Repositories.News
 {

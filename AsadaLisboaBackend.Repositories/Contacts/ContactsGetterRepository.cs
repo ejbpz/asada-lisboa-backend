@@ -27,7 +27,7 @@ namespace AsadaLisboaBackend.Repositories.Contacts
                 string search = searchSortRequestDTO.Search.ToLower();
 
                 query = query.Where(c =>
-                        EF.Functions.Like(c.ContactType, $"%{search}%"));
+                        EF.Functions.ILike(c.ContactType, $"%{search}%"));
             }
 
             // Sort

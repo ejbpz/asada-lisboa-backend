@@ -2,7 +2,6 @@
 using Moq;
 using AutoFixture;
 using FluentAssertions;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.News;
@@ -19,7 +18,6 @@ namespace AsadaLisboaBackend.Tests.News
         private readonly Fixture _fixture;
 
         private readonly Mock<ILogger<NewsDeleterService>> _loggerMock;
-        private readonly Mock<ElasticsearchClient> _elasticSearchClientMock;
         private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
         private readonly Mock<INewsGetterRepository> _newsGetterRepositoryMock;
         private readonly Mock<INewsDeleterRepository> _newsDeleterRepositoryMock;
@@ -39,7 +37,6 @@ namespace AsadaLisboaBackend.Tests.News
             _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
             _loggerMock = new Mock<ILogger<NewsDeleterService>>();
-            _elasticSearchClientMock = new Mock<ElasticsearchClient>();
             _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
             _newsGetterRepositoryMock = new Mock<INewsGetterRepository>();
             _newsDeleterRepositoryMock = new Mock<INewsDeleterRepository>();
@@ -50,8 +47,7 @@ namespace AsadaLisboaBackend.Tests.News
                 _editorsDeleterServiceMock.Object,
                 _newsGetterRepositoryMock.Object,
                 _loggerMock.Object,
-                _memoryCachesServiceMock.Object,
-                _elasticSearchClientMock.Object
+                _memoryCachesServiceMock.Object
             );
         }
 

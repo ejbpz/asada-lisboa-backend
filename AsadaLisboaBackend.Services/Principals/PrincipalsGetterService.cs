@@ -43,5 +43,24 @@ namespace AsadaLisboaBackend.Services.Principals
                 Documents = (await _documentsGetterService.GetDocuments(searchSortRequestDTO)).Data
             };
         }
+
+        public async Task<PrincipalResponseDTO> GetPrincipalAdminInformation()
+        {
+            var searchSortRequestDTO = new SearchSortRequestDTO()
+            {
+                Take = 6,
+                Offset = 0,
+                IsPublic = false,
+            };
+
+            _logger.LogInformation("Información principal administrativa obtenida correctamente.");
+
+            return new PrincipalResponseDTO()
+            {
+                News = (await _newsGetterService.GetNews(searchSortRequestDTO)).Data,
+                Images = (await _imagesGetterService.GetImages(searchSortRequestDTO)).Data,
+                Documents = (await _documentsGetterService.GetDocuments(searchSortRequestDTO)).Data
+            };
+        }
     }
 }

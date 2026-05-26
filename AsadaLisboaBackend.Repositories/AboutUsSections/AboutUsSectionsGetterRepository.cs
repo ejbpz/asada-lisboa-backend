@@ -27,7 +27,7 @@ namespace AsadaLisboaBackend.Repositories.AboutUsSections
                 string search = searchSortRequestDTO.Search.ToLower();
 
                 query = query.Where(a =>
-                        EF.Functions.Like(a.SectionType, $"%{search}%"));
+                        EF.Functions.ILike(a.SectionType, $"%{search}%"));
             }
 
             // Sort

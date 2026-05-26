@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
@@ -12,17 +11,15 @@ namespace AsadaLisboaBackend.Services.Images
 {
     public class ImagesDeleterService : IImagesDeleterService
     {
-        private readonly ElasticsearchClient _elastic;
         private readonly IFileSystemsManager _fileSystems;
         private readonly ILogger<ImagesDeleterService> _logger;
         private readonly IMemoryCachesService _memoryCachesService;
         private readonly IImagesGetterRepository _imagesGetterRepository;
         private readonly IImagesDeleterRepository _imagesDeleterRepository;
 
-        public ImagesDeleterService(IFileSystemsManager fileSystems, IImagesDeleterRepository imagesDeleterRepository, IImagesGetterRepository imagesGetterRepository, ILogger<ImagesDeleterService> logger,IMemoryCachesService memoryCachesService, ElasticsearchClient elastic)
+        public ImagesDeleterService(IFileSystemsManager fileSystems, IImagesDeleterRepository imagesDeleterRepository, IImagesGetterRepository imagesGetterRepository, ILogger<ImagesDeleterService> logger,IMemoryCachesService memoryCachesService)
         {
             _logger = logger;
-            _elastic = elastic;
             _fileSystems = fileSystems;
             _memoryCachesService = memoryCachesService;
             _imagesGetterRepository = imagesGetterRepository;
@@ -43,12 +40,6 @@ namespace AsadaLisboaBackend.Services.Images
                 await _fileSystems.DeleteAsync(image.FileName, "imagenes");
 
             await _imagesDeleterRepository.DeleteImage(id);
-
-            // Delete the image from Elasticsearch index
-            await _elastic.DeleteAsync<Image>(id, i => i
-                .Index("imagenes")
-                .Refresh(Refresh.True)
-            );
 
             _memoryCachesService.RemoveById(Constants.CACHE_IMAGES, image.Id);
             _memoryCachesService.ChangeVersion(Constants.CACHE_IMAGES);

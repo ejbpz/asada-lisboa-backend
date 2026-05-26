@@ -14,12 +14,12 @@ using AsadaLisboaBackend.RepositoryContracts.Roles;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.ServiceContracts.Configurations;
-using AsadaLisboaBackend.ServiceContracts.SearchGlobal;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.Principals;
 using AsadaLisboaBackend.ServiceContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
 using AsadaLisboaBackend.ServiceContracts.Documents;
+using AsadaLisboaBackend.ServiceContracts.Searches;
 using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.Accounts;
@@ -45,12 +45,12 @@ using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
 using AsadaLisboaBackend.Services.Configurations;
-using AsadaLisboaBackend.Services.SearchGlobal;
 using AsadaLisboaBackend.Services.MemoryCaches;
 using AsadaLisboaBackend.Services.Principals;
 using AsadaLisboaBackend.Services.Categories;
 using AsadaLisboaBackend.Services.ReCaptchas;
 using AsadaLisboaBackend.Services.Documents;
+using AsadaLisboaBackend.Services.Searches;
 using AsadaLisboaBackend.Services.Statuses;
 using AsadaLisboaBackend.Services.Contacts;
 using AsadaLisboaBackend.Services.Accounts;
@@ -208,8 +208,8 @@ namespace AsadaLisboaBackend.ServicesExtension
             services.AddScoped<IUsersDeleterService, UsersDeleterService>();
             services.AddScoped<IUsersGetterRepository, UsersGetterRepository>();
 
-            //SearchGlobal
-            services.AddScoped<ISearchGlobalService, SearchGlobalService>();
+            //Searches
+            services.AddScoped<ISearchesGetterService, SearchesGetterService>();
 
             return services;
         }

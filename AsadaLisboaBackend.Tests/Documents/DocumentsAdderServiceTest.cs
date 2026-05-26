@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using AutoFixture;
 using FluentAssertions;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Documents;
@@ -24,7 +23,6 @@ namespace AsadaLisboaBackend.Tests.Services.Documents
     {
         private readonly Fixture _fixture = new();
 
-        private readonly Mock<ElasticsearchClient> _elasticMock;
         private readonly Mock<IFileSystemsManager> _fileSystemsManagerMock = new Mock<IFileSystemsManager>();
         private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
         private readonly Mock<ILogger<DocumentsAdderService>> _loggerMock = new Mock<ILogger<DocumentsAdderService>>();
@@ -37,8 +35,6 @@ namespace AsadaLisboaBackend.Tests.Services.Documents
 
         public DocumentsAdderServiceTest()
         {
-            _elasticMock = new Mock<ElasticsearchClient>();
-
             _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
                 .ForEach(b => _fixture.Behaviors.Remove(b));
             
@@ -51,8 +47,7 @@ namespace AsadaLisboaBackend.Tests.Services.Documents
                 _documentTypesGetterRepositoryMock.Object,
                 _fileSystemsManagerMock.Object,
                 _loggerMock.Object,
-                _memoryCachesServiceMock.Object,
-                _elasticMock.Object
+                _memoryCachesServiceMock.Object
             );
         }
 

@@ -1,11 +1,11 @@
-﻿using AsadaLisboaBackend.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using AsadaLisboaBackend.Utils;
+using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.New;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
-using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.Repositories.News
 {
@@ -74,14 +74,14 @@ namespace AsadaLisboaBackend.Repositories.News
                 {
                     "status" => query.Where(n =>
                         n.Status != null &&
-                        EF.Functions.Like(n.Status.Name, $"%{search}%")),
+                        EF.Functions.ILike(n.Status.Name, $"%{search}%")),
 
                     "category" => query.Where(n =>
                         n.Categories.Any(c =>
-                            EF.Functions.Like(c.Name, $"%{search}%"))),
+                            EF.Functions.ILike(c.Name, $"%{search}%"))),
 
                     _ => query.Where(n =>
-                        EF.Functions.Like(n.Title, $"%{search}%")),
+                        EF.Functions.ILike(n.Title, $"%{search}%")),
                 };
             }
 

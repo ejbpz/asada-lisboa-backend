@@ -1,0 +1,835 @@
+﻿using AsadaLisboaBackend.Models;
+
+namespace AsadaLisboaBackend.Seeders.SeedData
+{
+    /// <summary>
+    /// Provides seed data for images.
+    /// </summary>
+    public class ImagesSeedData
+    {
+        /// <summary>
+        /// Gets the list of seed images.
+        /// </summary>
+        /// <returns>A list of seed images.</returns>
+        public static List<Image> Get(List<Category> categories)
+        {
+            var proyectosEjecutados = categories.First(x => x.Id == Guid.Parse("03E622EC-438B-49F3-8C53-3A3873651C16"));
+            var estadosFinancieros = categories.First(x => x.Id == Guid.Parse("6DA5CF2D-E946-43ED-A092-D5B4C9282FFA"));
+            var tanquePrincipal = categories.First(x => x.Id == Guid.Parse("3643CD9F-99FE-4873-85F9-2A7B6B4DAC28"));
+            var pozoPrincipal = categories.First(x => x.Id == Guid.Parse("F62ED863-70D4-446B-9088-10EFD6CB6C77"));
+            var lineamientos = categories.First(x => x.Id == Guid.Parse("77607C99-2ED1-4B8E-89CC-CCC7C6344E53"));
+            var sugerencias = categories.First(x => x.Id == Guid.Parse("2B3B492D-E243-4FC8-8217-03EA9998A201"));
+            var solicitudes = categories.First(x => x.Id == Guid.Parse("BA84F8AC-EAD7-4CB3-83B4-77238DF95884"));
+            var reglamentos = categories.First(x => x.Id == Guid.Parse("93CA9020-78FD-4080-8D57-469EB05D9DC3"));
+            var colindancia = categories.First(x => x.Id == Guid.Parse("783E94BC-4748-4223-A150-8892354B865B"));
+            var hidrantes = categories.First(x => x.Id == Guid.Parse("560841FB-884B-45F6-9A09-18D4641B7AF5"));
+            var convenios = categories.First(x => x.Id == Guid.Parse("5AA04636-CD02-4184-BBE0-603A2E785988"));
+            var medidores = categories.First(x => x.Id == Guid.Parse("64C63C8A-20E2-487D-A365-815E20978E81"));
+            var informes = categories.First(x => x.Id == Guid.Parse("81F11C15-3556-40BE-8074-A6BE7A5D5AB4"));
+            var examenes = categories.First(x => x.Id == Guid.Parse("CEB0BB8A-0414-474C-B378-46491B4C08E8"));
+            var estudios = categories.First(x => x.Id == Guid.Parse("B2DBCF36-FDDF-4752-B39D-B31F61E704A3"));
+            var dudas = categories.First(x => x.Id == Guid.Parse("71B9C756-B148-4E0F-A5C7-09A8A7AA209E"));
+
+            return new()
+            {
+                new ()
+                {
+                    Id = Guid.Parse("0adb106d-c1fc-4ee7-ab6d-92b8db98db1a"),
+                    Slug = "colindancia-1-0adb10",
+                    Title = "Colindancia - 1",
+                    Description = "Registro fotográfico de colindancia y delimitación territorial del proyecto.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-1-0adb10.jpg",
+                    FileName = "colindancia-1-0adb10.jpg",
+                    FilePath = "imagenes/colindancia-1-0adb10.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 376521,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("fb23f6af-ce50-476c-aec5-528a0f57ea9c"),
+                    Slug = "colindancia-10-fb23f6",
+                    Title = "Colindancia - 10",
+                    Description = "Imagen de referencia utilizada para documentar colindancias y áreas adyacentes.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-10-fb23f6.jpg",
+                    FileName = "colindancia-10-fb23f6.jpg",
+                    FilePath = "imagenes/colindancia-10-fb23f6.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 342095,
+                    Categories = new List<Category> {
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("080414bf-372e-4c00-a4c3-1d4c1c703b08"),
+                    Slug = "colindancia-11-080414",
+                    Title = "Colindancia - 11",
+                    Description = "Fotografía técnica correspondiente al levantamiento de colindancias del terreno.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-11-080414.jpg",
+                    FileName = "colindancia-11-080414.jpg",
+                    FilePath = "imagenes/colindancia-11-080414.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 446386,
+                    Categories = new List<Category> {
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("f26ea746-288a-4de7-b869-486f5dbf4bdd"),
+                    Slug = "colindancia-12-f26ea7",
+                    Title = "Colindancia - 12",
+                    Description = "Imagen de apoyo para la validación visual de límites y colindancias.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-12-f26ea7.jpg",
+                    FileName = "colindancia-12-f26ea7.jpg",
+                    FilePath = "imagenes/colindancia-12-f26ea7.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 426119,
+                    Categories = new List<Category> {
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("eec94ea2-61c8-48ce-b237-759a6c234c19"),
+                    Slug = "colindancia-2-eec94e",
+                    Title = "Colindancia - 2",
+                    Description = "Registro visual de inspección relacionado con áreas colindantes.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-2-eec94e.jpg",
+                    FileName = "colindancia-2-eec94e.jpg",
+                    FilePath = "imagenes/colindancia-2-eec94e.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 393401,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("4906343c-17c2-4056-aa48-65c8929a14a3"),
+                    Slug = "colindancia-3-490634",
+                    Title = "Colindancia - 3",
+                    Description = "Fotografía documental asociada al análisis de colindancias y delimitaciones.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-3-490634.jpg",
+                    FileName = "colindancia-3-490634.jpg",
+                    FilePath = "imagenes/colindancia-3-490634.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 460463,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("4a77d6dd-6548-4112-a553-34e564d34d9f"),
+                    Slug = "colindancia-4-4a77d6",
+                    Title = "Colindancia - 4",
+                    Description = "Imagen utilizada para respaldo técnico de colindancias territoriales.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-4-4a77d6.jpg",
+                    FileName = "colindancia-4-4a77d6.jpg",
+                    FilePath = "imagenes/colindancia-4-4a77d6.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 325167,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("a74df392-a2d7-4096-9bd7-c1846701c88c"),
+                    Slug = "colindancia-5-a74df3",
+                    Title = "Colindancia - 5",
+                    Description = "Registro fotográfico de campo correspondiente a límites de propiedad y colindancias.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-5-a74df3.jpg",
+                    FileName = "colindancia-5-a74df3.jpg",
+                    FilePath = "imagenes/colindancia-5-a74df3.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 392362,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("321e3956-89d3-4b39-99f4-a2fa845dca17"),
+                    Slug = "colindancia-6-321e39",
+                    Title = "Colindancia - 6",
+                    Description = "Imagen técnica para documentación de zonas colindantes y referencias geográficas.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-6-321e39.jpg",
+                    FileName = "colindancia-6-321e39.jpg",
+                    FilePath = "imagenes/colindancia-6-321e39.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 394471,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("f460d3a0-f68b-4432-981a-9073d24dc018"),
+                    Slug = "colindancia-7-f460d3",
+                    Title = "Colindancia - 7",
+                    Description = "Fotografía técnica correspondiente al registro de colindancias y delimitación territorial.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-7-f460d3.jpg",
+                    FileName = "colindancia-7-f460d3.jpg",
+                    FilePath = "imagenes/colindancia-7-f460d3.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 349382,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("30400be1-8449-43a3-984e-7357cdbfa95a"),
+                    Slug = "colindancia-8-30400b",
+                    Title = "Colindancia - 8",
+                    Description = "Imagen documental utilizada para validar límites y áreas colindantes.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-8-30400b.jpg",
+                    FileName = "colindancia-8-30400b.jpg",
+                    FilePath = "imagenes/colindancia-8-30400b.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 337325,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("2fe20411-2332-4ba3-bf28-372212a680dd"),
+                    Slug = "colindancia-9-2fe204",
+                    Title = "Colindancia - 9",
+                    Description = "Registro visual asociado al análisis de colindancias y referencias geográficas.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/colindancia-9-2fe204.jpg",
+                    FileName = "colindancia-9-2fe204.jpg",
+                    FilePath = "imagenes/colindancia-9-2fe204.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 369350,
+                    Categories = new List<Category> { 
+                        colindancia
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("6ba3d0ff-82df-4236-87b6-561f47bd9bd2"),
+                    Slug = "estado-financieros-2020-y-2021-1-6ba3d0",
+                    Title = "Estado Financieros 2020 y 2021 - 1",
+                    Description = "Imagen correspondiente a estados financieros de los períodos 2020 y 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/estado-financieros-2020-y-2021-1-6ba3d0.jpg",
+                    FileName = "estado-financieros-2020-y-2021-1-6ba3d0.jpg",
+                    FilePath = "imagenes/estado-financieros-2020-y-2021-1-6ba3d0.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 602601,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("cd1bff74-5443-4af4-93f2-1ace75a70576"),
+                    Slug = "estado-financieros-2020-y-2021-2-cd1bff",
+                    Title = "Estado Financieros 2020 y 2021 - 2",
+                    Description = "Registro gráfico de información financiera y balances institucionales de 2020 y 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/estado-financieros-2020-y-2021-2-cd1bff.jpg",
+                    FileName = "estado-financieros-2020-y-2021-2-cd1bff.jpg",
+                    FilePath = "imagenes/estado-financieros-2020-y-2021-2-cd1bff.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 384048,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("7c088257-178b-404e-a577-94cd5270c777"),
+                    Slug = "estado-financieros-2020-y-2021-3-7c0882",
+                    Title = "Estado Financieros 2020 y 2021 - 3",
+                    Description = "Imagen documental relacionada con estados financieros y reportes contables institucionales.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/estado-financieros-2020-y-2021-3-7c0882.jpg",
+                    FileName = "estado-financieros-2020-y-2021-3-7c0882.jpg",
+                    FilePath = "imagenes/estado-financieros-2020-y-2021-3-7c0882.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 537098,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("64619c42-34d7-4bcd-8585-c48b8d4ca4b9"),
+                    Slug = "estado-financieros-2020-y-2021-4-64619c",
+                    Title = "Estado Financieros 2020 y 2021 - 4",
+                    Description = "Fotografía de respaldo para documentación financiera correspondiente a los años 2020 y 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/estado-financieros-2020-y-2021-4-64619c.jpg",
+                    FileName = "estado-financieros-2020-y-2021-4-64619c.jpg",
+                    FilePath = "imagenes/estado-financieros-2020-y-2021-4-64619c.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 390431,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("074d0107-2585-42e1-a3ef-3aa52d4e877d"),
+                    Slug = "notas-estado-financieros-diciembre-2021-1-074d01",
+                    Title = "Notas Estado Financieros Diciembre 2021 - 1",
+                    Description = "Imagen de notas explicativas de estados financieros al cierre de diciembre 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/notas-estado-financieros-diciembre-2021-1-074d01.jpg",
+                    FileName = "notas-estado-financieros-diciembre-2021-1-074d01.jpg",
+                    FilePath = "imagenes/notas-estado-financieros-diciembre-2021-1-074d01.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 596413,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("f135ea0f-3ed2-4339-8a2a-210f00ea62ac"),
+                    Slug = "notas-estado-financieros-diciembre-2021-2-f135ea",
+                    Title = "Notas Estado Financieros Diciembre 2021 - 2",
+                    Description = "Registro visual complementario de notas financieras correspondientes a diciembre de 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/notas-estado-financieros-diciembre-2021-2-f135ea.jpg",
+                    FileName = "notas-estado-financieros-diciembre-2021-2-f135ea.jpg",
+                    FilePath = "imagenes/notas-estado-financieros-diciembre-2021-2-f135ea.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 502266,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("131c0bda-93e6-4557-aed7-2b2d50aea8ea"),
+                    Slug = "notas-estado-financieros-diciembre-2021-3-131c0b",
+                    Title = "Notas Estado Financieros Diciembre 2021 - 3",
+                    Description = "Imagen asociada a notas y aclaraciones de estados financieros institucionales de diciembre 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/notas-estado-financieros-diciembre-2021-3-131c0b.jpg",
+                    FileName = "notas-estado-financieros-diciembre-2021-3-131c0b.jpg",
+                    FilePath = "imagenes/notas-estado-financieros-diciembre-2021-3-131c0b.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 541386,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("423aca90-c31f-4314-843d-4e4b467cd363"),
+                    Slug = "notas-estado-financieros-diciembre-2021-4-423aca",
+                    Title = "Notas Estado Financieros Diciembre 2021 - 4",
+                    Description = "Imagen correspondiente a notas de estados financieros de diciembre de 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/notas-estado-financieros-diciembre-2021-4-423aca.jpg",
+                    FileName = "notas-estado-financieros-diciembre-2021-4-423aca.jpg",
+                    FilePath = "imagenes/notas-estado-financieros-diciembre-2021-4-423aca.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 526033,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("074ae770-a0d0-4f49-9463-7821d0921955"),
+                    Slug = "notas-estado-financieros-diciembre-2021-5-074ae7",
+                    Title = "Notas Estado Financieros Diciembre 2021 - 5",
+                    Description = "Imagen correspondiente a notas de estados financieros de diciembre de 2021.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/notas-estado-financieros-diciembre-2021-5-074ae7.jpg",
+                    FileName = "notas-estado-financieros-diciembre-2021-5-074ae7.jpg",
+                    FilePath = "imagenes/notas-estado-financieros-diciembre-2021-5-074ae7.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 312965,
+                    Categories = new List<Category> {
+                        estadosFinancieros
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("c3c54488-c28a-4a42-81a9-2410996de87d"),
+                    Slug = "pozo-principal-1-c3c544",
+                    Title = "Pozo Principal - 1",
+                    Description = "Imagen del pozo principal y su infraestructura.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/pozo-principal-1-c3c544.jpg",
+                    FileName = "pozo-principal-1-c3c544.jpg",
+                    FilePath = "imagenes/pozo-principal-1-c3c544.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 303360,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("910d17a6-69d2-4bfd-8ac5-57bfd1118749"),
+                    Slug = "pozo-principal-2-910d17",
+                    Title = "Pozo Principal - 2",
+                    Description = "Imagen del pozo principal y su infraestructura.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/pozo-principal-2-910d17.jpg",
+                    FileName = "pozo-principal-2-910d17.jpg",
+                    FilePath = "imagenes/pozo-principal-2-910d17.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 277839,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("4d03b98e-2b79-43cd-a5cc-6c5c5afc021d"),
+                    Slug = "pozo-principal-3-4d03b9",
+                    Title = "Pozo Principal - 3",
+                    Description = "Imagen del pozo principal y su infraestructura.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/pozo-principal-3-4d03b9.jpg",
+                    FileName = "pozo-principal-3-4d03b9.jpg",
+                    FilePath = "imagenes/pozo-principal-3-4d03b9.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 318122,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("1b5cc3e2-eef4-4a60-b9b6-7a1dbc1ef17b"),
+                    Slug = "pozo-principal-4-1b5cc3",
+                    Title = "Pozo Principal - 4",
+                    Description = "Imagen del pozo principal y su infraestructura.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/pozo-principal-4-1b5cc3.jpg",
+                    FileName = "pozo-principal-4-1b5cc3.jpg",
+                    FilePath = "imagenes/pozo-principal-4-1b5cc3.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 301913,
+                    Categories = new List<Category> {
+                        pozoPrincipal
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("74c65e02-7ac1-47f7-a5b5-90a95ce4b85f"),
+                    Slug = "proyecto-aire-acondicionado-1-74c65e",
+                    Title = "Proyecto Aire Acondicionado - 1",
+                    Description = "Imagen del proyecto de instalación de aire acondicionado.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-aire-acondicionado-1-74c65e.jpg",
+                    FileName = "proyecto-aire-acondicionado-1-74c65e.jpg",
+                    FilePath = "imagenes/proyecto-aire-acondicionado-1-74c65e.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 144260,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("69993888-3507-4d8e-aed4-d76c57c1f312"),
+                    Slug = "proyecto-aire-acondicionado-2-699938",
+                    Title = "Proyecto Aire Acondicionado - 2",
+                    Description = "Imagen del proyecto de instalación de aire acondicionado.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-aire-acondicionado-2-699938.jpg",
+                    FileName = "proyecto-aire-acondicionado-2-699938.jpg",
+                    FilePath = "imagenes/proyecto-aire-acondicionado-2-699938.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 326298,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("588aebfd-77f9-4c1e-b47e-fc6fc0809721"),
+                    Slug = "proyecto-aire-acondicionado-3-588aeb",
+                    Title = "Proyecto Aire Acondicionado - 3",
+                    Description = "Imagen del proyecto de instalación de aire acondicionado.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-aire-acondicionado-3-588aeb.jpg",
+                    FileName = "proyecto-aire-acondicionado-3-588aeb.jpg",
+                    FilePath = "imagenes/proyecto-aire-acondicionado-3-588aeb.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 340549,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("f7fbda4d-ff3e-40e6-96ac-d69109842c40"),
+                    Slug = "proyecto-aire-acondicionado-4-f7fbda",
+                    Title = "Proyecto Aire Acondicionado - 4",
+                    Description = "Imagen del proyecto de instalación de aire acondicionado.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-aire-acondicionado-4-f7fbda.jpg",
+                    FileName = "proyecto-aire-acondicionado-4-f7fbda.jpg",
+                    FilePath = "imagenes/proyecto-aire-acondicionado-4-f7fbda.jpg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 105526,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("fa211039-d898-4a68-b21b-6546c9a33eb6"),
+                    Slug = "proyecto-instalacin-de-techo-1-fa2110",
+                    Title = "Proyecto Instalación de Techo - 1",
+                    Description = "Imagen del proyecto de instalación de techo.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-instalacin-de-techo-1-fa2110.jpeg",
+                    FileName = "proyecto-instalacin-de-techo-1-fa2110.jpeg",
+                    FilePath = "imagenes/proyecto-instalacin-de-techo-1-fa2110.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 183632,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("61bc9dbd-548f-40de-89a1-fcde4735ef40"),
+                    Slug = "proyecto-instalacin-malla-1-61bc9d",
+                    Title = "Proyecto Instalación Malla - 1",
+                    Description = "Imagen del proyecto de instalación de malla perimetral.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-instalacin-malla-1-61bc9d.jpeg",
+                    FileName = "proyecto-instalacin-malla-1-61bc9d.jpeg",
+                    FilePath = "imagenes/proyecto-instalacin-malla-1-61bc9d.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 480329,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("6e002126-e493-4add-a3d3-2f917c3e3fd8"),
+                    Slug = "proyecto-instalacin-malla-2-6e0021",
+                    Title = "Proyecto Instalación Malla - 2",
+                    Description = "Imagen del proyecto de instalación de malla perimetral.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-instalacin-malla-2-6e0021.jpeg",
+                    FileName = "proyecto-instalacin-malla-2-6e0021.jpeg",
+                    FilePath = "imagenes/proyecto-instalacin-malla-2-6e0021.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 362839,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("805717da-0da7-4e38-a5f7-bfc1d20d6383"),
+                    Slug = "proyecto-instalacin-malla-3-805717",
+                    Title = "Proyecto Instalación Malla - 3",
+                    Description = "Imagen del proyecto de instalación de malla perimetral.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-instalacin-malla-3-805717.jpeg",
+                    FileName = "proyecto-instalacin-malla-3-805717.jpeg",
+                    FilePath = "imagenes/proyecto-instalacin-malla-3-805717.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 448603,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("4a699f56-8f3e-4c8d-9fc0-5bd1593c6b09"),
+                    Slug = "proyecto-instalacin-malla-4-4a699f",
+                    Title = "Proyecto Instalación Malla - 4",
+                    Description = "Imagen del proyecto de instalación de malla perimetral.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-instalacin-malla-4-4a699f.jpeg",
+                    FileName = "proyecto-instalacin-malla-4-4a699f.jpeg",
+                    FilePath = "imagenes/proyecto-instalacin-malla-4-4a699f.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 530056,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("502511c1-34bf-4e29-9aee-c4b7995d7ac7"),
+                    Slug = "proyecto-medidor-de-agua-turbina-bar-meter-1-502511",
+                    Title = "Proyecto Medidor de Agua Turbina Bar Meter - 1",
+                    Description = "Imagen del proyecto de instalación de medidor de agua tipo turbina Bar Meter.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-medidor-de-agua-turbina-bar-meter-1-502511.jpeg",
+                    FileName = "proyecto-medidor-de-agua-turbina-bar-meter-1-502511.jpeg",
+                    FilePath = "imagenes/proyecto-medidor-de-agua-turbina-bar-meter-1-502511.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 476938,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        medidores
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("c8d70e02-cbad-4d75-9c83-c5e468ce8849"),
+                    Slug = "proyecto-medidor-de-agua-turbina-bar-meter-2-c8d70e",
+                    Title = "Proyecto Medidor de Agua Turbina Bar Meter - 2",
+                    Description = "Imagen del proyecto de instalación de medidor de agua tipo turbina Bar Meter.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-medidor-de-agua-turbina-bar-meter-2-c8d70e.jpeg",
+                    FileName = "proyecto-medidor-de-agua-turbina-bar-meter-2-c8d70e.jpeg",
+                    FilePath = "imagenes/proyecto-medidor-de-agua-turbina-bar-meter-2-c8d70e.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 242456,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        medidores
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("dc215b8e-e64d-425e-b55f-757fe0fcb522"),
+                    Slug = "proyecto-medidor-de-agua-turbina-bar-meter-3-dc215b",
+                    Title = "Proyecto Medidor de Agua Turbina Bar Meter - 3",
+                    Description = "Imagen del proyecto de instalación de medidor de agua tipo turbina Bar Meter.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-medidor-de-agua-turbina-bar-meter-3-dc215b.jpeg",
+                    FileName = "proyecto-medidor-de-agua-turbina-bar-meter-3-dc215b.jpeg",
+                    FilePath = "imagenes/proyecto-medidor-de-agua-turbina-bar-meter-3-dc215b.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 198718,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        medidores
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("984c5e7e-8c85-421c-bf58-7d0388ee26d3"),
+                    Slug = "proyecto-panel-monitoreo-y-proteccin-submonitor-1-984c5e",
+                    Title = "Proyecto Panel Monitoreo y Protección SubMonitor - 1",
+                    Description = "Imagen del proyecto de panel de monitoreo y protección SubMonitor.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-1-984c5e.jpeg",
+                    FileName = "proyecto-panel-monitoreo-y-proteccin-submonitor-1-984c5e.jpeg",
+                    FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-1-984c5e.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 185994,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("086b1c6d-2ba6-40f4-9c81-40fa3651d0d8"),
+                    Slug = "proyecto-panel-monitoreo-y-proteccin-submonitor-2-086b1c",
+                    Title = "Proyecto Panel Monitoreo y Protección SubMonitor - 2",
+                    Description = "Imagen del proyecto de panel de monitoreo y protección SubMonitor.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-2-086b1c.jpeg",
+                    FileName = "proyecto-panel-monitoreo-y-proteccin-submonitor-2-086b1c.jpeg",
+                    FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-2-086b1c.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 224575,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("1d5bf85e-18e8-44a6-94f7-7a86917a8e36"),
+                    Slug = "proyecto-panel-monitoreo-y-proteccin-submonitor-3-1d5bf8",
+                    Title = "Proyecto Panel Monitoreo y Protección SubMonitor - 3",
+                    Description = "Imagen del proyecto de panel de monitoreo y protección SubMonitor.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-3-1d5bf8.jpeg",
+                    FileName = "proyecto-panel-monitoreo-y-proteccin-submonitor-3-1d5bf8.jpeg",
+                    FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-3-1d5bf8.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 448585,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("219b4a7d-9609-4f13-b2f3-b32f95deca59"),
+                    Slug = "proyecto-panel-monitoreo-y-proteccin-submonitor-4-219b4a",
+                    Title = "Proyecto Panel Monitoreo y Protección SubMonitor - 4",
+                    Description = "Imagen del proyecto de panel de monitoreo y protección SubMonitor.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-4-219b4a.jpeg",
+                    FileName = "proyecto-panel-monitoreo-y-proteccin-submonitor-4-219b4a.jpeg",
+                    FilePath = "imagenes/proyecto-panel-monitoreo-y-proteccin-submonitor-4-219b4a.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 280688,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("5d4ff30f-9a16-44d7-b59d-57f2fd5dc48b"),
+                    Slug = "proyecto-prueba-de-pozo-principal-1-5d4ff3",
+                    Title = "Proyecto Prueba de Pozo Principal - 1",
+                    Description = "Imagen del proyecto de prueba del pozo principal.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-prueba-de-pozo-principal-1-5d4ff3.jpeg",
+                    FileName = "proyecto-prueba-de-pozo-principal-1-5d4ff3.jpeg",
+                    FilePath = "imagenes/proyecto-prueba-de-pozo-principal-1-5d4ff3.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 161705,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("5fe11d76-d94a-45c7-8399-5b940ea02204"),
+                    Slug = "proyecto-prueba-de-pozo-principal-2-5fe11d",
+                    Title = "Proyecto Prueba de Pozo Principal - 2",
+                    Description = "Imagen del proyecto de prueba del pozo principal.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-prueba-de-pozo-principal-2-5fe11d.jpeg",
+                    FileName = "proyecto-prueba-de-pozo-principal-2-5fe11d.jpeg",
+                    FilePath = "imagenes/proyecto-prueba-de-pozo-principal-2-5fe11d.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 262796,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("071b3161-be03-43ba-9b12-856fc8673d1f"),
+                    Slug = "proyecto-prueba-de-pozo-principal-3-071b31",
+                    Title = "Proyecto Prueba de Pozo Principal - 3",
+                    Description = "Imagen del proyecto de prueba del pozo principal.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-prueba-de-pozo-principal-3-071b31.jpeg",
+                    FileName = "proyecto-prueba-de-pozo-principal-3-071b31.jpeg",
+                    FilePath = "imagenes/proyecto-prueba-de-pozo-principal-3-071b31.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 252464,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("ab2d3599-991d-4641-afd2-1ca46ea2b1dd"),
+                    Slug = "proyecto-prueba-de-pozo-principal-4-ab2d35",
+                    Title = "Proyecto Prueba de Pozo Principal - 4",
+                    Description = "Imagen del proyecto de prueba del pozo principal.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-prueba-de-pozo-principal-4-ab2d35.jpeg",
+                    FileName = "proyecto-prueba-de-pozo-principal-4-ab2d35.jpeg",
+                    FilePath = "imagenes/proyecto-prueba-de-pozo-principal-4-ab2d35.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 245846,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("a2f617c6-ae8e-42f4-8fc6-0d6324602ab7"),
+                    Slug = "proyecto-prueba-de-pozo-principal-5-a2f617",
+                    Title = "Proyecto Prueba de Pozo Principal - 5",
+                    Description = "Imagen del proyecto de prueba del pozo principal.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-prueba-de-pozo-principal-5-a2f617.jpeg",
+                    FileName = "proyecto-prueba-de-pozo-principal-5-a2f617.jpeg",
+                    FilePath = "imagenes/proyecto-prueba-de-pozo-principal-5-a2f617.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 255876,
+                    Categories = new List<Category> {
+                        proyectosEjecutados,
+                        pozoPrincipal,
+                        examenes
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("c3566ab8-5b03-4a7a-97f4-7192ff444f9a"),
+                    Slug = "proyecto-recoleccin-1-c3566a",
+                    Title = "Proyecto Recolección - 1",
+                    Description = "Imagen del proyecto de recolección de materiales o residuos.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-recoleccin-1-c3566a.jpeg",
+                    FileName = "proyecto-recoleccin-1-c3566a.jpeg",
+                    FilePath = "imagenes/proyecto-recoleccin-1-c3566a.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 407363,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("514b2876-cc2a-4b94-940f-ef1e218fd4dc"),
+                    Slug = "proyecto-recoleccin-2-514b28",
+                    Title = "Proyecto Recolección - 2",
+                    Description = "Imagen del proyecto de recolección de materiales o residuos.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-recoleccin-2-514b28.jpeg",
+                    FileName = "proyecto-recoleccin-2-514b28.jpeg",
+                    FilePath = "imagenes/proyecto-recoleccin-2-514b28.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 422083,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+                new ()
+                {
+                    Id = Guid.Parse("b1ec69ce-3fbf-461a-a191-08cbaea9828b"),
+                    Slug = "proyecto-transfomadores-de-electricidad-1-b1ec69",
+                    Title = "Proyecto Transformadores de Electricidad - 1",
+                    Description = "Imagen del proyecto de instalación de transformadores eléctricos.",
+                    PublicationDate = DateTime.Parse("2022-12-31T00:00:00Z").ToUniversalTime(),
+                    Url = "/imagenes/proyecto-transformadores-de-electricidad-1-b1ec69.jpeg",
+                    FileName = "proyecto-transformadores-de-electricidad-1-b1ec69.jpeg",
+                    FilePath = "imagenes/proyecto-transformadores-de-electricidad-1-b1ec69.jpeg",
+                    StatusId = Guid.Parse("5C1CEBDA-FC8C-44AC-997C-AAF015572D46"),
+                    FileSize = 316078,
+                    Categories = new List<Category> {
+                        proyectosEjecutados
+                    }
+                },
+            };
+        }
+    }
+}

@@ -47,18 +47,18 @@ namespace AsadaLisboaBackend.Repositories.Documents
                 {
                     "status" => query.Where(d =>
                         d.Status != null &&
-                        EF.Functions.Like(d.Status.Name, $"%{search}%")),
+                        EF.Functions.ILike(d.Status.Name, $"%{search}%")),
 
                     "type" => query.Where(d =>
                     d.DocumentType != null &&
-                    EF.Functions.Like(d.DocumentType.Name, $"%{search}%")),
+                    EF.Functions.ILike(d.DocumentType.Name, $"%{search}%")),
 
                     "category" => query.Where(d =>
                         d.Categories.Any(c =>
-                            EF.Functions.Like(c.Name, $"%{search}%"))),
+                            EF.Functions.ILike(c.Name, $"%{search}%"))),
 
                     _ => query.Where(d =>
-                        EF.Functions.Like(d.Title, $"%{search}%")),
+                        EF.Functions.ILike(d.Title, $"%{search}%")),
                 };
             }
 

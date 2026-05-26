@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using FluentAssertions;
-using Elastic.Clients.Elasticsearch;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Documents;
@@ -20,21 +19,17 @@ namespace AsadaLisboaBackend.Tests.Services.Documents
         private readonly Mock<ILogger<DocumentsDeleterService>> _loggerMock = new Mock<ILogger<DocumentsDeleterService>>();
         private readonly Mock<IDocumentsDeleterRepository> _deleterRepositoryMock = new Mock<IDocumentsDeleterRepository>();
 
-        private readonly Mock<ElasticsearchClient> _elasticMock;
-
         private readonly DocumentsDeleterService _service;
 
         public DocumentsDeleterServiceTest()
         {
-            _elasticMock = new Mock<ElasticsearchClient>();
 
             _service = new DocumentsDeleterService(
                 _fileSystemsMock.Object,
                 _loggerMock.Object,
                 _deleterRepositoryMock.Object,
                 _getterRepositoryMock.Object,
-                _memoryCacheMock.Object,
-                _elasticMock.Object
+                _memoryCacheMock.Object
             );
         }
 

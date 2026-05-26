@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
@@ -25,7 +25,7 @@ namespace AsadaLisboaBackend.Repositories.Categories
             }
             catch (DbUpdateException ex)
             {
-                if (ex.InnerException is SqlException sqlException && sqlException.Number == 547)
+                if (ex.InnerException is PostgresException postgresException && postgresException.SqlState == PostgresErrorCodes.ForeignKeyViolation)
                     throw new InUsedException("Esta categoría está siendo usada por otro elemento.");
 
                 throw;
