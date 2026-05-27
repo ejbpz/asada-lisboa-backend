@@ -38,11 +38,10 @@ namespace AsadaLisboaBackend.Services.Searches
                 .Select(x => new SearchResponseDTO
                 {
                     Id = x.Id,
-                    Slug = x.Slug,
                     Title = x.Title,
                     Type = "Noticia",
-                    Description = x.Description,
-                    PublicationDate = x.PublicationDate
+                    Url = $"/noticia/{x.Slug}",
+                    Description = x.Description
                 })
                 .ToListAsync();
 
@@ -61,11 +60,10 @@ namespace AsadaLisboaBackend.Services.Searches
                 .Select(x => new SearchResponseDTO
                 {
                     Id = x.Id,
-                    Slug = x.Slug,
+                    Url = x.Url,
                     Title = x.Title,
                     Type = "Documento",
-                    Description = x.Description,
-                    PublicationDate = x.PublicationDate
+                    Description = x.Description
                 })
                 .ToListAsync();
 
@@ -84,11 +82,10 @@ namespace AsadaLisboaBackend.Services.Searches
                 .Select(x => new SearchResponseDTO
                 {
                     Id = x.Id,
-                    Slug = x.Slug,
+                    Url = x.Url,
                     Type = "Imagen",
                     Title = x.Title,
-                    Description = x.Description,
-                    PublicationDate = x.PublicationDate
+                    Description = x.Description
                 })
                 .ToListAsync();
 
