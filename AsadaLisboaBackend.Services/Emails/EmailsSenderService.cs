@@ -36,7 +36,7 @@ namespace AsadaLisboaBackend.Services.Emails
             var response = await _resend.EmailSendAsync(
                 new EmailMessage()
                 {
-                    From = "Acme <onboarding@resend.dev>",
+                    From = "no-replay <no-replay@asadalisboa.org>",
                     To = new[] { email },
                     Subject = "Token restauración de contraseña para usuario.",
                     Template = new EmailMessageTemplate()
@@ -68,8 +68,7 @@ namespace AsadaLisboaBackend.Services.Emails
             var response = await _resend.EmailSendAsync(
                 new EmailMessage()
                 {
-                    From = "Acme <onboarding@resend.dev>",
-                    //To = new[] { "asadaurblisboa@gmail.com" },
+                    From = "no-replay <no-replay@asadalisboa.org>",
                     To = new[] { _contactEmailOptions.CONTACT_EMAIL },
                     ReplyTo = sendEmailRequestDTO.Email,
                     Subject = sendEmailRequestDTO.Subject,
@@ -102,7 +101,7 @@ namespace AsadaLisboaBackend.Services.Emails
             var response = await _resend.EmailSendAsync(
                 new EmailMessage()
                 {
-                    From = "Acme <onboarding@resend.dev>",
+                    From = "no-replay <no-replay@asadalisboa.org>",
                     To = new[] { email },
                     Subject = "Token confirmación correo electrónico de usuario.",
                     Template = new EmailMessageTemplate()
