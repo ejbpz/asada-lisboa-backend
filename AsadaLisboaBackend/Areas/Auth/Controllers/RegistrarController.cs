@@ -36,7 +36,7 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// <param name="registerRequestDTO">An object containing the details of the user to be created. Cannot be null.</param>
         /// <returns>Create confirmation.</returns>
         [HttpPost("")]
-        [Authorize(Policy = Constants.ROLE_ADMINISTRADOR)]
+        [Authorize(Roles = Constants.ROLE_ADMINISTRADOR)]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterRequestDTO registerRequestDTO)
         {
             await _userService.RegisterUser(registerRequestDTO);
