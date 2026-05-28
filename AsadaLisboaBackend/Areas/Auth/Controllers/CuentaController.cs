@@ -50,8 +50,8 @@ namespace AsadaLisboaBackend.Areas.Auth.Controllers
         /// Log out an user by its token sent in the Authorization header.
         /// </summary>
         /// <returns>No content.</returns>
-        [Authorize(Policy = Constants.ROLE_LECTOR)]
         [HttpPost("cerrar-sesion")]
+        [Authorize(Policy = Constants.ROLE_LECTOR)]
         public async Task<IActionResult> Logout()
         {
             await _jwtsService.DeleteToken();
