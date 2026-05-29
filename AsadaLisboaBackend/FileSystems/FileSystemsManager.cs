@@ -1,4 +1,5 @@
 ﻿using AsadaLisboaBackend.ServiceContracts.FileSystems;
+using AsadaLisboaBackend.Utils;
 
 namespace AsadaLisboaBackend.FileSystems
 {
@@ -123,7 +124,7 @@ namespace AsadaLisboaBackend.FileSystems
 
         private string BuildUrl(string folder, string fileName)
         {
-            return $"/{folder}/{fileName}";
+            return $"{Constants.CLIENT_HOST}/{folder}/{fileName}";
         }
     }
 }
