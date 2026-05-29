@@ -43,10 +43,14 @@ namespace AsadaLisboaBackend.Repositories.Documents
             existingDocument.Categories.Clear();
             existingDocument.Categories = categoriesFromDb;
 
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new UpdateObjectException("Error al modificar el documento");
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new UpdateObjectException("Error al modificar el documento.", ex);
+            }
 
             return existingDocument;
         }

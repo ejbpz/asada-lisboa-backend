@@ -42,10 +42,14 @@ namespace AsadaLisboaBackend.Repositories.Images
             existingImage.Categories.Clear();
             existingImage.Categories = categoriesFromDb;
 
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new UpdateObjectException("Error al modificar la imagen.");
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new UpdateObjectException("Error al modificar la imagen.", ex);
+            }
 
             return existingImage;
         }
