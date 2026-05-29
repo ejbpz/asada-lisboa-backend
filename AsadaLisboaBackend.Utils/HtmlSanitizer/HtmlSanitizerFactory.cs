@@ -73,10 +73,6 @@ namespace AsadaLisboaBackend.Utils.HtmlSanitizer
                         element.Remove();
                         return;
                     }
-
-                    if (!Uri.TryCreate(src, UriKind.Absolute, out var uri) ||
-                        (uri.Scheme != "http" && uri.Scheme != "https"))
-                        element.Remove();
                 }
             };
 
