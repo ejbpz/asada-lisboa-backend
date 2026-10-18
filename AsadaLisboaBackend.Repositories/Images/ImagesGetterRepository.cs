@@ -6,105 +6,92 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Images;
 
-namespace AsadaLisboaBackend.Repositories.Images
+namespace AsadaLisboaBackend.Repositories.Images;
+
+public class ImagesGetterRepository(ApplicationDbContext context) : IImagesGetterRepository
 {
-    public class ImagesGetterRepository : IImagesGetterRepository
+    public async Task<PageResponseDto<ImageMinimalResponseDto>> GetImages(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly ApplicationDbContext _context;
+        IQueryable<Image> query = context.Images
+            .AsNoTracking()
+            .Include(i => i.Status)
+            .Include(i => i.Categories);
 
-        public ImagesGetterRepository(ApplicationDbContext context)
+        if (searchSortRequestDto.IsPublic)
         {
-            _context = context;
+            query = query.Where(i =>
+                i.Status != null &&
+                i.Status.Name.Trim().ToLower() == "publicado");
         }
 
-        public async Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
+        if (searchSortRequestDto.IsPublic && searchSortRequestDto.FilterBy?.Trim().ToLower() == "status")
         {
-            IQueryable<Image> query = _context.Images
-                .AsNoTracking()
-                .Include(i => i.Status)
-                .Include(i => i.Categories);
+            searchSortRequestDto.FilterBy = null;
+        }
 
-            if (searchSortRequestDTO.IsPublic)
+        // Search
+        if (!string.IsNullOrEmpty(searchSortRequestDto.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDto.Search))
+        {
+            string search = searchSortRequestDto.Search.ToLower();
+
+            query = searchSortRequestDto.FilterBy?.ToLower() switch
             {
-                query = query.Where(i =>
+                "status" => query.Where(i =>
                     i.Status != null &&
-                    i.Status.Name.Trim().ToLower() == "publicado");
-            }
+                    EF.Functions.ILike(i.Status.Name, $"%{search}%")),
 
-            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "status")
-            {
-                searchSortRequestDTO.FilterBy = null;
-            }
+                "category" => query.Where(i =>
+                    i.Categories.Any(c =>
+                        EF.Functions.ILike(c.Name, $"%{search}%"))),
 
-            // Search
-            if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
-            {
-                string search = searchSortRequestDTO.Search.ToLower();
-
-                query = searchSortRequestDTO.FilterBy?.ToLower() switch
-                {
-                    "status" => query.Where(i =>
-                        i.Status != null &&
-                        EF.Functions.ILike(i.Status.Name, $"%{search}%")),
-
-                    "category" => query.Where(i =>
-                        i.Categories.Any(c =>
-                            EF.Functions.ILike(c.Name, $"%{search}%"))),
-
-                    _ => query.Where(i =>
-                        EF.Functions.ILike(i.Title, $"%{search}%")),
-                };
-            }
-
-            // Sort
-            query = (searchSortRequestDTO.SortBy?.ToLower(), searchSortRequestDTO.SortDirection?.ToLower()) switch
-            {
-                ("date", "desc") => query.OrderByDescending(i => i.PublicationDate),
-                ("date", _) => query.OrderBy(i => i.PublicationDate),
-
-                ("title", "desc") => query.OrderByDescending(i => i.Title),
-                ("title", _) => query.OrderBy(i => i.Title),
-
-                _ => query.OrderByDescending(i => i.PublicationDate)
-            };
-
-            return new PageResponseDTO<ImageMinimalResponseDTO>()
-            {
-                Total = await query.CountAsync(),
-                Data = await query
-                    .Skip(searchSortRequestDTO.Offset)
-                    .Take(searchSortRequestDTO.Take)
-                    .Select(ImageExtensions.MapImageMinimalResponseDTO())
-                    .ToListAsync(),
+                _ => query.Where(i =>
+                    EF.Functions.ILike(i.Title, $"%{search}%")),
             };
         }
 
-        public async Task<Image> GetImage(Guid id)
+        // Sort
+        query = (searchSortRequestDto.SortBy.ToLower(), searchSortRequestDto.SortDirection.ToLower()) switch
         {
-            var image = await _context.Images
-                .AsNoTracking()
-                .Include(i => i.Status)
-                .Include(i => i.Categories)
-                .FirstOrDefaultAsync(i => i.Id == id);
+            ("title", "asc") => query.OrderBy(i => i.Title),
+            ("title", _) => query.OrderByDescending(i => i.Title),
 
-            if (image is null)
-                throw new NotFoundException("La imagen seleccionada no existe.");
+            ("date", "asc") => query.OrderBy(i => i.PublicationDate),
+            _ => query.OrderByDescending(i => i.PublicationDate)
+        };
 
+        return new PageResponseDto<ImageMinimalResponseDto>()
+        {
+            Total = await query.CountAsync(),
+            Data = await query
+                .Skip(searchSortRequestDto.Offset)
+                .Take(searchSortRequestDto.Take)
+                .Select(ImageExtensions.MapImageMinimalResponseDto())
+                .ToListAsync(),
+        };
+    }
+
+    public async Task<Image> GetImage(Guid id)
+    {
+        var image = await context.Images
+            .AsNoTracking()
+            .Include(i => i.Status)
+            .Include(i => i.Categories)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        return image ?? throw new NotFoundException("La imagen seleccionada no existe.");
+    }
+
+    public async Task<Image> GetImageBySlug(string slug)
+    {
+        var image = await context.Images
+            .AsNoTracking()
+            .Include(i => i.Status)
+            .Include(i => i.Categories)
+            .FirstOrDefaultAsync(i => i.Slug == slug);
+
+        if (image?.Status != null && image.Status.Name.Trim().ToLower() == "publicado")
             return image;
-        }
 
-        public async Task<Image> GetImageBySlug(string slug)
-        {
-            var image = await _context.Images
-                .AsNoTracking()
-                .Include(i => i.Status)
-                .Include(i => i.Categories)
-                .FirstOrDefaultAsync(i => i.Slug == slug);
-
-            if (image?.Status != null && image.Status.Name.Trim().ToLower() == "publicado")
-                return image;
-
-            throw new NotFoundException("La imagen seleccionada no existe.");
-        }
+        throw new NotFoundException("La imagen seleccionada no existe.");
     }
 }

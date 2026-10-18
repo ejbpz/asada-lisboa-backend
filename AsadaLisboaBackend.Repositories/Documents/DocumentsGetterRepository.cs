@@ -7,112 +7,102 @@ using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
 
-namespace AsadaLisboaBackend.Repositories.Documents
-{
-    public class DocumentsGetterRepository : IDocumentsGetterRepository
-    {
-        private readonly ApplicationDbContext _context;
+namespace AsadaLisboaBackend.Repositories.Documents;
 
-        public DocumentsGetterRepository(ApplicationDbContext context)
+public class DocumentsGetterRepository(ApplicationDbContext context) : IDocumentsGetterRepository
+{
+    public async Task<PageResponseDto<DocumentMinimalResponseDto>> GetDocuments(SearchSortRequestDto searchSortRequestDto)
+    {
+        IQueryable<Document> query = context.Documents
+            .AsNoTracking()
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .Include(d => d.DocumentType);
+
+        if (searchSortRequestDto.IsPublic)
         {
-            _context = context;
+            query = query.Where(d =>
+                d.Status != null &&
+                d.Status.Name.Trim().ToLower() == "publicado");
         }
 
-        public async Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
+        if (searchSortRequestDto.IsPublic && searchSortRequestDto.FilterBy?.Trim().ToLower() == "status")
         {
-            IQueryable<Models.Document> query = _context.Documents
-                   .AsNoTracking()
-                   .Include(d => d.Status)
-                   .Include(d => d.Categories)
-                   .Include(d => d.DocumentType);
+            searchSortRequestDto.FilterBy = null;
+        }
 
-            if (searchSortRequestDTO.IsPublic)
+        // Search
+        if (!string.IsNullOrEmpty(searchSortRequestDto.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDto.Search))
+        {
+            string search = searchSortRequestDto.Search.ToLower();
+
+            query = searchSortRequestDto.FilterBy?.ToLower() switch
             {
-                query = query.Where(d =>
+                "status" => query.Where(d =>
                     d.Status != null &&
-                    d.Status.Name.Trim().ToLower() == "publicado");
-            }
+                    EF.Functions.ILike(d.Status.Name, $"%{search}%")),
 
-            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "status")
-            {
-                searchSortRequestDTO.FilterBy = null;
-            }
-
-            // Search
-            if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
-            {
-                string search = searchSortRequestDTO.Search.ToLower();
-
-                query = searchSortRequestDTO.FilterBy?.ToLower() switch
-                {
-                    "status" => query.Where(d =>
-                        d.Status != null &&
-                        EF.Functions.ILike(d.Status.Name, $"%{search}%")),
-
-                    "type" => query.Where(d =>
+                "type" => query.Where(d =>
                     d.DocumentType != null &&
                     EF.Functions.ILike(d.DocumentType.Name, $"%{search}%")),
 
-                    "category" => query.Where(d =>
-                        d.Categories.Any(c =>
-                            EF.Functions.ILike(c.Name, $"%{search}%"))),
+                "category" => query.Where(d =>
+                    d.Categories.Any(c =>
+                        EF.Functions.ILike(c.Name, $"%{search}%"))),
 
-                    _ => query.Where(d =>
-                        EF.Functions.ILike(d.Title, $"%{search}%")),
-                };
-            }
-
-            // Sort
-            query = (searchSortRequestDTO.SortBy?.ToLower(), searchSortRequestDTO.SortDirection?.ToLower()) switch
-            {
-                ("date", "desc") => query.OrderByDescending(d => d.PublicationDate),
-                ("date", _) => query.OrderBy(d => d.PublicationDate),
-
-                ("title", "desc") => query.OrderByDescending(d => d.Title),
-                ("title", _) => query.OrderBy(d => d.Title),
-
-                _ => query.OrderByDescending(d => d.PublicationDate)
-            };
-
-            return new PageResponseDTO<DocumentMinimalResponseDTO>()
-            {
-                Total = await query.CountAsync(),
-                Data = await query
-                    .Skip(searchSortRequestDTO.Offset)
-                    .Take(searchSortRequestDTO.Take)
-                    .Select(DocumentExtensions.MapDocumentMinimalResponseDTO())
-                    .ToListAsync(),
+                _ => query.Where(d =>
+                    EF.Functions.ILike(d.Title, $"%{search}%")),
             };
         }
 
-        public async Task<Document> GetDocument(Guid id)
+        // Sort
+        query = (searchSortRequestDto.SortBy.ToLower(), searchSortRequestDto.SortDirection.ToLower()) switch
         {
-            var document = await _context.Documents
-                    .AsNoTracking()
-                    .Include(d => d.Status)
-                    .Include(d => d.Categories)
-                    .Include(d => d.DocumentType)
-                    .FirstOrDefaultAsync(d => d.Id == id);
+            ("title", "asc") => query.OrderBy(d => d.Title),
+            ("title", _) => query.OrderByDescending(d => d.Title),
 
-            if (document is null)
-                throw new NotFoundException("El documento seleccionada no existe.");
+            ("date", "asc") => query.OrderBy(d => d.PublicationDate),
+            _ => query.OrderByDescending(d => d.PublicationDate)
+        };
 
-            return document;
-        }
-
-        public async Task<Document> GetDocumentBySlug(string slug)
+        return new PageResponseDto<DocumentMinimalResponseDto>()
         {
-            var document = await _context.Documents
-                    .AsNoTracking()
-                    .Include(d => d.Status)
-                    .Include(d => d.Categories)
-                    .Include(d => d.DocumentType)
-                    .FirstOrDefaultAsync(d => d.Slug == slug);
+            Total = await query.CountAsync(),
+            Data = await query
+                .Skip(searchSortRequestDto.Offset)
+                .Take(searchSortRequestDto.Take)
+                .Select(DocumentExtensions.MapDocumentMinimalResponseDto())
+                .ToListAsync(),
+        };
+    }
 
-            if(document?.Status != null && document.Status.Name.Trim().ToLower() == "publicado")
-                return document;
+    public async Task<Document> GetDocument(Guid id)
+    {
+        var document = await context.Documents
+            .AsNoTracking()
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .Include(d => d.DocumentType)
+            .FirstOrDefaultAsync(d => d.Id == id);
 
+        if (document is null)
             throw new NotFoundException("El documento seleccionada no existe.");
-        }
+
+        return document;
+    }
+
+    public async Task<Document> GetDocumentBySlug(string slug)
+    {
+        var document = await context.Documents
+            .AsNoTracking()
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .Include(d => d.DocumentType)
+            .FirstOrDefaultAsync(d => d.Slug == slug);
+
+        if(document?.Status != null && document.Status.Name.Trim().ToLower() == "publicado")
+            return document;
+
+        throw new NotFoundException("El documento seleccionada no existe.");
     }
 }
