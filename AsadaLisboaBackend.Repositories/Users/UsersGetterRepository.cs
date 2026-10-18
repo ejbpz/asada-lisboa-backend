@@ -6,94 +6,86 @@ using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Users;
 
-namespace AsadaLisboaBackend.Repositories.Users
+namespace AsadaLisboaBackend.Repositories.Users;
+
+public class UsersGetterRepository(ApplicationDbContext context) : IUsersGetterRepository
 {
-    public class UsersGetterRepository : IUsersGetterRepository
+    public async Task<PageResponseDto<UserResponseDto>> GetUsers(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly ApplicationDbContext _context;
+        IQueryable<ApplicationUser> query = context.Users
+            .AsNoTracking()
+            .Include(u => u.Charge);
 
-        public UsersGetterRepository(ApplicationDbContext context)
+        if (searchSortRequestDto.IsPublic)
         {
-            _context = context;
+            query = query.Where(u =>
+                u.Charge != null &&
+                u.Charge.Name.Trim().ToLower() != "administrador");
         }
 
-        public async Task<PageResponseDTO<UserResponseDTO>> GetUsers(SearchSortRequestDTO searchSortRequestDTO)
+        if (searchSortRequestDto.IsPublic && searchSortRequestDto.FilterBy?.Trim().ToLower() == "charge")
         {
-            IQueryable<ApplicationUser> query = _context.Users
-                .AsNoTracking()
-                .Include(u => u.Charge);
+            searchSortRequestDto.FilterBy = null;
+        }
 
-            if (searchSortRequestDTO.IsPublic)
+        // Search
+        if (!string.IsNullOrEmpty(searchSortRequestDto.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDto.Search))
+        {
+            string search = searchSortRequestDto.Search.ToLower();
+
+            query = searchSortRequestDto.FilterBy switch
             {
-                query = query.Where(u =>
-                    u.Charge != null &&
-                    u.Charge.Name.Trim().ToLower() != "administrador");
-            }
+                "charge" => query.Where(u =>
+                    EF.Functions.ILike(u.Charge!.Name, $"%{search}%")),
 
-            if (searchSortRequestDTO.IsPublic && searchSortRequestDTO.FilterBy?.Trim().ToLower() == "charge")
-            {
-                searchSortRequestDTO.FilterBy = null;
-            }
-
-            // Search
-            if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
-            {
-                string search = searchSortRequestDTO.Search.ToLower();
-
-                query = searchSortRequestDTO.FilterBy switch
-                {
-                    "charge" => query.Where(u =>
-                        EF.Functions.ILike(u.Charge!.Name ?? "", $"%{search}%")),
-
-                    _ => query.Where(u =>
-                        EF.Functions.ILike((u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName), $"%{search}%")),
-                };
-            }
-
-            // Sort
-            query = (searchSortRequestDTO.SortBy.ToLower(), searchSortRequestDTO.SortDirection.ToLower()) switch
-            {
-                ("charge", "desc") => query.OrderByDescending(u => u.Charge!.Name),
-                ("charge", _) => query.OrderBy(u => u.Charge!.Name),
-                ("name", "desc") => query.OrderByDescending(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName)),
-                _ => query.OrderBy(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName)),
+                _ => query.Where(u =>
+                    EF.Functions.ILike((u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName), $"%{search}%")),
             };
-
-            return new PageResponseDTO<UserResponseDTO>()
-            {
-                Total = await query.CountAsync(),
-                Data = await query
-                    .Skip(searchSortRequestDTO.Offset)
-                    .Take(searchSortRequestDTO.Take)
-                    .Select(UserExtensions.MapUserResponseDTO())
-                    .ToListAsync(),
-            }; 
         }
 
-        public async Task<UserDetailResponseDTO?> GetUser(Guid id)
+        // Sort
+        query = (searchSortRequestDto.SortBy.ToLower(), searchSortRequestDto.SortDirection.ToLower()) switch
         {
-            var user = await _context.Users
-                .AsNoTracking()
-                .Include(u => u.Charge)
-                .Where(u => u.Id == id)
-                .Select(UserExtensions.MapUserDetailResponseDTO())
-                .FirstOrDefaultAsync();
+            ("charge", "desc") => query.OrderByDescending(u => u.Charge!.Name),
+            ("charge", _) => query.OrderBy(u => u.Charge!.Name),
+            ("name", "desc") => query.OrderByDescending(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName)),
+            _ => query.OrderBy(u => (u.FirstName + " " + u.FirstLastName + " " + u.SecondLastName)),
+        };
 
-            if (user is null) 
-                return null;
+        return new PageResponseDto<UserResponseDto>()
+        {
+            Total = await query.CountAsync(),
+            Data = await query
+                .Skip(searchSortRequestDto.Offset)
+                .Take(searchSortRequestDto.Take)
+                .Select(UserExtensions.MapUserResponseDto())
+                .ToListAsync(),
+        }; 
+    }
 
-            user.Roles = await _context.UserRoles
-                .Where(ur => ur.UserId == id)
-                .Join(
-                    _context.Roles,
-                    ur => ur.RoleId,
-                    r => r.Id,
-                    (ur, r) => r
-                )
-                .Select(RoleExtensions.MapRoleResponseDTO())
-                .ToListAsync();
+    public async Task<UserDetailResponseDto?> GetUser(Guid id)
+    {
+        var user = await context.Users
+            .AsNoTracking()
+            .Include(u => u.Charge)
+            .Where(u => u.Id == id)
+            .Select(UserExtensions.MapUserDetailResponseDto())
+            .FirstOrDefaultAsync();
 
-            return user;
-        }
+        if (user is null) 
+            return null;
+
+        user.Roles = await context.UserRoles
+            .Where(ur => ur.UserId == id)
+            .Join(
+                context.Roles,
+                ur => ur.RoleId,
+                r => r.Id,
+                (ur, r) => r
+            )
+            .Select(RoleExtensions.MapRoleResponseDto())
+            .ToListAsync();
+
+        return user;
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.Utils.OptionsPattern
+﻿namespace AsadaLisboaBackend.Utils.OptionsPattern;
+
+public class ReceiptOptions
 {
-    public class ReceiptOptions
-    {
-        public string? DOMAIN_RECEIPTS { get; set; } = string.Empty;
-    }
+    public string? DomainReceipts { get; set; } = string.Empty;
 }

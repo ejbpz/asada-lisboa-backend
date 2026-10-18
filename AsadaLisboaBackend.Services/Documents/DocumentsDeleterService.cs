@@ -1,50 +1,32 @@
 ﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
-namespace AsadaLisboaBackend.Services.Documents
+namespace AsadaLisboaBackend.Services.Documents;
+
+public class DocumentsDeleterService(
+    IFileSystemsManager fileSystems,
+    ILogger<DocumentsDeleterService> logger,
+    IDocumentsDeleterRepository documentsDeleterRespository,
+    IDocumentsGetterRepository documentsGetterRespository,
+    IMemoryCachesService memoryCachesService)
+    : IDocumentsDeleterService
 {
-    public class DocumentsDeleterService: IDocumentsDeleterService
+    public async Task DeleterDocument(Guid id)
     {
-        private readonly IFileSystemsManager _fileSystems;
-        private readonly ILogger<DocumentsDeleterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IDocumentsGetterRepository _documentsGetterRespository;
-        private readonly IDocumentsDeleterRepository _documentsDeleterRespository;
+        var document = await documentsGetterRespository.GetDocument(id);
 
-        public DocumentsDeleterService(IFileSystemsManager fileSystems, ILogger<DocumentsDeleterService> logger, IDocumentsDeleterRepository documentsDeleterRespository, IDocumentsGetterRepository documentsGetterRespository, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _fileSystems = fileSystems;
-            _memoryCachesService = memoryCachesService;
-            _documentsGetterRespository = documentsGetterRespository;
-            _documentsDeleterRespository = documentsDeleterRespository;
-        }
+        if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
+            await fileSystems.DeleteAsync(document.FileName, "documentos");
 
-        public async Task DeleterDocument(Guid id)
-        {
-            var document = await _documentsGetterRespository.GetDocument(id);
+        await documentsDeleterRespository.DeleteDocument(id);
 
-            if (document is null)
-            {
-                _logger.LogError("Documento con id: {Id} no encontrado.", id);
-                throw new NotFoundException("Documento no encontrado.");
-            }
+        memoryCachesService.RemoveById(Constants.CACHE_DOCUMENTS, document.Id);
+        memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
 
-            if (!string.IsNullOrEmpty(document.FilePath) && File.Exists(document.FilePath))
-                await _fileSystems.DeleteAsync(document.FileName, "documentos");
-
-            await _documentsDeleterRespository.DeleteDocument(id);
-
-            _memoryCachesService.RemoveById(Constants.CACHE_DOCUMENTS, document.Id);
-            _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
-
-            _logger.LogInformation("Documento con id {DocumentId} eliminado correctamente.", id);
-        }
+        logger.LogInformation("Documento con id {DocumentId} eliminado correctamente.", id);
     }
 }

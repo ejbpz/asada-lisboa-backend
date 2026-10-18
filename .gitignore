@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# database docker test 
+database-docker/
+
 # dotenv files
 .env
 

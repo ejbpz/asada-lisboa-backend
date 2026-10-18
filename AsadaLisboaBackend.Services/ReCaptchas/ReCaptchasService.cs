@@ -7,63 +7,57 @@ using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Models.DTOs.ReCaptcha;
 using AsadaLisboaBackend.ServiceContracts.ReCaptchas;
 
-namespace AsadaLisboaBackend.Services.ReCaptchas
-{
-    public class ReCaptchasService : IReCaptchasService
-    {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<ReCaptchasService> _logger;
-        private readonly ReCaptchaOptions _reCaptchaOptions;
+namespace AsadaLisboaBackend.Services.ReCaptchas;
 
-        public ReCaptchasService(HttpClient httpClient, ILogger<ReCaptchasService> logger, IOptions<ReCaptchaOptions> options)
+public class ReCaptchasService(
+    HttpClient httpClient,
+    ILogger<ReCaptchasService> logger,
+    IOptions<ReCaptchaOptions> options)
+    : IReCaptchasService
+{
+    private readonly ReCaptchaOptions _reCaptchaOptions = options.Value;
+
+    public async Task<bool> ReCaptchaValidation(string reCaptchaRequest)
+    {
+        if (string.IsNullOrEmpty(reCaptchaRequest) || string.IsNullOrWhiteSpace(reCaptchaRequest))
+            throw new ArgumentException("El reCaptcha ha sido nulo.");
+
+        if (string.IsNullOrEmpty(_reCaptchaOptions.SecretKey) || string.IsNullOrWhiteSpace(_reCaptchaOptions.SecretKey))
+            throw new ArgumentException("Error con el proveedor del correos.");
+
+        var content = new FormUrlEncodedContent(new Dictionary<string, string>()
         {
-            _logger = logger;
-            _httpClient = httpClient;
-            _reCaptchaOptions = options.Value; ;
+            { "secret", _reCaptchaOptions.SecretKey },
+            { "response", reCaptchaRequest },
+        });
+
+        var response = await httpClient.PostAsync(Constants.DOMAIN_RECAPTCHA, content);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogError("Error al validar ReCAPTCHA, codigo HTTP dado: {httpStatusCode}", response.StatusCode);
+            return false;
         }
 
-        public async Task<bool> ReCaptchaValidation(string reCaptchaRequest)
+        try
         {
-            if (string.IsNullOrEmpty(reCaptchaRequest) || string.IsNullOrWhiteSpace(reCaptchaRequest))
-                throw new ArgumentNullException("El reCaptcha ha sido nulo.");
+            var result = await response.Content
+                .ReadFromJsonAsync<ReCaptchaResponseDto>();
 
-            if (string.IsNullOrEmpty(_reCaptchaOptions.SECRET_KEY) || string.IsNullOrWhiteSpace(_reCaptchaOptions.SECRET_KEY))
-                throw new ArgumentNullException("Error con el proveedor del correos.");
-
-            var content = new FormUrlEncodedContent(new Dictionary<string, string>()
+            if (result is null)
             {
-                { "secret", _reCaptchaOptions.SECRET_KEY },
-                { "response", reCaptchaRequest },
-            });
-
-            var response = await _httpClient.PostAsync(Constants.DOMAIN_RECAPTCHA, content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError("Error al validar ReCAPTCHA, codigo HTTP dado: {httpStatusCode}", response.StatusCode);
+                logger.LogError("Error al validar ReCAPTCHA, respuesta no pudo ser deserializada");
                 return false;
             }
 
-            try
-            {
-                var result = await response.Content
-                    .ReadFromJsonAsync<ReCaptchaResponseDTO>();
+            return result.Success;
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex,
+                "Error al deserializar la respuesta de ReCAPTCHA");
 
-                if (result is null)
-                {
-                    _logger.LogError("Error al validar ReCAPTCHA, respuesta no pudo ser deserializada");
-                    return false;
-                }
-
-                return result.Success;
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex,
-                    "Error al deserializar la respuesta de ReCAPTCHA");
-
-                return false;
-            }
+            return false;
         }
     }
 }

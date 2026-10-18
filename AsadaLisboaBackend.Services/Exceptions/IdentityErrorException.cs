@@ -1,24 +1,12 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Error;
 
-namespace AsadaLisboaBackend.Services.Exceptions
-{
-    public class IdentityErrorException : Exception
-    {   
-        public IReadOnlyCollection<ErrorDetailResponseDTO> Errors { get; }
+namespace AsadaLisboaBackend.Services.Exceptions;
 
-        public IdentityErrorException(List<ErrorDetailResponseDTO> errors) : base()
-        {
-            Errors = errors ?? new List<ErrorDetailResponseDTO>();
-        }
-
-        public IdentityErrorException(string message, List<ErrorDetailResponseDTO> errors) : base(message)
-        {
-            Errors = errors ?? new List<ErrorDetailResponseDTO>();
-        }
-
-        public IdentityErrorException(string message, Exception inner, List<ErrorDetailResponseDTO> errors) : base(message, inner)
-        {
-            Errors = errors ?? new List<ErrorDetailResponseDTO>();
-        }
-    }
+public class IdentityErrorException : Exception
+{   
+    public IReadOnlyCollection<ErrorDetailResponseDto> Errors { get; }
+    
+    public IdentityErrorException(List<ErrorDetailResponseDto>? errors) { Errors = errors ?? []; }
+    public IdentityErrorException(string message, List<ErrorDetailResponseDto>? errors) : base(message) { Errors = errors ?? []; }
+    public IdentityErrorException(string message, Exception inner, List<ErrorDetailResponseDto>? errors) : base(message, inner) { Errors = errors ?? []; }
 }

@@ -1,37 +1,36 @@
 ﻿using System.Linq.Expressions;
 
-namespace AsadaLisboaBackend.Models.DTOs.Contact
+namespace AsadaLisboaBackend.Models.DTOs.Contact;
+
+public class ContactResponseDto
 {
-    public class ContactResponseDTO
+    public Guid Id { get; set; }
+    public string ContactType { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+    public byte Order { get; set; }
+}
+
+public static partial class ContactExtensions
+{
+    public static Expression<Func<Models.Contact, ContactResponseDto>> MapContactResponseDto()
     {
-        public Guid Id { get; set; }
-        public string ContactType { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
-        public byte Order { get; set; }
+        return contact => new ContactResponseDto
+        {
+            Id = contact.Id,
+            Order = contact.Order,
+            Value = contact.Value,
+            ContactType = contact.ContactType,
+        };
     }
 
-    public static partial class ContactExtensions
+    public static ContactResponseDto ToContactResponseDto(this Models.Contact contact)
     {
-        public static Expression<Func<Models.Contact, ContactResponseDTO>> MapContactResponseDTO()
+        return new ContactResponseDto()
         {
-            return contact => new ContactResponseDTO
-            {
-                Id = contact.Id,
-                Order = contact.Order,
-                Value = contact.Value,
-                ContactType = contact.ContactType,
-            };
-        }
-
-        public static ContactResponseDTO ToContactResponseDTO(this Models.Contact contact)
-        {
-            return new ContactResponseDTO()
-            {
-                Id = contact.Id,
-                Order = contact.Order,
-                Value = contact.Value,
-                ContactType = contact.ContactType,
-            };
-        }
+            Id = contact.Id,
+            Order = contact.Order,
+            Value = contact.Value,
+            ContactType = contact.ContactType,
+        };
     }
 }

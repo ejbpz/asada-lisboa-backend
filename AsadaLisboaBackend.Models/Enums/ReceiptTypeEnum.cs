@@ -1,9 +1,8 @@
-﻿namespace AsadaLisboaBackend.Models.Enums
+﻿namespace AsadaLisboaBackend.Models.Enums;
+
+public enum ReceiptType
 {
-    public enum ReceiptType
-    {
-        WithDebt = 1,
-        NotExists = 2,
-        WithoutDebt = 3,
-    }
+    WithDebt = 1,
+    NotExists = 2,
+    WithoutDebt = 3,
 }

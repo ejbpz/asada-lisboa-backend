@@ -1,7 +1,6 @@
 ﻿using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
-using AsadaLisboaBackend.RepositoryContracts.Configurations;
 using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 using AsadaLisboaBackend.RepositoryContracts.Categories;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
@@ -13,7 +12,6 @@ using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.Roles;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
-using AsadaLisboaBackend.ServiceContracts.Configurations;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.Principals;
 using AsadaLisboaBackend.ServiceContracts.Categories;
@@ -32,7 +30,6 @@ using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Jwts;
 using AsadaLisboaBackend.Repositories.AboutUsSections;
-using AsadaLisboaBackend.Repositories.Configurations;
 using AsadaLisboaBackend.Repositories.DocumentTypes;
 using AsadaLisboaBackend.Repositories.Categories;
 using AsadaLisboaBackend.Repositories.Documents;
@@ -44,7 +41,6 @@ using AsadaLisboaBackend.Repositories.Roles;
 using AsadaLisboaBackend.Repositories.Users;
 using AsadaLisboaBackend.Repositories.News;
 using AsadaLisboaBackend.Services.AboutUsSections;
-using AsadaLisboaBackend.Services.Configurations;
 using AsadaLisboaBackend.Services.MemoryCaches;
 using AsadaLisboaBackend.Services.Principals;
 using AsadaLisboaBackend.Services.Categories;
@@ -63,155 +59,143 @@ using AsadaLisboaBackend.Services.Roles;
 using AsadaLisboaBackend.Services.News;
 using AsadaLisboaBackend.Services.Jwts;
 
-namespace AsadaLisboaBackend.ServicesExtension
+namespace AsadaLisboaBackend.ServicesExtension;
+
+/// <summary>
+/// Services and repositories registration extension method.
+/// </summary>
+public static class ServicesExtension
 {
     /// <summary>
-    /// Services and repositories registration extension method.
-    /// </summary>
-    public static class ServicesExtension
+    /// Services and repositories registration into DI container.
+    /// </summary>        
+    /// <param name="services">Collection of services.</param>
+    /// <returns>List of registered services.</returns>
+    public static IServiceCollection ServicesRegistration(this IServiceCollection services)
     {
-        /// <summary>
-        /// Services and repositories registration into DI container.
-        /// </summary>        
-        /// <param name="services">Collection of services.</param>
-        /// <returns>List of registered services.</returns>
-        public static IServiceCollection ServicesRegistration(this IServiceCollection services)
-        {
-            // Cache
-            services.AddScoped<IMemoryCachesService, MemoryCachesService>();
+        // Cache
+        services.AddScoped<IMemoryCachesService, MemoryCachesService>();
 
-            // File System
-            services.AddScoped<IFileSystemsManager, FileSystemsManager>();
+        // File System
+        services.AddScoped<IFileSystemsManager, FileSystemsManager>();
 
-            // ReCaptcha
-            services.AddScoped<IReCaptchasService, ReCaptchasService>();
+        // ReCaptcha
+        services.AddScoped<IReCaptchasService, ReCaptchasService>();
 
-            // Document Types
-            services.AddScoped<IDocumentTypesGetterRepository, DocumentTypesGetterRepository>();
+        // Document Types
+        services.AddScoped<IDocumentTypesGetterRepository, DocumentTypesGetterRepository>();
 
-            // Principals
-            services.AddScoped<IPrincipalsGetterService, PrincipalsGetterService>();
+        // Principals
+        services.AddScoped<IPrincipalsGetterService, PrincipalsGetterService>();
 
-            // Contacts
-            services.AddScoped<IContactsUpdaterService, ContactsUpdaterService>();
-            services.AddScoped<IContactsDeleterService, ContactsDeleterService>();
-            services.AddScoped<IContactsGetterService, ContactsGetterService>();
-            services.AddScoped<IContactsAdderService, ContactsAdderService>();
+        // Contacts
+        services.AddScoped<IContactsUpdaterService, ContactsUpdaterService>();
+        services.AddScoped<IContactsDeleterService, ContactsDeleterService>();
+        services.AddScoped<IContactsGetterService, ContactsGetterService>();
+        services.AddScoped<IContactsAdderService, ContactsAdderService>();
 
-            services.AddScoped<IContactsAdderRepository, ContactsAdderRepository>();
-            services.AddScoped<IContactsGetterRepository, ContactsGetterRepository>();
-            services.AddScoped<IContactsUpdaterRepository, ContactsUpdaterRepository>();
-            services.AddScoped<IContactsDeleterRepository, ContactsDeleterRepository>();
+        services.AddScoped<IContactsAdderRepository, ContactsAdderRepository>();
+        services.AddScoped<IContactsGetterRepository, ContactsGetterRepository>();
+        services.AddScoped<IContactsUpdaterRepository, ContactsUpdaterRepository>();
+        services.AddScoped<IContactsDeleterRepository, ContactsDeleterRepository>();
 
-            // About Us
-            services.AddScoped<IAboutUsSectionsUpdaterRepository, AboutUsSectionsUpdaterRepository>();
-            services.AddScoped<IAboutUsSectionsDeleterRepository, AboutUsSectionsDeleterRepository>();
-            services.AddScoped<IAboutUsSectionsGetterRepository, AboutUsSectionsGetterRepository>();
-            services.AddScoped<IAboutUsSectionsAdderRepository, AboutUsSectionsAdderRepository>();
+        // About Us
+        services.AddScoped<IAboutUsSectionsUpdaterRepository, AboutUsSectionsUpdaterRepository>();
+        services.AddScoped<IAboutUsSectionsDeleterRepository, AboutUsSectionsDeleterRepository>();
+        services.AddScoped<IAboutUsSectionsGetterRepository, AboutUsSectionsGetterRepository>();
+        services.AddScoped<IAboutUsSectionsAdderRepository, AboutUsSectionsAdderRepository>();
 
-            services.AddScoped<IAboutUsSectionsAdderService, AboutUsSectionsAdderService>();
-            services.AddScoped<IAboutUsSectionsGetterService, AboutUsSectionsGetterService>();
-            services.AddScoped<IAboutUsSectionsUpdaterService, AboutUsSectionsUpdaterService>();
-            services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDeleterService>();
+        services.AddScoped<IAboutUsSectionsAdderService, AboutUsSectionsAdderService>();
+        services.AddScoped<IAboutUsSectionsGetterService, AboutUsSectionsGetterService>();
+        services.AddScoped<IAboutUsSectionsUpdaterService, AboutUsSectionsUpdaterService>();
+        services.AddScoped<IAboutUsSectionsDeleterService, AboutUsSectionsDeleterService>();
 
-            // Configurations
-            services.AddScoped<IConfigurationsUpdaterRepository, ConfigurationsUpdaterRepository>();
-            services.AddScoped<IConfigurationsDeleterRepository, ConfigurationsDeleterRepository>();
-            services.AddScoped<IConfigurationsGetterRepository, ConfigurationsGetterRepository>();
-            services.AddScoped<IConfigurationsAdderRepository, ConfigurationsAdderRepository>();
+        // Documents
+        services.AddScoped<IDocumentsUpdaterRepository, DocumentsUpdaterRepository>();
+        services.AddScoped<IDocumentsDeleterRepository, DocumentsDeleterRepository>();
+        services.AddScoped<IDocumentsGetterRepository, DocumentsGetterRepository>();
+        services.AddScoped<IDocumentsAdderRepository, DocumentsAdderRepository>();
 
-            services.AddScoped<IConfigurationsAdderService, ConfigurationsAdderService>();
-            services.AddScoped<IConfigurationsGetterService, ConfigurationsGetterService>();
-            services.AddScoped<IConfigurationsUpdaterService, ConfigurationsUpdaterService>();
-            services.AddScoped<IConfigurationsDeleterService, ConfigurationsDeleterService>();
+        services.AddScoped<IDocumentsAdderService, DocumentsAdderService>();
+        services.AddScoped<IDocumentsGetterService, DocumentsGetterService>();
+        services.AddScoped<IDocumentsUpdaterService, DocumentsUpdaterService>();
+        services.AddScoped<IDocumentsDeleterService, DocumentsDeleterService>();
 
-            // Documents
-            services.AddScoped<IDocumentsUpdaterRepository, DocumentsUpdaterRepository>();
-            services.AddScoped<IDocumentsDeleterRepository, DocumentsDeleterRepository>();
-            services.AddScoped<IDocumentsGetterRepository, DocumentsGetterRepository>();
-            services.AddScoped<IDocumentsAdderRepository, DocumentsAdderRepository>();
+        // Images
+        services.AddScoped<IImagesUpdaterRepository, ImagesUpdaterRepository>();
+        services.AddScoped<IImagesDeleterRepository, ImagesDeleterRepository>();
+        services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
+        services.AddScoped<IImagesAdderRepository, ImagesAdderRepository>();
 
-            services.AddScoped<IDocumentsAdderService, DocumentsAdderService>();
-            services.AddScoped<IDocumentsGetterService, DocumentsGetterService>();
-            services.AddScoped<IDocumentsUpdaterService, DocumentsUpdaterService>();
-            services.AddScoped<IDocumentsDeleterService, DocumentsDeleterService>();
+        services.AddScoped<IImagesAdderService, ImagesAdderService>();
+        services.AddScoped<IImagesGetterService, ImagesGetterService>();
+        services.AddScoped<IImagesUpdaterService, ImagesUpdaterService>();
+        services.AddScoped<IImagesDeleterService, ImagesDeleterService>();
 
-            // Images
-            services.AddScoped<IImagesUpdaterRepository, ImagesUpdaterRepository>();
-            services.AddScoped<IImagesDeleterRepository, ImagesDeleterRepository>();
-            services.AddScoped<IImagesGetterRepository, ImagesGetterRepository>();
-            services.AddScoped<IImagesAdderRepository, ImagesAdderRepository>();
+        // News
+        services.AddScoped<INewsUpdaterRepository, NewsUpdaterRepository>();
+        services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
+        services.AddScoped<INewsGetterRepository, NewsGetterRepository>();
+        services.AddScoped<INewsAdderRepository, NewsAdderRepository>();
 
-            services.AddScoped<IImagesAdderService, ImagesAdderService>();
-            services.AddScoped<IImagesGetterService, ImagesGetterService>();
-            services.AddScoped<IImagesUpdaterService, ImagesUpdaterService>();
-            services.AddScoped<IImagesDeleterService, ImagesDeleterService>();
+        services.AddScoped<INewsAdderService, NewsAdderService>();
+        services.AddScoped<INewsGetterService, NewsGetterService>();
+        services.AddScoped<INewsUpdaterService, NewsUpdaterService>();
+        services.AddScoped<INewsDeleterService, NewsDeleterService>();
 
-            // News
-            services.AddScoped<INewsUpdaterRepository, NewsUpdaterRepository>();
-            services.AddScoped<INewsDeleterRepository, NewsDeleterRepository>();
-            services.AddScoped<INewsGetterRepository, NewsGetterRepository>();
-            services.AddScoped<INewsAdderRepository, NewsAdderRepository>();
+        // Statuses
+        services.AddScoped<IStatusesUpdaterRepository, StatusesUpdaterRepository>();
+        services.AddScoped<IStatusesGetterRepository, StatusesGetterRepository>();
 
-            services.AddScoped<INewsAdderService, NewsAdderService>();
-            services.AddScoped<INewsGetterService, NewsGetterService>();
-            services.AddScoped<INewsUpdaterService, NewsUpdaterService>();
-            services.AddScoped<INewsDeleterService, NewsDeleterService>();
+        services.AddScoped<IStatusesGetterService, StatusesGetterService>();
+        services.AddScoped<IStatusesUpdaterService, StatusesUpdaterService>();
 
-            // Statuses
-            services.AddScoped<IStatusesUpdaterRepository, StatusesUpdaterRepository>();
-            services.AddScoped<IStatusesGetterRepository, StatusesGetterRepository>();
+        // Categories
+        services.AddScoped<ICategoriesDeleterRepository, CategoriesDeleterRepository>();
+        services.AddScoped<ICategoriesGetterRepository, CategoriesGetterRepository>();
+        services.AddScoped<ICategoriesAdderRepository, CategoriesAdderRepository>();
 
-            services.AddScoped<IStatusesGetterService, StatusesGetterService>();
-            services.AddScoped<IStatusesUpdaterService, StatusesUpdaterService>();
+        services.AddScoped<ICategoriesGetterService, CategoriesGetterService>();
+        services.AddScoped<ICategoriesDeleterService, CategoriesDeleterService>();
 
-            // Categories
-            services.AddScoped<ICategoriesDeleterRepository, CategoriesDeleterRepository>();
-            services.AddScoped<ICategoriesGetterRepository, CategoriesGetterRepository>();
-            services.AddScoped<ICategoriesAdderRepository, CategoriesAdderRepository>();
+        // Charges
+        services.AddScoped<IChargesUpdaterRepository, ChargesUpdaterRepository>();
+        services.AddScoped<IChargesDeleterRepository, ChargesDeleterRepository>();
+        services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
+        services.AddScoped<IChargesAdderRepository, ChargesAdderRepository>();
 
-            services.AddScoped<ICategoriesGetterService, CategoriesGetterService>();
-            services.AddScoped<ICategoriesDeleterService, CategoriesDeleterService>();
+        services.AddScoped<IChargesAdderService, ChargesAdderService>();
+        services.AddScoped<IChargesGetterService, ChargesGetterService>();
+        services.AddScoped<IChargesDeleterService, ChargesDeleterService>();
+        services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
 
-            // Charges
-            services.AddScoped<IChargesUpdaterRepository, ChargesUpdaterRepository>();
-            services.AddScoped<IChargesDeleterRepository, ChargesDeleterRepository>();
-            services.AddScoped<IChargesGetterRepository, ChargesGetterRepository>();
-            services.AddScoped<IChargesAdderRepository, ChargesAdderRepository>();
+        // Editor
+        services.AddScoped<IEditorsAdderService, EditorsAdderService>();
+        services.AddScoped<IEditorsUpdaterService, EditorsUpdaterService>();
+        services.AddScoped<IEditorsDeleterService, EditorsDeleterService>();
 
-            services.AddScoped<IChargesAdderService, ChargesAdderService>();
-            services.AddScoped<IChargesGetterService, ChargesGetterService>();
-            services.AddScoped<IChargesDeleterService, ChargesDeleterService>();
-            services.AddScoped<IChargesUpdaterService, ChargesUpdaterService>();
+        // Account
+        services.AddScoped<IJwtsService, JwtsService>();
+        services.AddScoped<ILoginService, LoginService>();
+        services.AddScoped<IEmailsSenderService, EmailsSenderService>();
+        services.AddScoped<IRegisterUserService, RegisterUserService>();
+        services.AddScoped<IResetPasswordService, ResetPasswordService>();
+        services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 
-            // Editor
-            services.AddScoped<IEditorsAdderService, EditorsAdderService>();
-            services.AddScoped<IEditorsUpdaterService, EditorsUpdaterService>();
-            services.AddScoped<IEditorsDeleterService, EditorsDeleterService>();
+        // Roles
+        services.AddScoped<IRolesGetterRepository, RolesGetterRepository>();
 
-            // Account
-            services.AddScoped<IJwtsService, JwtsService>();
-            services.AddScoped<ILoginService, LoginService>();
-            services.AddScoped<IEmailsSenderService, EmailsSenderService>();
-            services.AddScoped<IRegisterUserService, RegisterUserService>();
-            services.AddScoped<IResetPasswordService, ResetPasswordService>();
-            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
-
-            // Roles
-            services.AddScoped<IRolesGetterRepository, RolesGetterRepository>();
-
-            services.AddScoped<IRolesGetterService, RolesGetterService>();
+        services.AddScoped<IRolesGetterService, RolesGetterService>();
             
-            // Users
-            services.AddScoped<IUsersGetterService, UsersGetterService>();
-            services.AddScoped<IUsersUpdaterService, UsersUpdaterService>();
-            services.AddScoped<IUsersDeleterService, UsersDeleterService>();
-            services.AddScoped<IUsersGetterRepository, UsersGetterRepository>();
+        // Users
+        services.AddScoped<IUsersGetterService, UsersGetterService>();
+        services.AddScoped<IUsersUpdaterService, UsersUpdaterService>();
+        services.AddScoped<IUsersDeleterService, UsersDeleterService>();
+        services.AddScoped<IUsersGetterRepository, UsersGetterRepository>();
 
-            //Searches
-            services.AddScoped<ISearchesGetterService, SearchesGetterService>();
+        //Searches
+        services.AddScoped<ISearchesGetterService, SearchesGetterService>();
 
-            return services;
-        }
+        return services;
     }
 }

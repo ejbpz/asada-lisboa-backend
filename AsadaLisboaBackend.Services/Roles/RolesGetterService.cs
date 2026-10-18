@@ -5,30 +5,22 @@ using AsadaLisboaBackend.ServiceContracts.Roles;
 using AsadaLisboaBackend.RepositoryContracts.Roles;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Roles
+namespace AsadaLisboaBackend.Services.Roles;
+
+public class RolesGetterService(
+    IRolesGetterRepository rolesGetterRepository,
+    ILogger<RolesGetterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IRolesGetterService
 {
-    public class RolesGetterService : IRolesGetterService
+    public async Task<List<RoleResponseDto>> GetRoles()
     {
-        private readonly ILogger<RolesGetterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IRolesGetterRepository _rolesGetterRepository;
+        logger.LogInformation("Los roles para usuarios han sido solicitados.");
 
-        public RolesGetterService(IRolesGetterRepository rolesGetterRepository, ILogger<RolesGetterService> logger, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _rolesGetterRepository = rolesGetterRepository;
-        }
-
-        public async Task<List<RoleResponseDTO>> GetRoles()
-        {
-            _logger.LogInformation("Los roles para usuarios han sido solicitados.");
-
-            return await _memoryCachesService.GetOrCreateCacheList<List<RoleResponseDTO>>(
-                resource: Constants.CACHE_ROLES,
-                request: "",
-                create: () => _rolesGetterRepository.GetRoles(),
-                time: TimeSpan.FromMinutes(5));
-        }
+        return await memoryCachesService.GetOrCreateCacheList(
+            resource: Constants.CACHE_ROLES,
+            request: "",
+            create: rolesGetterRepository.GetRoles,
+            time: TimeSpan.FromMinutes(5));
     }
 }

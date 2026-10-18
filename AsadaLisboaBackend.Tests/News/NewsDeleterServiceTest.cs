@@ -11,223 +11,219 @@ using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.News
+namespace AsadaLisboaBackend.Tests.News;
+
+public class NewsDeleterServiceTest
 {
-    public class NewsDeleterServiceTest
+    private readonly Fixture _fixture;
+    private readonly NewsDeleterService _service;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<INewsGetterRepository> _newsGetterRepositoryMock;
+    private readonly Mock<INewsDeleterRepository> _newsDeleterRepositoryMock;
+    private readonly Mock<IEditorsDeleterService> _editorsDeleterServiceMock;
+
+    public NewsDeleterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<ILogger<NewsDeleterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
-        private readonly Mock<INewsGetterRepository> _newsGetterRepositoryMock;
-        private readonly Mock<INewsDeleterRepository> _newsDeleterRepositoryMock;
-        private readonly Mock<IEditorsDeleterService> _editorsDeleterServiceMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly NewsDeleterService _service;
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public NewsDeleterServiceTest()
-        {
-            _fixture = new Fixture();
+        var loggerMock = new Mock<ILogger<NewsDeleterService>>();
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        _newsGetterRepositoryMock = new Mock<INewsGetterRepository>();
+        _newsDeleterRepositoryMock = new Mock<INewsDeleterRepository>();
+        _editorsDeleterServiceMock = new Mock<IEditorsDeleterService>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _service = new NewsDeleterService(
+            _newsDeleterRepositoryMock.Object,
+            _editorsDeleterServiceMock.Object,
+            _newsGetterRepositoryMock.Object,
+            loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+    [Fact]
+    public async Task DeleteNew_Should_Delete_Successfully()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _loggerMock = new Mock<ILogger<NewsDeleterService>>();
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
-            _newsGetterRepositoryMock = new Mock<INewsGetterRepository>();
-            _newsDeleterRepositoryMock = new Mock<INewsDeleterRepository>();
-            _editorsDeleterServiceMock = new Mock<IEditorsDeleterService>();
+        var existingNew = _fixture.Build<New>()
+            .With(x => x.Id, id)
+            .With(x => x.FileName, "image.jpg")
+            .With(x => x.Description, "<img src='test.jpg'>")
+            .Create();
 
-            _service = new NewsDeleterService(
-                _newsDeleterRepositoryMock.Object,
-                _editorsDeleterServiceMock.Object,
-                _newsGetterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        _newsGetterRepositoryMock
+            .Setup(x => x.GetNew(id))
+            .ReturnsAsync(existingNew.ToNewResponseDto());
 
-        [Fact]
-        public async Task DeleteNew_Should_Delete_Successfully()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () => await _service.DeleteNew(id);
 
-            var existingNew = _fixture.Build<New>()
-                .With(x => x.Id, id)
-                .With(x => x.FileName, "image.jpg")
-                .With(x => x.Description, "<img src='test.jpg'>")
-                .Create();
+        // Assert
+        await act.Should().NotThrowAsync();
 
-            _newsGetterRepositoryMock
-                .Setup(x => x.GetNew(id))
-                .ReturnsAsync(existingNew.ToNewResponseDTO());
+        _editorsDeleterServiceMock.Verify(
+            x => x.DeletePrincipalImage(existingNew.FileName),
+            Times.Once);
 
-            // Act
-            Func<Task> act = async () => await _service.DeleteNew(id);
+        _editorsDeleterServiceMock.Verify(
+            x => x.DeleteContentImages(existingNew.Description),
+            Times.Once);
 
-            // Assert
-            await act.Should().NotThrowAsync();
+        _newsDeleterRepositoryMock.Verify(
+            x => x.DeleteNew(id),
+            Times.Once);
 
-            _editorsDeleterServiceMock.Verify(
-                x => x.DeletePrincipalImage(existingNew.FileName),
-                Times.Once);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(Constants.CACHE_NEWS, existingNew.Id),
+            Times.Once);
 
-            _editorsDeleterServiceMock.Verify(
-                x => x.DeleteContentImages(existingNew.Description),
-                Times.Once);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(Constants.CACHE_NEWS),
+            Times.Once);
+    }
 
-            _newsDeleterRepositoryMock.Verify(
-                x => x.DeleteNew(id),
-                Times.Once);
+    [Fact]
+    public async Task DeleteNew_Should_Throw_When_New_Not_Found()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(Constants.CACHE_NEWS, existingNew.Id),
-                Times.Once);
+        _newsGetterRepositoryMock
+            .Setup(x => x.GetNew(id))!
+            .ReturnsAsync((NewResponseDto?)null);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(Constants.CACHE_NEWS),
-                Times.Once);
-        }
+        // Act
+        Func<Task> act = async () => await _service.DeleteNew(id);
 
-        [Fact]
-        public async Task DeleteNew_Should_Throw_When_New_Not_Found()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("La noticia no fue encontrada.");
 
-            _newsGetterRepositoryMock
-                .Setup(x => x.GetNew(id))!
-                .ReturnsAsync((NewResponseDTO?)null);
+        _newsDeleterRepositoryMock.Verify(
+            x => x.DeleteNew(It.IsAny<Guid>()),
+            Times.Never);
 
-            // Act
-            Func<Task> act = async () => await _service.DeleteNew(id);
+        _editorsDeleterServiceMock.Verify(
+            x => x.DeletePrincipalImage(It.IsAny<string>()),
+            Times.Never);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("La noticia no fue encontrada.");
+        _editorsDeleterServiceMock.Verify(
+            x => x.DeleteContentImages(It.IsAny<string>()),
+            Times.Never);
+    }
 
-            _newsDeleterRepositoryMock.Verify(
-                x => x.DeleteNew(It.IsAny<Guid>()),
-                Times.Never);
+    [Fact]
+    public async Task DeleteNew_Should_Execute_In_Correct_Order()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _editorsDeleterServiceMock.Verify(
-                x => x.DeletePrincipalImage(It.IsAny<string>()),
-                Times.Never);
+        var existingNew = _fixture.Build<New>()
+            .With(x => x.Id, id)
+            .Create();
 
-            _editorsDeleterServiceMock.Verify(
-                x => x.DeleteContentImages(It.IsAny<string>()),
-                Times.Never);
-        }
+        var sequence = new MockSequence();
 
-        [Fact]
-        public async Task DeleteNew_Should_Execute_In_Correct_Order()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _newsGetterRepositoryMock
+            .InSequence(sequence)
+            .Setup(x => x.GetNew(id))
+            .ReturnsAsync(existingNew.ToNewResponseDto());
 
-            var existingNew = _fixture.Build<New>()
-                .With(x => x.Id, id)
-                .Create();
+        _editorsDeleterServiceMock
+            .InSequence(sequence)
+            .Setup(x => x.DeletePrincipalImage(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
 
-            var sequence = new MockSequence();
+        _editorsDeleterServiceMock
+            .InSequence(sequence)
+            .Setup(x => x.DeleteContentImages(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
 
-            _newsGetterRepositoryMock
-                .InSequence(sequence)
-                .Setup(x => x.GetNew(id))
-                .ReturnsAsync(existingNew.ToNewResponseDTO());
+        _newsDeleterRepositoryMock
+            .InSequence(sequence)
+            .Setup(x => x.DeleteNew(id))
+            .Returns(Task.CompletedTask);
 
-            _editorsDeleterServiceMock
-                .InSequence(sequence)
-                .Setup(x => x.DeletePrincipalImage(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
+        // Act
+        Func<Task> act = async () => await _service.DeleteNew(id);
 
-            _editorsDeleterServiceMock
-                .InSequence(sequence)
-                .Setup(x => x.DeleteContentImages(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
+        // Assert
+        await act.Should().NotThrowAsync();
 
-            _newsDeleterRepositoryMock
-                .InSequence(sequence)
-                .Setup(x => x.DeleteNew(id))
-                .Returns(Task.CompletedTask);
+        _newsDeleterRepositoryMock.Verify(
+            x => x.DeleteNew(id),
+            Times.Once);
+    }
 
-            // Act
-            Func<Task> act = async () => await _service.DeleteNew(id);
+    [Fact]
+    public async Task DeleteNew_Should_Stop_When_DeletePrincipalImage_Fails()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            // Assert
-            await act.Should().NotThrowAsync();
+        var existingNew = _fixture.Build<New>()
+            .With(x => x.Id, id)
+            .Create();
 
-            _newsDeleterRepositoryMock.Verify(
-                x => x.DeleteNew(id),
-                Times.Once);
-        }
+        _newsGetterRepositoryMock
+            .Setup(x => x.GetNew(id))
+            .ReturnsAsync(existingNew.ToNewResponseDto());
 
-        [Fact]
-        public async Task DeleteNew_Should_Stop_When_DeletePrincipalImage_Fails()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _editorsDeleterServiceMock
+            .Setup(x => x.DeletePrincipalImage(It.IsAny<string>()))
+            .ThrowsAsync(new Exception("File error"));
 
-            var existingNew = _fixture.Build<New>()
-                .With(x => x.Id, id)
-                .Create();
+        // Act
+        Func<Task> act = async () => await _service.DeleteNew(id);
 
-            _newsGetterRepositoryMock
-                .Setup(x => x.GetNew(id))
-                .ReturnsAsync(existingNew.ToNewResponseDTO());
+        // Assert
+        await act.Should()
+            .ThrowAsync<Exception>();
 
-            _editorsDeleterServiceMock
-                .Setup(x => x.DeletePrincipalImage(It.IsAny<string>()))
-                .ThrowsAsync(new Exception("File error"));
+        _newsDeleterRepositoryMock.Verify(
+            x => x.DeleteNew(It.IsAny<Guid>()),
+            Times.Never);
 
-            // Act
-            Func<Task> act = async () => await _service.DeleteNew(id);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(It.IsAny<string>()),
+            Times.Never);
+    }
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<Exception>();
+    [Fact]
+    public async Task DeleteNew_Should_Remove_Cache_By_Correct_Id()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _newsDeleterRepositoryMock.Verify(
-                x => x.DeleteNew(It.IsAny<Guid>()),
-                Times.Never);
+        var existingNew = _fixture.Build<New>()
+            .With(x => x.Id, id)
+            .Create();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(It.IsAny<string>()),
-                Times.Never);
-        }
+        _newsGetterRepositoryMock
+            .Setup(x => x.GetNew(id))
+            .ReturnsAsync(existingNew.ToNewResponseDto());
 
-        [Fact]
-        public async Task DeleteNew_Should_Remove_Cache_By_Correct_Id()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () => await _service.DeleteNew(id);
 
-            var existingNew = _fixture.Build<New>()
-                .With(x => x.Id, id)
-                .Create();
+        // Assert
+        await act.Should().NotThrowAsync();
 
-            _newsGetterRepositoryMock
-                .Setup(x => x.GetNew(id))
-                .ReturnsAsync(existingNew.ToNewResponseDTO());
-
-            // Act
-            Func<Task> act = async () => await _service.DeleteNew(id);
-
-            // Assert
-            await act.Should().NotThrowAsync();
-
-            // Assert
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    Constants.CACHE_NEWS,
-                    id),
-                Times.Once);
-        }
+        // Assert
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                Constants.CACHE_NEWS,
+                id),
+            Times.Once);
     }
 }

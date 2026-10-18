@@ -17,250 +17,246 @@ using AsadaLisboaBackend.ServiceContracts.FileSystems;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.News
+namespace AsadaLisboaBackend.Tests.News;
+
+public class NewsAdderServiceTest
 {
-    public class NewsAdderServiceTest
+    private readonly Fixture _fixture;
+    private readonly NewsAdderService _service;
+    private readonly Mock<IFileSystemsManager> _fileSystemsMock;
+    private readonly Mock<INewsAdderRepository> _newsAdderRepositoryMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<IEditorsUpdaterService> _editorsUpdaterServiceMock;
+    private readonly Mock<ICategoriesGetterService> _categoriesGetterServiceMock;
+    private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
+
+    public NewsAdderServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IFileSystemsManager> _fileSystemsMock;
-        private readonly Mock<ILogger<NewsAdderService>> _loggerMock;
-        private readonly Mock<INewsAdderRepository> _newsAdderRepositoryMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
-        private readonly Mock<IEditorsUpdaterService> _editorsUpdaterServiceMock;
-        private readonly Mock<ICategoriesGetterService> _categoriesGetterServiceMock;
-        private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly NewsAdderService _service;
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public NewsAdderServiceTest()
-        {
-            _fixture = new Fixture();
+        _fileSystemsMock = new Mock<IFileSystemsManager>();
+        var loggerMock = new Mock<ILogger<NewsAdderService>>();
+        _newsAdderRepositoryMock = new Mock<INewsAdderRepository>();
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        _editorsUpdaterServiceMock = new Mock<IEditorsUpdaterService>();
+        _categoriesGetterServiceMock = new Mock<ICategoriesGetterService>();
+        _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _service = new NewsAdderService(
+            _newsAdderRepositoryMock.Object,
+            _editorsUpdaterServiceMock.Object,
+            _statusesGetterRepositoryMock.Object,
+            _categoriesGetterServiceMock.Object,
+            _fileSystemsMock.Object,
+            loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+    [Fact]
+    public async Task CreateNew_Should_Create_New_Successfully()
+    {
+        // Arrange
+        var request = _fixture.Build<NewRequestDto>()
+            .With(x => x.StatusId, Guid.NewGuid())
+            .Without(x => x.File)
+            .Create();
 
-            _fileSystemsMock = new Mock<IFileSystemsManager>();
-            _loggerMock = new Mock<ILogger<NewsAdderService>>();
-            _newsAdderRepositoryMock = new Mock<INewsAdderRepository>();
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
-            _editorsUpdaterServiceMock = new Mock<IEditorsUpdaterService>();
-            _categoriesGetterServiceMock = new Mock<ICategoriesGetterService>();
-            _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
+        var status = _fixture.Build<Status>()
+            .With(x => x.Id, request.StatusId)
+            .Create();
 
-            _service = new NewsAdderService(
-                _newsAdderRepositoryMock.Object,
-                _editorsUpdaterServiceMock.Object,
-                _statusesGetterRepositoryMock.Object,
-                _categoriesGetterServiceMock.Object,
-                _fileSystemsMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        var categories = _fixture.CreateMany<Category>(3).ToList();
 
-        [Fact]
-        public async Task CreateNew_Should_Create_New_Successfully()
-        {
-            // Arrange
-            var request = _fixture.Build<NewRequestDTO>()
-                .With(x => x.StatusId, Guid.NewGuid())
-                .Without(x => x.File)
-                .Create();
+        var createdNew = _fixture.Build<New>()
+            .With(x => x.Id, Guid.NewGuid())
+            .Create();
 
-            var status = _fixture.Build<Status>()
-                .With(x => x.Id, request.StatusId)
-                .Create();
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            var categories = _fixture.CreateMany<Category>(3).ToList();
+        _categoriesGetterServiceMock
+            .Setup(x => x.ToCreateCategories(request.Categories))
+            .ReturnsAsync(categories.ToHashSet());
 
-            var createdNew = _fixture.Build<New>()
-                .With(x => x.Id, Guid.NewGuid())
-                .Create();
+        _editorsUpdaterServiceMock
+            .Setup(x => x.ChangeHtmlImagesFolder(It.IsAny<string>()))
+            .ReturnsAsync("clean html");
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _newsAdderRepositoryMock
+            .Setup(x => x.CreateNew(It.IsAny<New>()))
+            .ReturnsAsync(createdNew);
 
-            _categoriesGetterServiceMock
-                .Setup(x => x.ToCreateCategories(request.Categories))
-                .ReturnsAsync(categories.ToHashSet());
+        // Act
+        var result = await _service.CreateNew(request);
 
-            _editorsUpdaterServiceMock
-                .Setup(x => x.ChangeHtmlImagesFolder(It.IsAny<string>()))
-                .ReturnsAsync("clean html");
+        // Assert
+        result.Should().NotBeNull();
 
-            _newsAdderRepositoryMock
-                .Setup(x => x.CreateNew(It.IsAny<New>()))
-                .ReturnsAsync(createdNew);
+        _newsAdderRepositoryMock.Verify(
+            x => x.CreateNew(It.Is<New>(n =>
+                n.Title == request.Title &&
+                n.StatusId == request.StatusId &&
+                n.Description == "clean html"
+            )),
+            Times.Once);
 
-            // Act
-            var result = await _service.CreateNew(request);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(Constants.CACHE_NEWS),
+            Times.Once);
+    }
 
-            // Assert
-            result.Should().NotBeNull();
+    [Fact]
+    public async Task CreateNew_Should_Throw_When_StatusId_Is_Empty()
+    {
+        // Arrange
+        var request = _fixture.Build<NewRequestDto>()
+            .With(x => x.StatusId, Guid.Empty)
+            .Without(x => x.File)
+            .Create();
 
-            _newsAdderRepositoryMock.Verify(
-                x => x.CreateNew(It.Is<New>(n =>
-                    n.Title == request.Title &&
-                    n.StatusId == request.StatusId &&
-                    n.Description == "clean html"
-                )),
-                Times.Once);
+        // Act
+        Func<Task> act = async () => await _service.CreateNew(request);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(Constants.CACHE_NEWS),
-                Times.Once);
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("StatusId inválido.");
 
-        [Fact]
-        public async Task CreateNew_Should_Throw_When_StatusId_Is_Empty()
-        {
-            // Arrange
-            var request = _fixture.Build<NewRequestDTO>()
-                .With(x => x.StatusId, Guid.Empty)
-                .Without(x => x.File)
-                .Create();
+        _newsAdderRepositoryMock.Verify(
+            x => x.CreateNew(It.IsAny<New>()),
+            Times.Never);
+    }
 
-            // Act
-            Func<Task> act = async () => await _service.CreateNew(request);
+    [Fact]
+    public async Task CreateNew_Should_Throw_When_Status_Not_Found()
+    {
+        // Arrange
+        var request = _fixture.Build<NewRequestDto>()
+            .With(x => x.StatusId, Guid.NewGuid())
+            .Without(x => x.File)
+            .Create();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<ArgumentException>()
-                .WithMessage("StatusId inválido.");
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(request.StatusId))!
+            .ReturnsAsync((StatusResponseDto?)null);
 
-            _newsAdderRepositoryMock.Verify(
-                x => x.CreateNew(It.IsAny<New>()),
-                Times.Never);
-        }
+        // Act
+        Func<Task> act = async () => await _service.CreateNew(request);
 
-        [Fact]
-        public async Task CreateNew_Should_Throw_When_Status_Not_Found()
-        {
-            // Arrange
-            var request = _fixture.Build<NewRequestDTO>()
-                .With(x => x.StatusId, Guid.NewGuid())
-                .Without(x => x.File)
-                .Create();
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>();
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(request.StatusId))!
-                .ReturnsAsync((StatusResponseDTO?)null);
+        _newsAdderRepositoryMock.Verify(
+            x => x.CreateNew(It.IsAny<New>()),
+            Times.Never);
+    }
 
-            // Act
-            Func<Task> act = async () => await _service.CreateNew(request);
+    [Fact]
+    public async Task CreateNew_Should_Throw_When_Create_Fails()
+    {
+        // Arrange
+        var request = _fixture.Build<NewRequestDto>()
+            .With(x => x.StatusId, Guid.NewGuid())
+            .Without(x => x.File)
+            .Create();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>();
+        var status = _fixture.Build<Status>()
+            .With(x => x.Id, request.StatusId)
+            .Create();
 
-            _newsAdderRepositoryMock.Verify(
-                x => x.CreateNew(It.IsAny<New>()),
-                Times.Never);
-        }
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-        [Fact]
-        public async Task CreateNew_Should_Throw_When_Create_Fails()
-        {
-            // Arrange
-            var request = _fixture.Build<NewRequestDTO>()
-                .With(x => x.StatusId, Guid.NewGuid())
-                .Without(x => x.File)
-                .Create();
+        _categoriesGetterServiceMock
+            .Setup(x => x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            var status = _fixture.Build<Status>()
-                .With(x => x.Id, request.StatusId)
-                .Create();
+        _editorsUpdaterServiceMock
+            .Setup(x => x.ChangeHtmlImagesFolder(It.IsAny<string>()))
+            .ReturnsAsync("html");
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _newsAdderRepositoryMock
+            .Setup(x => x.CreateNew(It.IsAny<New>()))!
+            .ReturnsAsync((New?)null);
 
-            _categoriesGetterServiceMock
-                .Setup(x => x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        // Act
+        Func<Task> act = async () => await _service.CreateNew(request);
 
-            _editorsUpdaterServiceMock
-                .Setup(x => x.ChangeHtmlImagesFolder(It.IsAny<string>()))
-                .ReturnsAsync("html");
+        // Assert
+        await act.Should()
+            .ThrowAsync<CreateObjectException>();
+    }
 
-            _newsAdderRepositoryMock
-                .Setup(x => x.CreateNew(It.IsAny<New>()))!
-                .ReturnsAsync((New?)null);
+    [Fact]
+    public async Task CreateNew_Should_Save_Image_When_File_Exists()
+    {
+        // Arrange
+        var fileMock = new Mock<IFormFile>();
 
-            // Act
-            Func<Task> act = async () => await _service.CreateNew(request);
+        fileMock.Setup(x => x.Length)
+            .Returns(100);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<CreateObjectException>();
-        }
+        var request = _fixture.Build<NewRequestDto>()
+            .With(x => x.File, fileMock.Object)
+            .With(x => x.StatusId, Guid.NewGuid())
+            .Create();
 
-        [Fact]
-        public async Task CreateNew_Should_Save_Image_When_File_Exists()
-        {
-            // Arrange
-            var fileMock = new Mock<IFormFile>();
+        var status = _fixture.Build<Status>()
+            .With(x => x.Id, request.StatusId)
+            .Create();
 
-            fileMock.Setup(x => x.Length)
-                .Returns(100);
+        var createdNew = _fixture.Create<New>();
 
-            var request = _fixture.Build<NewRequestDTO>()
-                .With(x => x.File, fileMock.Object)
-                .With(x => x.StatusId, Guid.NewGuid())
-                .Create();
+        _fileSystemsMock
+            .Setup(x => x.SaveAsync(
+                It.IsAny<IFormFile>(),
+                "noticias",
+                It.IsAny<string>()))
+            .ReturnsAsync("https://server/noticias/image.jpg");
 
-            var status = _fixture.Build<Status>()
-                .With(x => x.Id, request.StatusId)
-                .Create();
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            var createdNew = _fixture.Create<New>();
+        _categoriesGetterServiceMock
+            .Setup(x => x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            _fileSystemsMock
-                .Setup(x => x.SaveAsync(
-                    It.IsAny<IFormFile>(),
-                    "noticias",
-                    It.IsAny<string>()))
-                .ReturnsAsync("https://server/noticias/image.jpg");
+        _editorsUpdaterServiceMock
+            .Setup(x => x.ChangeHtmlImagesFolder(It.IsAny<string>()))
+            .ReturnsAsync("html");
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _newsAdderRepositoryMock
+            .Setup(x => x.CreateNew(It.IsAny<New>()))
+            .ReturnsAsync(createdNew);
 
-            _categoriesGetterServiceMock
-                .Setup(x => x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        // Act
+        await _service.CreateNew(request);
 
-            _editorsUpdaterServiceMock
-                .Setup(x => x.ChangeHtmlImagesFolder(It.IsAny<string>()))
-                .ReturnsAsync("html");
+        // Assert
+        _fileSystemsMock.Verify(
+            x => x.SaveAsync(
+                It.IsAny<IFormFile>(),
+                "noticias",
+                It.IsAny<string>()),
+            Times.Once);
 
-            _newsAdderRepositoryMock
-                .Setup(x => x.CreateNew(It.IsAny<New>()))
-                .ReturnsAsync(createdNew);
-
-            // Act
-            await _service.CreateNew(request);
-
-            // Assert
-            _fileSystemsMock.Verify(
-                x => x.SaveAsync(
-                    It.IsAny<IFormFile>(),
-                    "noticias",
-                    It.IsAny<string>()),
-                Times.Once);
-
-            _newsAdderRepositoryMock.Verify(
-                x => x.CreateNew(It.Is<New>(n =>
-                    n.FileName == "image.jpg" &&
-                    n.FilePath == "noticias/image.jpg"
-                )),
-                Times.Once);
-        }
+        _newsAdderRepositoryMock.Verify(
+            x => x.CreateNew(It.Is<New>(n =>
+                n.FileName == "image.jpg" &&
+                n.FilePath == "noticias/image.jpg"
+            )),
+            Times.Once);
     }
 }

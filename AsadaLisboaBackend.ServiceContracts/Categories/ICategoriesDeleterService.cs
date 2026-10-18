@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.Categories
+﻿namespace AsadaLisboaBackend.ServiceContracts.Categories;
+
+public interface ICategoriesDeleterService
 {
-    public interface ICategoriesDeleterService
-    {
-        public Task DeleteCategory(Guid id);
-    }
+    public Task DeleteCategory(Guid id);
 }

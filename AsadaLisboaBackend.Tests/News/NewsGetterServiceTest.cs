@@ -8,180 +8,177 @@ using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.News
+namespace AsadaLisboaBackend.Tests.News;
+
+public class NewsGetterServiceTest
 {
-    public class NewsGetterServiceTest
+    private readonly Fixture _fixture;
+    private readonly NewsGetterService _service;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<INewsGetterRepository> _newsGetterRepositoryMock;
+
+    public NewsGetterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
-        private readonly Mock<INewsGetterRepository> _newsGetterRepositoryMock;
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        _newsGetterRepositoryMock = new Mock<INewsGetterRepository>();
 
-        private readonly NewsGetterService _service;
+        _service = new NewsGetterService(
+            _newsGetterRepositoryMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-        public NewsGetterServiceTest()
-        {
-            _fixture = new Fixture();
+    [Fact]
+    public async Task GetNew_Should_Return_Cached_New()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
-            _newsGetterRepositoryMock = new Mock<INewsGetterRepository>();
+        var expected = _fixture.Create<NewResponseDto>();
 
-            _service = new NewsGetterService(
-                _newsGetterRepositoryMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                $"{Constants.CACHE_NEWS}_{id}",
+                It.IsAny<Func<Task<NewResponseDto>>>(),
+                It.IsAny<TimeSpan>()))
+            .ReturnsAsync(expected);
 
-        [Fact]
-        public async Task GetNew_Should_Return_Cached_New()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        var result = await _service.GetNew(id);
 
-            var expected = _fixture.Create<NewResponseDTO>();
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(expected);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<NewResponseDTO>(
-                    $"{Constants.CACHE_NEWS}_{id}",
-                    It.IsAny<Func<Task<NewResponseDTO>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ReturnsAsync(expected);
+        _memoryCachesServiceMock.Verify(
+            x => x.GetOrCreateCache(
+                $"{Constants.CACHE_NEWS}_{id}",
+                It.IsAny<Func<Task<NewResponseDto>>>(),
+                TimeSpan.FromMinutes(5)),
+            Times.Once);
+    }
 
-            // Act
-            var result = await _service.GetNew(id);
+    [Fact]
+    public async Task GetNewBySlug_Should_Return_Cached_New()
+    {
+        // Arrange
+        var slug = "my-news";
 
-            // Assert
-            result.Should().NotBeNull();
-            result.Should().BeEquivalentTo(expected);
+        var expected = _fixture.Create<NewResponseDto>();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.GetOrCreateCache<NewResponseDTO>(
-                    $"{Constants.CACHE_NEWS}_{id}",
-                    It.IsAny<Func<Task<NewResponseDTO>>>(),
-                    TimeSpan.FromMinutes(5)),
-                Times.Once);
-        }
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                $"{Constants.CACHE_NEWS}_{slug}",
+                It.IsAny<Func<Task<NewResponseDto>>>(),
+                It.IsAny<TimeSpan>()))
+            .ReturnsAsync(expected);
 
-        [Fact]
-        public async Task GetNewBySlug_Should_Return_Cached_New()
-        {
-            // Arrange
-            var slug = "my-news";
+        // Act
+        var result = await _service.GetNewBySlug(slug);
 
-            var expected = _fixture.Create<NewResponseDTO>();
+        // Assert
+        result.Should().BeEquivalentTo(expected);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<NewResponseDTO>(
-                    $"{Constants.CACHE_NEWS}_{slug}",
-                    It.IsAny<Func<Task<NewResponseDTO>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ReturnsAsync(expected);
+        _memoryCachesServiceMock.Verify(
+            x => x.GetOrCreateCache(
+                $"{Constants.CACHE_NEWS}_{slug}",
+                It.IsAny<Func<Task<NewResponseDto>>>(),
+                TimeSpan.FromMinutes(5)),
+            Times.Once);
+    }
 
-            // Act
-            var result = await _service.GetNewBySlug(slug);
+    [Fact]
+    public async Task GetNews_Should_Return_Cached_List()
+    {
+        // Arrange
+        var request = _fixture.Create<SearchSortRequestDto>();
 
-            // Assert
-            result.Should().BeEquivalentTo(expected);
+        var expected = _fixture.Create<PageResponseDto<NewMinimalResponseDto>>();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.GetOrCreateCache<NewResponseDTO>(
-                    $"{Constants.CACHE_NEWS}_{slug}",
-                    It.IsAny<Func<Task<NewResponseDTO>>>(),
-                    TimeSpan.FromMinutes(5)),
-                Times.Once);
-        }
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCacheList(
+                Constants.CACHE_NEWS,
+                request,
+                It.IsAny<Func<Task<PageResponseDto<NewMinimalResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .ReturnsAsync(expected);
 
-        [Fact]
-        public async Task GetNews_Should_Return_Cached_List()
-        {
-            // Arrange
-            var request = _fixture.Create<SearchSortRequestDTO>();
+        // Act
+        var result = await _service.GetNews(request);
 
-            var expected = _fixture.Create<PageResponseDTO<NewMinimalResponseDTO>>();
+        // Assert
+        result.Should().BeEquivalentTo(expected);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCacheList<PageResponseDTO<NewMinimalResponseDTO>>(
-                    Constants.CACHE_NEWS,
-                    request,
-                    It.IsAny<Func<Task<PageResponseDTO<NewMinimalResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ReturnsAsync(expected);
+        _memoryCachesServiceMock.Verify(
+            x => x.GetOrCreateCacheList(
+                Constants.CACHE_NEWS,
+                request,
+                It.IsAny<Func<Task<PageResponseDto<NewMinimalResponseDto>>>>(),
+                TimeSpan.FromMinutes(5)),
+            Times.Once);
+    }
 
-            // Act
-            var result = await _service.GetNews(request);
+    [Fact]
+    public async Task GetRecommendedNews_Should_Return_Cached_List()
+    {
+        // Arrange
+        var slug = "test-news";
 
-            // Assert
-            result.Should().BeEquivalentTo(expected);
+        var expected = _fixture.Create<List<NewMinimalResponseDto>>();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.GetOrCreateCacheList<PageResponseDTO<NewMinimalResponseDTO>>(
-                    Constants.CACHE_NEWS,
-                    request,
-                    It.IsAny<Func<Task<PageResponseDTO<NewMinimalResponseDTO>>>>(),
-                    TimeSpan.FromMinutes(5)),
-                Times.Once);
-        }
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCacheList(
+                $"{Constants.CACHE_NEWS}-{slug}",
+                slug,
+                It.IsAny<Func<Task<List<NewMinimalResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .ReturnsAsync(expected);
 
-        [Fact]
-        public async Task GetRecommendedNews_Should_Return_Cached_List()
-        {
-            // Arrange
-            var slug = "test-news";
+        // Act
+        var result = await _service.GetRecommendedNews(slug);
 
-            var expected = _fixture.Create<List<NewMinimalResponseDTO>>();
+        // Assert
+        result.Should().BeEquivalentTo(expected);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCacheList<List<NewMinimalResponseDTO>>(
-                    $"{Constants.CACHE_NEWS}-{slug}",
-                    slug,
-                    It.IsAny<Func<Task<List<NewMinimalResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ReturnsAsync(expected);
+        _memoryCachesServiceMock.Verify(
+            x => x.GetOrCreateCacheList(
+                $"{Constants.CACHE_NEWS}-{slug}",
+                slug,
+                It.IsAny<Func<Task<List<NewMinimalResponseDto>>>>(),
+                TimeSpan.FromMinutes(5)),
+            Times.Once);
+    }
 
-            // Act
-            var result = await _service.GetRecommendedNews(slug);
+    [Fact]
+    public async Task GetNew_Should_Call_Repository_Through_Cache_Factory()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            // Assert
-            result.Should().BeEquivalentTo(expected);
+        var expected = _fixture.Create<NewResponseDto>();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.GetOrCreateCacheList<List<NewMinimalResponseDTO>>(
-                    $"{Constants.CACHE_NEWS}-{slug}",
-                    slug,
-                    It.IsAny<Func<Task<List<NewMinimalResponseDTO>>>>(),
-                    TimeSpan.FromMinutes(5)),
-                Times.Once);
-        }
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                It.IsAny<string>(),
+                It.IsAny<Func<Task<NewResponseDto>>>(),
+                It.IsAny<TimeSpan>()))
+            .Returns<string, Func<Task<NewResponseDto>>, TimeSpan>(
+                async (_, create, _) => await create());
 
-        [Fact]
-        public async Task GetNew_Should_Call_Repository_Through_Cache_Factory()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _newsGetterRepositoryMock
+            .Setup(x => x.GetNew(id))
+            .ReturnsAsync(expected);
 
-            var expected = _fixture.Create<NewResponseDTO>();
+        // Act
+        var result = await _service.GetNew(id);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<NewResponseDTO>(
-                    It.IsAny<string>(),
-                    It.IsAny<Func<Task<NewResponseDTO>>>(),
-                    It.IsAny<TimeSpan>()))
-                .Returns<string, Func<Task<NewResponseDTO>>, TimeSpan>(
-                    async (_, create, _) => await create());
+        // Assert
+        result.Should().BeEquivalentTo(expected);
 
-            _newsGetterRepositoryMock
-                .Setup(x => x.GetNew(id))
-                .ReturnsAsync(expected);
-
-            // Act
-            var result = await _service.GetNew(id);
-
-            // Assert
-            result.Should().BeEquivalentTo(expected);
-
-            _newsGetterRepositoryMock.Verify(
-                x => x.GetNew(id),
-                Times.Once);
-        }
+        _newsGetterRepositoryMock.Verify(
+            x => x.GetNew(id),
+            Times.Once);
     }
 }

@@ -10,174 +10,171 @@ using AsadaLisboaBackend.Models.DTOs.Contact;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 
-namespace AsadaLisboaBackend.Tests.Contacts
+namespace AsadaLisboaBackend.Tests.Contacts;
+
+public class ContactsUpdaterServiceTest
 {
-    public class ContactsUpdaterServiceTest
+    private readonly Fixture _fixture;
+    private readonly ContactsUpdaterService _service;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<ILogger<ContactsUpdaterService>> _loggerMock;
+    private readonly Mock<IContactsUpdaterRepository> _contactsUpdaterRepositoryMock;
+
+    public ContactsUpdaterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IContactsUpdaterRepository> _contactsUpdaterRepositoryMock;
-        private readonly Mock<ILogger<ContactsUpdaterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly ContactsUpdaterService _service;
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public ContactsUpdaterServiceTest()
-        {
-            _fixture = new Fixture();
+        _contactsUpdaterRepositoryMock = new Mock<IContactsUpdaterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _loggerMock = new Mock<ILogger<ContactsUpdaterService>>();
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        _memoryCachesServiceMock =new Mock<IMemoryCachesService>();
 
-            _contactsUpdaterRepositoryMock = new Mock<IContactsUpdaterRepository>();
+        _service = new ContactsUpdaterService(
+            _contactsUpdaterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _loggerMock = new Mock<ILogger<ContactsUpdaterService>>();
+    [Fact]
+    public async Task UpdateContact_Should_Update_Contact_Successfully()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock =new Mock<IMemoryCachesService>();
+        var request = _fixture.Build<ContactRequestDto>()
+            .With(x => x.Order, 1)
+            .With(x => x.Value, "test@gmail.com")
+            .With(x => x.ContactType, "Email")
+            .Create();
 
-            _service = new ContactsUpdaterService(
-                _contactsUpdaterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        var updatedContact = _fixture.Build<Contact>()
+            .With(x => x.Id, id)
+            .With(x => x.Order, request.Order)
+            .With(x => x.Value, request.Value)
+            .With(x => x.ContactType, request.ContactType)
+            .Create();
 
-        [Fact]
-        public async Task UpdateContact_Should_Update_Contact_Successfully()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _contactsUpdaterRepositoryMock
+            .Setup(x => x.UpdateContact(id, request))
+            .ReturnsAsync(updatedContact);
 
-            var request = _fixture.Build<ContactRequestDTO>()
-                .With(x => x.Order, 1)
-                .With(x => x.Value, "test@gmail.com")
-                .With(x => x.ContactType, "Email")
-                .Create();
+        // Act
+        var result = await _service.UpdateContact(id, request);
 
-            var updatedContact = _fixture.Build<Contact>()
-                .With(x => x.Id, id)
-                .With(x => x.Order, request.Order)
-                .With(x => x.Value, request.Value)
-                .With(x => x.ContactType, request.ContactType)
-                .Create();
+        // Assert
+        result.Should().NotBeNull();
 
-            _contactsUpdaterRepositoryMock
-                .Setup(x => x.UpdateContact(id, request))
-                .ReturnsAsync(updatedContact);
+        result.Order.Should().Be(request.Order);
+        result.Value.Should().Be(request.Value);
+        result.ContactType.Should().Be(request.ContactType);
 
-            // Act
-            var result = await _service.UpdateContact(id, request);
+        _contactsUpdaterRepositoryMock.Verify(
+            x => x.UpdateContact(id, request),
+            Times.Once);
 
-            // Assert
-            result.Should().NotBeNull();
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(Constants.CACHE_CONTACTS, id),
+            Times.Once);
 
-            result.Order.Should().Be(request.Order);
-            result.Value.Should().Be(request.Value);
-            result.ContactType.Should().Be(request.ContactType);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(Constants.CACHE_CONTACTS),
+            Times.Once);
+    }
 
-            _contactsUpdaterRepositoryMock.Verify(
-                x => x.UpdateContact(id, request),
-                Times.Once);
+    [Fact]
+    public async Task UpdateContact_Should_Throw_When_Contact_Not_Found()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(Constants.CACHE_CONTACTS, id),
-                Times.Once);
+        var request = _fixture.Create<ContactRequestDto>();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(Constants.CACHE_CONTACTS),
-                Times.Once);
-        }
+        _contactsUpdaterRepositoryMock
+            .Setup(x => x.UpdateContact(id, request))
+            .ReturnsAsync((Contact)null!);
 
-        [Fact]
-        public async Task UpdateContact_Should_Throw_When_Contact_Not_Found()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () => await _service.UpdateContact(id, request);
 
-            var request = _fixture.Create<ContactRequestDTO>();
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage($"No se encontró contacto para actualizar con Id: {id}");
 
-            _contactsUpdaterRepositoryMock
-                .Setup(x => x.UpdateContact(id, request))
-                .ReturnsAsync((Contact)null!);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(It.IsAny<string>(), It.IsAny<Guid>()),
+            Times.Never);
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateContact(id, request);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(It.IsAny<string>()),
+            Times.Never);
+    }
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage($"No se encontró contacto para actualizar con Id: {id}");
+    [Fact]
+    public async Task UpdateContact_Should_Call_Logger_When_Success()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(It.IsAny<string>(), It.IsAny<Guid>()),
-                Times.Never);
+        var request = _fixture.Create<ContactRequestDto>();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(It.IsAny<string>()),
-                Times.Never);
-        }
+        var updatedContact = _fixture.Build<Contact>()
+            .With(x => x.Id, id)
+            .Create();
 
-        [Fact]
-        public async Task UpdateContact_Should_Call_Logger_When_Success()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _contactsUpdaterRepositoryMock
+            .Setup(x => x.UpdateContact(id, request))
+            .ReturnsAsync(updatedContact);
 
-            var request = _fixture.Create<ContactRequestDTO>();
+        // Act
+        await _service.UpdateContact(id, request);
 
-            var updatedContact = _fixture.Build<Contact>()
-                .With(x => x.Id, id)
-                .Create();
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
+    }
 
-            _contactsUpdaterRepositoryMock
-                .Setup(x => x.UpdateContact(id, request))
-                .ReturnsAsync(updatedContact);
+    [Fact]
+    public async Task UpdateContact_Should_Call_Logger_When_NotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            // Act
-            await _service.UpdateContact(id, request);
+        var request = _fixture.Create<ContactRequestDto>();
 
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.AtLeastOnce);
-        }
+        _contactsUpdaterRepositoryMock
+            .Setup(x => x.UpdateContact(id, request))
+            .ReturnsAsync((Contact)null!);
 
-        [Fact]
-        public async Task UpdateContact_Should_Call_Logger_When_NotFound()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () => await _service.UpdateContact(id, request);
 
-            var request = _fixture.Create<ContactRequestDTO>();
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>();
 
-            _contactsUpdaterRepositoryMock
-                .Setup(x => x.UpdateContact(id, request))
-                .ReturnsAsync((Contact)null!);
-
-            // Act
-            Func<Task> act = async () => await _service.UpdateContact(id, request);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>();
-
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.AtLeastOnce);
-        }
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
     }
 }

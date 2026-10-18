@@ -1,51 +1,31 @@
 ﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Models;
-using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.RepositoryContracts.News;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.News
+namespace AsadaLisboaBackend.Services.News;
+
+public class NewsDeleterService(
+    INewsDeleterRepository newsDeleterRepository,
+    IEditorsDeleterService editorsDeleterService,
+    INewsGetterRepository newsGetterRepository,
+    ILogger<NewsDeleterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : INewsDeleterService
 {
-    public class NewsDeleterService : INewsDeleterService
+    public async Task DeleteNew(Guid id)
     {
-        private readonly ILogger<NewsDeleterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly INewsGetterRepository _newsGetterRepository;
-        private readonly INewsDeleterRepository _newsDeleterRepository;
-        private readonly IEditorsDeleterService _editorsDeleterService;
+        var existingNew = await newsGetterRepository.GetNew(id);
 
-        public NewsDeleterService(INewsDeleterRepository newsDeleterRepository, IEditorsDeleterService editorsDeleterService, INewsGetterRepository newsGetterRepository, ILogger<NewsDeleterService> logger, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _newsGetterRepository = newsGetterRepository;
-            _editorsDeleterService = editorsDeleterService;
-            _newsDeleterRepository = newsDeleterRepository;
-        }
+        await editorsDeleterService.DeletePrincipalImage(existingNew.FileName);
+        await editorsDeleterService.DeleteContentImages(existingNew.Description);
+        await newsDeleterRepository.DeleteNew(id);
 
-        public async Task DeleteNew(Guid id)
-        {
-            var existingNew = await _newsGetterRepository.GetNew(id);
+        memoryCachesService.RemoveById(Constants.CACHE_NEWS, existingNew.Id);
+        memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
 
-            if (existingNew is null)
-            {
-                _logger.LogError("Noticia con id: {Id} no encontrada.", id);
-                throw new NotFoundException("La noticia no fue encontrada.");
-            }
-
-            await _editorsDeleterService.DeletePrincipalImage(existingNew.FileName);
-
-            await _editorsDeleterService.DeleteContentImages(existingNew.Description);
-
-            await _newsDeleterRepository.DeleteNew(id);
-
-            _memoryCachesService.RemoveById(Constants.CACHE_NEWS, existingNew.Id);
-            _memoryCachesService.ChangeVersion(Constants.CACHE_NEWS);
-
-            _logger.LogInformation("Noticia con id {Id} eliminada exitosamente.", id);
-        }
+        logger.LogInformation("Noticia con id {Id} eliminada exitosamente.", id);
     }
 }

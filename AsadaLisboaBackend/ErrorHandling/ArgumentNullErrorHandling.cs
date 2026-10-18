@@ -1,41 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class ArgumentNullErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<ArgumentNullErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class ArgumentNullErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<ArgumentNullErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
+        if (exception is not ArgumentNullException)
+            return false;
 
-        public ArgumentNullErrorHandling(IProblemDetailsService problemDetailsService, ILogger<ArgumentNullErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Error al enviar un valor nulo.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            if (exception is not ArgumentNullException argumentNullException)
-                return false;
-
-            _logger.LogError(exception, "Error Global - Error al enviar un valor nulo.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Detail = exception.Message,
-                    Title = "Nulo en el valor enviado",
-                    Status = StatusCodes.Status400BadRequest,
-                }
-            });
+                Detail = exception.Message,
+                Title = "Nulo en el valor enviado",
+                Status = StatusCodes.Status400BadRequest,
+            }
+        });
 
-            return true;
-        }
+        return true;
     }
 }

@@ -3,56 +3,48 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
-namespace AsadaLisboaBackend.Repositories.Documents
+namespace AsadaLisboaBackend.Repositories.Documents;
+
+public class DocumentsUpdaterRepository(ApplicationDbContext context) : IDocumentsUpdaterRepository
 {
-    public class DocumentsUpdaterRepository : IDocumentsUpdaterRepository
+    public async Task<Models.Document> UpdateDocument(Models.Document document)
     {
-        private readonly ApplicationDbContext _context;
+        var existingDocument = await context.Documents
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .Include(d => d.DocumentType)
+            .FirstAsync(d => d.Id == document.Id);
 
-        public DocumentsUpdaterRepository(ApplicationDbContext context)
+        existingDocument.Url = document.Url;
+        existingDocument.Slug = document.Slug;
+        existingDocument.Title = document.Title;
+        existingDocument.StatusId = document.StatusId;
+        existingDocument.FileSize = document.FileSize;
+        existingDocument.FilePath = document.FilePath;
+        existingDocument.FileName = document.FileName;
+        existingDocument.Description = document.Description;
+        existingDocument.DocumentTypeId = document.DocumentTypeId;
+
+        var categoryIds = document.Categories
+            .Select(c => c.Id)
+            .ToList();
+
+        var categoriesFromDb = await context.Categories
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToListAsync();
+
+        existingDocument.Categories.Clear();
+        existingDocument.Categories = categoriesFromDb;
+
+        try
         {
-            _context = context;
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new UpdateObjectException("Error al modificar el documento.", ex);
         }
 
-        public async Task<Models.Document> UpdateDocument(Models.Document document)
-        {
-            var existingDocument = await _context.Documents
-                .Include(d => d.Status)
-                .Include(d => d.Categories)
-                .Include(d => d.DocumentType)
-                .FirstAsync(d => d.Id == document.Id);
-
-            existingDocument.Url = document.Url;
-            existingDocument.Slug = document.Slug;
-            existingDocument.Title = document.Title;
-            existingDocument.StatusId = document.StatusId;
-            existingDocument.FileSize = document.FileSize;
-            existingDocument.FilePath = document.FilePath;
-            existingDocument.FileName = document.FileName;
-            existingDocument.Description = document.Description;
-            existingDocument.DocumentTypeId = document.DocumentTypeId;
-
-            var categoryIds = document.Categories
-                .Select(c => c.Id)
-                .ToList();
-
-            var categoriesFromDb = await _context.Categories
-                .Where(c => categoryIds.Contains(c.Id))
-                .ToListAsync();
-
-            existingDocument.Categories.Clear();
-            existingDocument.Categories = categoriesFromDb;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new UpdateObjectException("Error al modificar el documento.", ex);
-            }
-
-            return existingDocument;
-        }
+        return existingDocument;
     }
 }

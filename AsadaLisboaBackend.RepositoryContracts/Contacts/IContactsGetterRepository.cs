@@ -1,10 +1,9 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Contact;
 
-namespace AsadaLisboaBackend.RepositoryContracts.Contacts
+namespace AsadaLisboaBackend.RepositoryContracts.Contacts;
+
+public interface IContactsGetterRepository
 {
-    public interface IContactsGetterRepository
-    {
-        public Task<PageResponseDTO<ContactResponseDTO>> GetContacts(SearchSortRequestDTO searchSortRequestDTO);
-    }
+    public Task<PageResponseDto<ContactResponseDto>> GetContacts(SearchSortRequestDto searchSortRequestDto);
 }

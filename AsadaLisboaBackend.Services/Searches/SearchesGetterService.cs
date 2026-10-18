@@ -3,93 +3,85 @@ using AsadaLisboaBackend.Models.DTOs.Search;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.ServiceContracts.Searches;
 
-namespace AsadaLisboaBackend.Services.Searches
+namespace AsadaLisboaBackend.Services.Searches;
+
+public class SearchesGetterService(ApplicationDbContext context) : ISearchesGetterService
 {
-    public class SearchesGetterService : ISearchesGetterService
+    public async Task<List<SearchResponseDto>> Search(string query)
     {
-        private readonly ApplicationDbContext _context;
+        query = query.Trim();
 
-        public SearchesGetterService(ApplicationDbContext context)
+        if (query.Trim().Length < 2)
         {
-            _context = context;
+            return [];
         }
 
-        public async Task<List<SearchResponseDTO>> Search(string query)
-        {
-            query = query.Trim();
-
-            if (query.Trim().Length < 2)
+        var news = await context.News
+            .AsNoTracking()
+            .Include(x => x.Status)
+            .Where(x =>
+                x.Status != null && x.Status.Name == "Publicado" &&
+                (
+                    EF.Functions.ILike(x.Title, $"%{query}%") ||
+                    EF.Functions.ILike(x.Description, $"%{query}%")
+                )
+            )
+            .OrderByDescending(x => x.PublicationDate)
+            .Take(6)
+            .Select(x => new SearchResponseDto
             {
-                return new List<SearchResponseDTO>();
-            }
+                Id = x.Id,
+                Title = x.Title,
+                Type = "Noticia",
+                Url = $"/noticia/{x.Slug}",
+                Description = x.Description
+            })
+            .ToListAsync();
 
-            var news = await _context.News
-                .AsNoTracking()
-                .Include(x => x.Status)
-                .Where(x =>
-                    x.Status != null && x.Status.Name == "Publicado" &&
-                    (
-                        EF.Functions.ILike(x.Title, $"%{query}%") ||
-                        EF.Functions.ILike(x.Description, $"%{query}%")
-                    )
+        var documents = await context.Documents
+            .AsNoTracking()
+            .Include(x => x.Status)
+            .Where(x =>
+                x.Status != null && x.Status.Name == "Publicado" &&
+                (
+                    EF.Functions.ILike(x.Title, $"%{query}%") ||
+                    EF.Functions.ILike(x.Description, $"%{query}%")
                 )
-                .OrderByDescending(x => x.PublicationDate)
-                .Take(6)
-                .Select(x => new SearchResponseDTO
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                    Type = "Noticia",
-                    Url = $"/noticia/{x.Slug}",
-                    Description = x.Description
-                })
-                .ToListAsync();
+            )
+            .OrderByDescending(x => x.PublicationDate)
+            .Take(6)
+            .Select(x => new SearchResponseDto
+            {
+                Id = x.Id,
+                Url = x.Url,
+                Title = x.Title,
+                Type = "Documento",
+                Description = x.Description
+            })
+            .ToListAsync();
 
-            var documents = await _context.Documents
-                .AsNoTracking()
-                .Include(x => x.Status)
-                .Where(x =>
-                    x.Status != null && x.Status.Name == "Publicado" &&
-                    (
-                        EF.Functions.ILike(x.Title, $"%{query}%") ||
-                        EF.Functions.ILike(x.Description, $"%{query}%")
-                    )
+        var images = await context.Images
+            .AsNoTracking()
+            .Include(x => x.Status)
+            .Where(x =>
+                x.Status != null && x.Status.Name == "Publicado" &&
+                (
+                    EF.Functions.ILike(x.Title, $"%{query}%") ||
+                    EF.Functions.ILike(x.Description, $"%{query}%")
                 )
-                .OrderByDescending(x => x.PublicationDate)
-                .Take(6)
-                .Select(x => new SearchResponseDTO
-                {
-                    Id = x.Id,
-                    Url = x.Url,
-                    Title = x.Title,
-                    Type = "Documento",
-                    Description = x.Description
-                })
-                .ToListAsync();
+            )
+            .OrderByDescending(x => x.PublicationDate)
+            .Take(6)
+            .Select(x => new SearchResponseDto
+            {
+                Id = x.Id,
+                Url = x.Url,
+                Type = "Imagen",
+                Title = x.Title,
+                Description = x.Description
+            })
+            .ToListAsync();
 
-            var images = await _context.Images
-                .AsNoTracking()
-                .Include(x => x.Status)
-                .Where(x =>
-                    x.Status != null && x.Status.Name == "Publicado" &&
-                    (
-                        EF.Functions.ILike(x.Title, $"%{query}%") ||
-                        EF.Functions.ILike(x.Description, $"%{query}%")
-                    )
-                )
-                .OrderByDescending(x => x.PublicationDate)
-                .Take(6)
-                .Select(x => new SearchResponseDTO
-                {
-                    Id = x.Id,
-                    Url = x.Url,
-                    Type = "Imagen",
-                    Title = x.Title,
-                    Description = x.Description
-                })
-                .ToListAsync();
-
-            return [.. news,.. documents,.. images];
-        }
+        return [.. news,.. documents,.. images];
     }
 }

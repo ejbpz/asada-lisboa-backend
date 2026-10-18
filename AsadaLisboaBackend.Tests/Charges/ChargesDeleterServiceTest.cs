@@ -10,193 +10,191 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
 
-namespace AsadaLisboaBackend.Tests.Charges
+namespace AsadaLisboaBackend.Tests.Charges;
+
+public class ChargesDeleterServiceTest
 {
-    public class ChargesDeleterServiceTest
+    private readonly Fixture _fixture;
+    private readonly Mock<ILogger<ChargesDeleterService>> _loggerMock;
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<IChargesDeleterRepository> _chargesDeleterRepositoryMock;
+
+    private readonly ChargesDeleterService _service;
+
+    public ChargesDeleterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IChargesDeleterRepository> _chargesDeleterRepositoryMock;
-        private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
-        private readonly Mock<ILogger<ChargesDeleterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly ChargesDeleterService _service;
+        _fixture.Behaviors
+            .Add(new OmitOnRecursionBehavior());
 
-        public ChargesDeleterServiceTest()
-        {
-            _fixture = new Fixture();
+        _chargesDeleterRepositoryMock =
+            new Mock<IChargesDeleterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        var store = new Mock<IUserStore<ApplicationUser>>();
 
-            _fixture.Behaviors
-                .Add(new OmitOnRecursionBehavior());
+        _userManagerMock =
+            new Mock<UserManager<ApplicationUser>>(
+                store.Object,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!);
 
-            _chargesDeleterRepositoryMock =
-                new Mock<IChargesDeleterRepository>();
+        _loggerMock =
+            new Mock<ILogger<ChargesDeleterService>>();
 
-            var store = new Mock<IUserStore<ApplicationUser>>();
+        _memoryCachesServiceMock =
+            new Mock<IMemoryCachesService>();
 
-            _userManagerMock =
-                new Mock<UserManager<ApplicationUser>>(
-                    store.Object,
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    null!,
-                    null!);
+        _service = new ChargesDeleterService(
+            _chargesDeleterRepositoryMock.Object,
+            _userManagerMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _loggerMock =
-                new Mock<ILogger<ChargesDeleterService>>();
+    [Fact]
+    public async Task DeleteCharge_Should_Delete_Charge_Successfully()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock =
-                new Mock<IMemoryCachesService>();
+        var user = _fixture.Build<ApplicationUser>()
+            .With(x => x.Id, Guid.Empty)
+            .Create();
 
-            _service = new ChargesDeleterService(
-                _chargesDeleterRepositoryMock.Object,
-                _userManagerMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(id.ToString()))
+            .ReturnsAsync(user);
 
-        [Fact]
-        public async Task DeleteCharge_Should_Delete_Charge_Successfully()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _chargesDeleterRepositoryMock
+            .Setup(x => x.DeleteCharge(id))
+            .Returns(Task.CompletedTask);
 
-            var user = _fixture.Build<ApplicationUser>()
-                .With(x => x.Id, Guid.Empty)
-                .Create();
+        // Act
+        await _service.DeleteCharge(id);
 
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(id.ToString()))
-                .ReturnsAsync(user);
+        // Assert
+        _chargesDeleterRepositoryMock.Verify(
+            x => x.DeleteCharge(id),
+            Times.Once);
 
-            _chargesDeleterRepositoryMock
-                .Setup(x => x.DeleteCharge(id))
-                .Returns(Task.CompletedTask);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                Constants.CACHE_CHARGES,
+                id),
+            Times.Once);
 
-            // Act
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                Constants.CACHE_CHARGES),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteCharge_Should_Throw_NotFoundException_When_User_Does_Not_Exist()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(id.ToString()))
+            .ReturnsAsync((ApplicationUser?)null);
+
+        // Act
+        Func<Task> act = async () =>
             await _service.DeleteCharge(id);
 
-            // Assert
-            _chargesDeleterRepositoryMock.Verify(
-                x => x.DeleteCharge(id),
-                Times.Once);
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Usuario inexistente.");
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    Constants.CACHE_CHARGES,
-                    id),
-                Times.Once);
+        _chargesDeleterRepositoryMock.Verify(
+            x => x.DeleteCharge(It.IsAny<Guid>()),
+            Times.Never);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    Constants.CACHE_CHARGES),
-                Times.Once);
-        }
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                It.IsAny<string>(),
+                It.IsAny<Guid>()),
+            Times.Never);
 
-        [Fact]
-        public async Task DeleteCharge_Should_Throw_NotFoundException_When_User_Does_Not_Exist()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                It.IsAny<string>()),
+            Times.Never);
+    }
 
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(id.ToString()))
-                .ReturnsAsync((ApplicationUser?)null);
+    [Fact]
+    public async Task DeleteCharge_Should_Call_Logger_Information()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.DeleteCharge(id);
+        var user = _fixture.Build<ApplicationUser>()
+            .With(x => x.Id, Guid.Empty)
+            .Create();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("Usuario inexistente.");
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(id.ToString()))
+            .ReturnsAsync(user);
 
-            _chargesDeleterRepositoryMock.Verify(
-                x => x.DeleteCharge(It.IsAny<Guid>()),
-                Times.Never);
+        _chargesDeleterRepositoryMock
+            .Setup(x => x.DeleteCharge(id))
+            .Returns(Task.CompletedTask);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>()),
-                Times.Never);
+        // Act
+        await _service.DeleteCharge(id);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    It.IsAny<string>()),
-                Times.Never);
-        }
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 
-        [Fact]
-        public async Task DeleteCharge_Should_Call_Logger_Information()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+    [Fact]
+    public async Task DeleteCharge_Should_Call_Logger_Warning_When_User_Not_Found()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            var user = _fixture.Build<ApplicationUser>()
-                .With(x => x.Id, Guid.Empty)
-                .Create();
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(id.ToString()))
+            .ReturnsAsync((ApplicationUser?)null);
 
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(id.ToString()))
-                .ReturnsAsync(user);
-
-            _chargesDeleterRepositoryMock
-                .Setup(x => x.DeleteCharge(id))
-                .Returns(Task.CompletedTask);
-
-            // Act
+        // Act
+        Func<Task> act = async () =>
             await _service.DeleteCharge(id);
 
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        await act.Should()
+            .ThrowAsync<NotFoundException>();
 
-        [Fact]
-        public async Task DeleteCharge_Should_Call_Logger_Warning_When_User_Not_Found()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
-
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(id.ToString()))
-                .ReturnsAsync((ApplicationUser?)null);
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.DeleteCharge(id);
-
-            await act.Should()
-                .ThrowAsync<NotFoundException>();
-
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 }

@@ -1,29 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AsadaLisboaBackend.Models.DatabaseContext;
 
-namespace AsadaLisboaBackend.Seeders
+namespace AsadaLisboaBackend.Seeders;
+
+/// <summary>
+/// Seed the database with initial data for the application.
+/// </summary>
+public static class ApplicationDbSeeder
 {
     /// <summary>
-    /// Seed the database with initial data for the application.
+    /// Seeds the database with initial data.
     /// </summary>
-    public static class ApplicationDbSeeder
+    /// <param name="services">The service provider.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public static async Task SeedAsync(IServiceProvider services)
     {
-        /// <summary>
-        /// Seeds the database with initial data.
-        /// </summary>
-        /// <param name="services">The service provider.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public static async Task SeedAsync(IServiceProvider services)
-        {
-            using var scope = services.CreateScope();
+        using var scope = services.CreateScope();
 
-            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            await context.Database.MigrateAsync();
+        await context.Database.MigrateAsync();
 
-            await DocumentSeeder.SeedAsync(context);
-            await ImageSeeder.SeedAsync(context);
-            await NewSeeder.SeedAsync(context);
-        }
+        await DocumentSeeder.SeedAsync(context);
+        await ImageSeeder.SeedAsync(context);
+        await NewSeeder.SeedAsync(context);
     }
 }

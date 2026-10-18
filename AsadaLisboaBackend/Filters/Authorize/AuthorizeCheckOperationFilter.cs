@@ -3,37 +3,37 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace AsadaLisboaBackend.Filters.Authorize
+namespace AsadaLisboaBackend.Filters.Authorize;
+
+/// <summary>
+/// Filter to check authentication and authorization into Swagger.
+/// </summary>
+public class AuthorizeCheckOperationFilter : IOperationFilter
 {
     /// <summary>
-    /// Filter to check authentication and authorization into Swagger.
+    /// Apply the Operation Filter into Swagger.
     /// </summary>
-    public class AuthorizeCheckOperationFilter : IOperationFilter
+    /// <param name="operation">Operation from OpenApi to apply in Swagger.</param>
+    /// <param name="context">Context to apply the operation.</param>
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        /// <summary>
-        /// Apply the Operation Filter into Swagger.
-        /// </summary>
-        /// <param name="operation">Operation from OpenApi to apply in Swagger.</param>
-        /// <param name="context">Context to apply the operation.</param>
-        public void Apply(OpenApiOperation operation, OperationFilterContext context)
-        {
-            var hasAuthorizeAttribute =
-                context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() == true
-                || context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
+        var hasAuthorizeAttribute =
+            context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() == true
+            || context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
-            var hasAuthorizeFilter =
-                context.ApiDescription.ActionDescriptor.FilterDescriptors
-                    .Any(f => f.Filter is AuthorizeFilter);
+        var hasAuthorizeFilter =
+            context.ApiDescription.ActionDescriptor.FilterDescriptors
+                .Any(f => f.Filter is AuthorizeFilter);
 
-            var hasAllowAnonymous =
-                context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
+        var hasAllowAnonymous =
+            context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
 
-            if ((!hasAuthorizeAttribute && !hasAuthorizeFilter) || hasAllowAnonymous)
-                return;
+        if ((!hasAuthorizeAttribute && !hasAuthorizeFilter) || hasAllowAnonymous)
+            return;
 
-            operation.Security ??= new List<OpenApiSecurityRequirement>();
+        operation.Security ??= new List<OpenApiSecurityRequirement>();
 
-            operation.Security.Add(new OpenApiSecurityRequirement
+        operation.Security.Add(new OpenApiSecurityRequirement
         {
             {
                 new OpenApiSecurityScheme
@@ -47,6 +47,5 @@ namespace AsadaLisboaBackend.Filters.Authorize
                 new List<string>()
             }
         });
-        }
     }
 }

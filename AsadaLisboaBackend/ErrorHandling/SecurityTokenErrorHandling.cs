@@ -2,41 +2,34 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Diagnostics;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class SecurityTokenErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<SecurityTokenErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class SecurityTokenErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<SecurityTokenErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
+        if (exception is not SecurityTokenException) 
+            return false;
 
-        public SecurityTokenErrorHandling(IProblemDetailsService problemDetailsService, ILogger<SecurityTokenErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Error al validar token de acceso.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            if (exception is not SecurityTokenException securityTokenException) 
-                return false;
-
-            _logger.LogError(exception, "Error Global - Error al validar token de acceso.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Detail = exception.Message,
-                    Title = "Error validación de token",
-                    Status = StatusCodes.Status401Unauthorized,
-                }
-            });
+                Detail = exception.Message,
+                Title = "Error validación de token",
+                Status = StatusCodes.Status401Unauthorized,
+            }
+        });
 
-            return true;
-        }
+        return true;
     }
 }

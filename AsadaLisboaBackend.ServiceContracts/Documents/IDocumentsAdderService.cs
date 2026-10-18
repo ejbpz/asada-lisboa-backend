@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Document;
 
-namespace AsadaLisboaBackend.ServiceContracts.Documents
+namespace AsadaLisboaBackend.ServiceContracts.Documents;
+
+public interface IDocumentsAdderService
 {
-    public interface IDocumentsAdderService
-    {
-        public Task<DocumentResponseDTO> CreateDocument(DocumentRequestDTO documentRequestDTO);
-    }
+    public Task<DocumentResponseDto> CreateDocument(DocumentRequestDto documentRequestDto);
 }

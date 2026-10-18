@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.Enums;
 
-namespace AsadaLisboaBackend.ServiceContracts.Statuses
+namespace AsadaLisboaBackend.ServiceContracts.Statuses;
+
+public interface IStatusesUpdaterService
 {
-    public interface IStatusesUpdaterService
-    {
-        public Task ChangeStatus(Guid objectId, Guid statusId, ObjectTypeEnum objectType);
-    }
+    public Task ChangeStatus(Guid objectId, Guid statusId, ObjectTypeEnum objectType);
 }

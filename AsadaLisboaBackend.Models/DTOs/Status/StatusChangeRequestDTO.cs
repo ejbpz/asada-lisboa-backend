@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AsadaLisboaBackend.Models.DTOs.Status
+namespace AsadaLisboaBackend.Models.DTOs.Status;
+
+public class StatusChangeRequestDto
 {
-    public class StatusChangeRequestDTO
-    {
-        [Required(ErrorMessage = "Debe seleccionar un estado.")]
-        public Guid StatusId { get; set; }
-    }
+    [Required(ErrorMessage = "Debe seleccionar un estado.")]
+    public Guid StatusId { get; set; }
 }

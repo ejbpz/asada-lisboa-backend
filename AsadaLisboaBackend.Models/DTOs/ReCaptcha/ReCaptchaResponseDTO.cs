@@ -1,8 +1,7 @@
-﻿namespace AsadaLisboaBackend.Models.DTOs.ReCaptcha
+﻿namespace AsadaLisboaBackend.Models.DTOs.ReCaptcha;
+
+public class ReCaptchaResponseDto
 {
-    public class ReCaptchaResponseDTO
-    {
-        public bool Success { get; set; }
-        public List<string> ErrorCodes { get; set; } = new List<string>();
-    }
+    public bool Success { get; set; }
+    public List<string> ErrorCodes { get; set; } = new List<string>();
 }

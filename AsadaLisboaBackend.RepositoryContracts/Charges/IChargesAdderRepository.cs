@@ -1,10 +1,9 @@
 ﻿using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.Charge;
 
-namespace AsadaLisboaBackend.RepositoryContracts.Charges
+namespace AsadaLisboaBackend.RepositoryContracts.Charges;
+
+public interface IChargesAdderRepository
 {
-    public interface IChargesAdderRepository
-    {
-        public Task<ChargeResponseDTO> CreateCharge(Charge charge);
-    }
+    public Task<ChargeResponseDto> CreateCharge(Charge charge);
 }

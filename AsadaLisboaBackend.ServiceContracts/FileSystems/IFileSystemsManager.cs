@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace AsadaLisboaBackend.ServiceContracts.FileSystems
+namespace AsadaLisboaBackend.ServiceContracts.FileSystems;
+
+public interface IFileSystemsManager
 {
-    public interface IFileSystemsManager
-    {
-        Task<string> SaveAsync(IFormFile file, string folder, string? customName = null);
-        Task MoveAsync(string fileName, string sourceFolder, string destinationFolder);
-        Task DeleteAsync(string fileName, string folder);
-        bool Exists(string fileName, string folder);
-    }
+    Task<string> SaveAsync(IFormFile file, string folder, string? customName = null);
+    Task MoveAsync(string fileName, string sourceFolder, string destinationFolder);
+    Task DeleteAsync(string fileName, string folder);
+    bool Exists(string fileName, string folder);
 }

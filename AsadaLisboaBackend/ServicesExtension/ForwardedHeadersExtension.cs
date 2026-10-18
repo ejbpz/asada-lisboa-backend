@@ -1,31 +1,30 @@
 ﻿using Microsoft.AspNetCore.HttpOverrides;
 
-namespace AsadaLisboaBackend.ServicesExtension
+namespace AsadaLisboaBackend.ServicesExtension;
+
+/// <summary>
+/// Extension method to Forwarded Headers.
+/// </summary>
+public static class ForwardedHeadersExtension
 {
     /// <summary>
-    /// Extension method to Forwarded Headers.
+    /// Registers the Forwarded Headers middleware.
     /// </summary>
-    public static class ForwardedHeadersExtension
+    /// <param name="services">The IServiceCollection to add the middleware to.</param>
+    /// <returns>The IServiceCollection with the middleware added.</returns>
+    public static IServiceCollection ForwardedHeadersRegistration(this IServiceCollection services)
     {
-        /// <summary>
-        /// Registers the Forwarded Headers middleware.
-        /// </summary>
-        /// <param name="services">The IServiceCollection to add the middleware to.</param>
-        /// <returns>The IServiceCollection with the middleware added.</returns>
-        public static IServiceCollection ForwardedHeadersRegistration(this IServiceCollection services)
+        services.Configure<ForwardedHeadersOptions>(options =>
         {
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders =
-                    ForwardedHeaders.XForwardedFor |
-                    ForwardedHeaders.XForwardedHost |
-                    ForwardedHeaders.XForwardedProto;
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor |
+                ForwardedHeaders.XForwardedHost |
+                ForwardedHeaders.XForwardedProto;
 
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
-            });
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
 
-            return services;
-        }
+        return services;
     }
 }

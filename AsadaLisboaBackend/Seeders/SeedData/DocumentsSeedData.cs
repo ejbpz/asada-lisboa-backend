@@ -15,13 +15,11 @@ public static class DocumentsSeedData
     {
         var proyectosEjecutados = categories.First(x => x.Id == Guid.Parse("03E622EC-438B-49F3-8C53-3A3873651C16"));
         var estadosFinancieros = categories.First(x => x.Id == Guid.Parse("6DA5CF2D-E946-43ED-A092-D5B4C9282FFA"));
-        var tanquePrincipal = categories.First(x => x.Id == Guid.Parse("3643CD9F-99FE-4873-85F9-2A7B6B4DAC28"));
         var pozoPrincipal = categories.First(x => x.Id == Guid.Parse("F62ED863-70D4-446B-9088-10EFD6CB6C77"));
         var lineamientos = categories.First(x => x.Id == Guid.Parse("77607C99-2ED1-4B8E-89CC-CCC7C6344E53"));
         var sugerencias = categories.First(x => x.Id == Guid.Parse("2B3B492D-E243-4FC8-8217-03EA9998A201"));
         var solicitudes = categories.First(x => x.Id == Guid.Parse("BA84F8AC-EAD7-4CB3-83B4-77238DF95884"));
         var reglamentos = categories.First(x => x.Id == Guid.Parse("93CA9020-78FD-4080-8D57-469EB05D9DC3"));
-        var colindancia = categories.First(x => x.Id == Guid.Parse("783E94BC-4748-4223-A150-8892354B865B"));
         var hidrantes = categories.First(x => x.Id == Guid.Parse("560841FB-884B-45F6-9A09-18D4641B7AF5"));
         var convenios = categories.First(x => x.Id == Guid.Parse("5AA04636-CD02-4184-BBE0-603A2E785988"));
         var medidores = categories.First(x => x.Id == Guid.Parse("64C63C8A-20E2-487D-A365-815E20978E81"));
@@ -30,9 +28,9 @@ public static class DocumentsSeedData
         var estudios = categories.First(x => x.Id == Guid.Parse("B2DBCF36-FDDF-4752-B39D-B31F61E704A3"));
         var dudas = categories.First(x => x.Id == Guid.Parse("71B9C756-B148-4E0F-A5C7-09A8A7AA209E"));
 
-        return new()
-        {
-            new ()
+        return
+        [
+            new()
             {
                 Id = Guid.Parse("017b65c0-6a58-4e56-919f-6d2de0782738"),
                 Slug = "balance-general-2022-017b65",
@@ -50,7 +48,8 @@ public static class DocumentsSeedData
                     estadosFinancieros
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("0f911392-11a1-4985-8a7e-db4fe19ad029"),
                 Slug = "balance-general-2023-0f9113",
@@ -68,7 +67,8 @@ public static class DocumentsSeedData
                     estadosFinancieros
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("61d28a90-16fa-46cb-bea4-afa6becd20f7"),
                 Slug = "estudio-de-demanda-del-pozo-61d28a",
@@ -87,7 +87,8 @@ public static class DocumentsSeedData
                     estudios
                 }
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("4d0d90f5-45d1-4e7b-83b6-0f1b5f3ed934"),
                 Slug = "informe-ejecutivo-anual-contable-2022-4d0d90",
@@ -106,7 +107,8 @@ public static class DocumentsSeedData
                     estadosFinancieros
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("86300c54-6634-49b8-98fa-5c4522b1c1a8"),
                 Slug = "informe-ejecutivo-anual-contable-2023-86300c",
@@ -125,7 +127,8 @@ public static class DocumentsSeedData
                     estadosFinancieros
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("ad0bc67d-0b44-4f75-bb44-b6734269e9c7"),
                 Slug = "informe-fiscal-2022-ad0bc6",
@@ -144,13 +147,15 @@ public static class DocumentsSeedData
                     estadosFinancieros
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("bc52f228-10cf-4fff-9db7-497e02e716b2"),
                 Slug = "informe-fiscal-2023-asamblea-general-ordinaria-y-extraordinaria-bc52f2",
                 Title = "Informe Fiscal 2023 Asamblea General Ordinaria y Extraordinaria",
                 PublicationDate = DateTime.Parse("2023-12-01T00:00:00Z").ToUniversalTime(),
-                Description = "Informe fiscal presentado en la asamblea general ordinaria y extraordinaria del año 2023.",
+                Description =
+                    "Informe fiscal presentado en la asamblea general ordinaria y extraordinaria del año 2023.",
                 FileSize = 145649,
                 Url = "/documentos/informe-fiscal-2023-asamblea-general-ordinaria-y-extraordinaria-bc52f2.pdf",
                 FileName = "informe-fiscal-2023-asamblea-general-ordinaria-y-extraordinaria-bc52f2.pdf",
@@ -163,7 +168,8 @@ public static class DocumentsSeedData
                     estadosFinancieros
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("7893c468-2309-4433-b9d7-87fa7ae84da6"),
                 Slug = "informe-plan-de-trabajo-e-inversin-2023-7893c4",
@@ -182,7 +188,8 @@ public static class DocumentsSeedData
                     proyectosEjecutados
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("64cfb69b-b06e-4d30-b4b3-0190a66a1037"),
                 Slug = "informe-presidencial-2022-64cfb6",
@@ -200,7 +207,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("4655903f-2404-4fa3-8e21-cbe909d123fe"),
                 Slug = "informe-presidencial-2023-465590",
@@ -218,13 +226,15 @@ public static class DocumentsSeedData
                     informes,
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("52c96608-af95-4917-bcdb-ec4e34ef077c"),
                 Slug = "informe-tesorera-2022-52c966",
                 Title = "Informe Tesorería 2022",
                 PublicationDate = DateTime.Parse("2022-12-01T00:00:00Z").ToUniversalTime(),
-                Description = "Informe de tesorería con detalles financieros y administrativos correspondientes al año 2022.",
+                Description =
+                    "Informe de tesorería con detalles financieros y administrativos correspondientes al año 2022.",
                 FileSize = 108359,
                 Url = "/documentos/informe-tesorera-2022-52c966.pdf",
                 FileName = "informe-tesorera-2022-52c966.pdf",
@@ -237,7 +247,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("99058f1a-b892-4ae5-a15f-530fd247c57c"),
                 Slug = "lineamiento-para-consumo-estimado-99058f",
@@ -255,7 +266,8 @@ public static class DocumentsSeedData
                     lineamientos
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("ad5f4c60-a71f-4f9b-bfb1-645fd54a9d3f"),
                 Slug = "perfil-del-pozo-principal-ad5f4c",
@@ -273,7 +285,8 @@ public static class DocumentsSeedData
                     pozoPrincipal,
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("c4cafcf9-9d17-4170-b52e-55232d7a7b4d"),
                 Slug = "pozo-principal-exmenes-bacteriolgicos-julio-2023-c4cafc",
@@ -292,7 +305,8 @@ public static class DocumentsSeedData
                     examenes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("0b9ad537-f55c-484a-ae73-5c2adaac6ce3"),
                 Slug = "pozo-principal-exmenes-fsico-qumicos-julio-2023-0b9ad5",
@@ -311,7 +325,8 @@ public static class DocumentsSeedData
                     examenes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("829dc314-5c88-4ed6-b83c-838ac005276a"),
                 Slug = "pozo-principal-informe-abril-2020-829dc3",
@@ -330,7 +345,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("1f1ef617-1a46-4825-8ad5-6d144a69835d"),
                 Slug = "pozo-principal-informe-abril-2021-1f1ef6",
@@ -349,7 +365,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("27ea0641-00e8-4a45-9651-346b153cf672"),
                 Slug = "pozo-principal-informe-agosto-2015-27ea06",
@@ -368,7 +385,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("96ecb1ce-fc8c-4d76-8799-92ca90b14603"),
                 Slug = "pozo-principal-informe-diciembre-2019-96ecb1",
@@ -387,7 +405,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("0b62879a-db5f-4cce-a775-7d74b5763cb3"),
                 Slug = "pozo-principal-informe-enero-2021-0b6287",
@@ -406,7 +425,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("d4c383ec-fe79-4f98-8e49-7bb7ea386316"),
                 Slug = "pozo-principal-informe-febrero-2020-d4c383",
@@ -425,13 +445,15 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("b040e2af-95cc-432d-8616-696f1a0ac2e4"),
                 Slug = "pozo-principal-informe-julio-2017-con-cmara-b040e2",
                 Title = "Pozo Principal - Informe Julio 2017 con Cámara",
                 PublicationDate = DateTime.Parse("2017-07-01T00:00:00Z").ToUniversalTime(),
-                Description = "Informe técnico del pozo principal con inspección realizada mediante cámara en julio de 2017.",
+                Description =
+                    "Informe técnico del pozo principal con inspección realizada mediante cámara en julio de 2017.",
                 FileSize = 68692,
                 Url = "/documentos/pozo-principal-informe-julio-2017-con-cmara-b040e2.docx",
                 FileName = "pozo-principal-informe-julio-2017-con-cmara-b040e2.docx",
@@ -444,7 +466,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("276b8a7c-96ff-4a63-8c89-e7be4daee12b"),
                 Slug = "pozo-principal-informe-julio-2017-276b8a",
@@ -463,7 +486,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("19ea3ee6-76f1-47fd-83b1-c7cd53979fc9"),
                 Slug = "pozo-principal-informe-julio-2023-19ea3e",
@@ -482,7 +506,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("6a20c483-c5d6-4c6f-8888-7dbc398c85e7"),
                 Slug = "pozo-principal-informe-junio-2019-6a20c4",
@@ -501,7 +526,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("aeedb763-c1f2-4cf7-bd47-2657b5167ea1"),
                 Slug = "pozo-principal-informe-junio-2020-aeedb7",
@@ -520,7 +546,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("18845405-8bcb-4895-b12a-5af31d2d9814"),
                 Slug = "pozo-principal-informe-junio-2021-188454",
@@ -539,7 +566,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("7ac7432d-3ea8-412f-818b-6f5f3ddaed01"),
                 Slug = "pozo-principal-informe-marzo-2019-7ac743",
@@ -558,7 +586,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("6c066e8c-00ad-4601-872b-61616435807c"),
                 Slug = "pozo-principal-informe-noviembre-2020-6c066e",
@@ -577,7 +606,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("cce54b81-2b9e-4c8e-b67a-b2d33a1d3300"),
                 Slug = "pozo-principal-informe-setiembre-2019-cce54b",
@@ -596,7 +626,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("c1418ee7-fec4-4f57-8858-be8b8b360174"),
                 Slug = "pozo-principal-informe-setiembre-2020-c1418e",
@@ -615,7 +646,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("43a31016-da6b-4135-9399-d335a64a1e07"),
                 Slug = "pozo-principal-resultados-anlisis-de-agua-43a310",
@@ -634,7 +666,8 @@ public static class DocumentsSeedData
                     examenes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("41bb7255-62cc-4fde-b89b-22004fa0e44f"),
                 Slug = "reglamento-asadas-2020-41bb72",
@@ -652,7 +685,8 @@ public static class DocumentsSeedData
                     reglamentos
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("95389740-e900-44a6-80c3-9e78a64e6df5"),
                 Slug = "reglamento-tcnico-prestacin-de-servicios-953897",
@@ -670,7 +704,8 @@ public static class DocumentsSeedData
                     reglamentos
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("988afba5-c1eb-4680-b5cf-4070942fedf7"),
                 Slug = "rendicin-de-cuentas-informe-tesorera-2023-988afb",
@@ -689,7 +724,8 @@ public static class DocumentsSeedData
                     informes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("f195d8b1-0fc3-43ef-93df-b68765580542"),
                 Slug = "resultados-revisin-hidrantes-bomberos-2014-f195d8",
@@ -707,7 +743,8 @@ public static class DocumentsSeedData
                     hidrantes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("a09dff75-96bf-49be-8554-c4f5b9989df4"),
                 Slug = "resultados-revisin-hidrantes-bomberos-2017-a09dff",
@@ -725,7 +762,8 @@ public static class DocumentsSeedData
                     hidrantes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("4f29e2f3-b802-4001-bd41-eef6d7a26047"),
                 Slug = "resultados-revisin-hidrantes-bomberos-2019-4f29e2",
@@ -743,7 +781,8 @@ public static class DocumentsSeedData
                     hidrantes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("4a6c5ce6-6463-49d5-9b86-d07a8b4f5a50"),
                 Slug = "resultados-revisin-hidrantes-bomberos-2020-4a6c5c",
@@ -761,7 +800,8 @@ public static class DocumentsSeedData
                     hidrantes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("09282776-33e6-40e1-ab3d-c8160eb24c85"),
                 Slug = "convenio-de-instalacin-de-medidores-adicionales-092827",
@@ -780,13 +820,15 @@ public static class DocumentsSeedData
                     medidores
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("5385af33-451c-46b2-98de-b4594909eac8"),
                 Slug = "machote-para-dudas-y-sugerencias-5385af",
                 Title = "Machote para Dudas y Sugerencias",
                 PublicationDate = DateTime.Parse("2026-05-14T03:05:19.7115915Z").ToUniversalTime(),
-                Description = "Formulario para la presentación de dudas, consultas, sugerencias o comentarios por parte de los usuarios.",
+                Description =
+                    "Formulario para la presentación de dudas, consultas, sugerencias o comentarios por parte de los usuarios.",
                 FileSize = 28921,
                 Url = "/documentos/machote-para-dudas-y-sugerencias-5385af.pdf",
                 FileName = "machote-para-dudas-y-sugerencias-5385af.pdf",
@@ -799,7 +841,8 @@ public static class DocumentsSeedData
                     sugerencias
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("1fd75994-f97a-4baf-a7cd-2cf093bd5ce8"),
                 Slug = "solicitud-para-cambio-de-nombre-en-recibo-de-agua-1fd759",
@@ -817,7 +860,8 @@ public static class DocumentsSeedData
                     solicitudes
                 },
             },
-            new ()
+
+            new()
             {
                 Id = Guid.Parse("9b64cc80-9d20-4467-b1e5-563be1c71c15"),
                 Slug = "solicitud-para-derechos-de-agua-9b64cc",
@@ -834,7 +878,7 @@ public static class DocumentsSeedData
                 {
                     solicitudes
                 },
-            },
-        };
+            }
+        ];
     }
 }

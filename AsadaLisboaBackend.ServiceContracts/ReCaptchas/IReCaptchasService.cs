@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.ReCaptchas
+﻿namespace AsadaLisboaBackend.ServiceContracts.ReCaptchas;
+
+public interface IReCaptchasService
 {
-    public interface IReCaptchasService
-    {
-        public Task<bool> ReCaptchaValidation(string reCaptchaResponse);
-    }
+    public Task<bool> ReCaptchaValidation(string reCaptchaResponse);
 }

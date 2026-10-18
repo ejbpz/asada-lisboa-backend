@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Status;
 
-namespace AsadaLisboaBackend.ServiceContracts.Statuses
+namespace AsadaLisboaBackend.ServiceContracts.Statuses;
+
+public interface IStatusesGetterService
 {
-    public interface IStatusesGetterService
-    {
-        public Task<List<StatusResponseDTO>> GetStatuses();
-    }
+    public Task<List<StatusResponseDto>> GetStatuses();
 }

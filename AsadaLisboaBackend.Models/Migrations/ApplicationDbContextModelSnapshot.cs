@@ -103,41 +103,6 @@ namespace AsadaLisboaBackend.Models.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a12d2ab5-24d2-420c-90d2-2cc3468a33f3"),
-                            Name = "Evento"
-                        },
-                        new
-                        {
-                            Id = new Guid("88af46be-8e2e-4451-a746-ee0864e7145a"),
-                            Name = "Ahorro"
-                        },
-                        new
-                        {
-                            Id = new Guid("5dcb6ba5-0084-4420-8c7e-152df55f8b0b"),
-                            Name = "Recibos"
-                        },
-                        new
-                        {
-                            Id = new Guid("cc1f685c-356e-46ec-a027-3c570fdc6009"),
-                            Name = "Reciclaje"
-                        },
-                        new
-                        {
-                            Id = new Guid("82bc31fd-3438-4b17-8216-a77c863bfb19"),
-                            Name = "SINPE Móvil"
-                        },
-                        new
-                        {
-                            Id = new Guid("be75e73d-145e-41b1-b3ac-149abc0ade06"),
-                            Name = "Mantenimiento"
-                        },
-                        new
-                        {
-                            Id = new Guid("712b5566-24bb-4681-9b7d-e636bdc2ab8e"),
-                            Name = "Asamblea Ordinaria"
-                        },
-                        new
-                        {
                             Id = new Guid("c5d3b3b3-e69b-48d9-93a5-a4803af196eb"),
                             Name = "Asamblea Extraordinaria"
                         },
@@ -145,6 +110,11 @@ namespace AsadaLisboaBackend.Models.Migrations
                         {
                             Id = new Guid("6da5cf2d-e946-43ed-a092-d5b4c9282ffa"),
                             Name = "Estados Financieros"
+                        },
+                        new
+                        {
+                            Id = new Guid("712b5566-24bb-4681-9b7d-e636bdc2ab8e"),
+                            Name = "Asamblea Ordinaria"
                         },
                         new
                         {
@@ -158,8 +128,18 @@ namespace AsadaLisboaBackend.Models.Migrations
                         },
                         new
                         {
+                            Id = new Guid("be75e73d-145e-41b1-b3ac-149abc0ade06"),
+                            Name = "Mantenimiento"
+                        },
+                        new
+                        {
                             Id = new Guid("77607c99-2ed1-4b8e-89cc-ccc7c6344e53"),
                             Name = "Lineamientos"
+                        },
+                        new
+                        {
+                            Id = new Guid("82bc31fd-3438-4b17-8216-a77c863bfb19"),
+                            Name = "SINPE Móvil"
                         },
                         new
                         {
@@ -180,6 +160,11 @@ namespace AsadaLisboaBackend.Models.Migrations
                         {
                             Id = new Guid("783e94bc-4748-4223-a150-8892354b865b"),
                             Name = "Colindancia"
+                        },
+                        new
+                        {
+                            Id = new Guid("cc1f685c-356e-46ec-a027-3c570fdc6009"),
+                            Name = "Reciclaje"
                         },
                         new
                         {
@@ -210,6 +195,21 @@ namespace AsadaLisboaBackend.Models.Migrations
                         {
                             Id = new Guid("b2dbcf36-fddf-4752-b39d-b31f61e704a3"),
                             Name = "Estudios"
+                        },
+                        new
+                        {
+                            Id = new Guid("5dcb6ba5-0084-4420-8c7e-152df55f8b0b"),
+                            Name = "Recibos"
+                        },
+                        new
+                        {
+                            Id = new Guid("a12d2ab5-24d2-420c-90d2-2cc3468a33f3"),
+                            Name = "Evento"
+                        },
+                        new
+                        {
+                            Id = new Guid("88af46be-8e2e-4451-a746-ee0864e7145a"),
+                            Name = "Ahorro"
                         },
                         new
                         {
@@ -779,32 +779,6 @@ namespace AsadaLisboaBackend.Models.Migrations
                             Id = new Guid("5c1cebda-fc8c-44ac-997c-aaf015572d46"),
                             Name = "Publicado"
                         });
-                });
-
-            modelBuilder.Entity("AsadaLisboaBackend.Models.VisualSetting", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<byte>("Order")
-                        .HasColumnType("smallint");
-
-                    b.Property<string>("SettingType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Order");
-
-                    b.ToTable("VisualSettings");
                 });
 
             modelBuilder.Entity("CategoryDocument", b =>

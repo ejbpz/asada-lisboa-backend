@@ -6,54 +6,46 @@ using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Contacts
+namespace AsadaLisboaBackend.Services.Contacts;
+
+public class ContactsAdderService(
+    IContactsAdderRepository contactsAdderRepository,
+    ILogger<ContactsAdderService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IContactsAdderService
 {
-    public class ContactsAdderService : IContactsAdderService
+    public async Task<ContactResponseDto> CreateContact(ContactRequestDto contactRequestDto)
     {
-        private readonly ILogger<ContactsAdderService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IContactsAdderRepository _contactsAdderRepository;
-
-        public ContactsAdderService(IContactsAdderRepository contactsAdderRepository, ILogger<ContactsAdderService> logger, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _contactsAdderRepository = contactsAdderRepository;
-        }
-
-        public async Task<ContactResponseDTO> CreateContact(ContactRequestDTO contactRequestDTO)
-        {
-            try { 
-                var contact = new Contact()
-                {
-                    Order = contactRequestDTO.Order,
-                    Value = contactRequestDTO.Value,
-                    ContactType = contactRequestDTO.ContactType,
-                };
-
-                var result = (await _contactsAdderRepository.CreateContact(contact));
-
-                _logger.LogInformation(
-                  "Contacto creado exitosamente. Tipo: {ContactType}, Orden: {Order}",
-                  contactRequestDTO.ContactType,
-                  contactRequestDTO.Order
-              );
-
-                _memoryCachesService.ChangeVersion(Constants.CACHE_CONTACTS);
-
-                return result.ToContactResponseDTO();
-            
-            }
-            catch (Exception ex)
+        try { 
+            var contact = new Contact()
             {
-                _logger.LogError(ex,
-                    "Error al crear contacto. Tipo: {ContactType}, Orden: {Order}",
-                    contactRequestDTO.ContactType,
-                    contactRequestDTO.Order
-                );
-                throw;
-            }
+                Order = contactRequestDto.Order,
+                Value = contactRequestDto.Value,
+                ContactType = contactRequestDto.ContactType,
+            };
 
+            var result = (await contactsAdderRepository.CreateContact(contact));
+
+            logger.LogInformation(
+                "Contacto creado exitosamente. Tipo: {ContactType}, Orden: {Order}",
+                contactRequestDto.ContactType,
+                contactRequestDto.Order
+            );
+
+            memoryCachesService.ChangeVersion(Constants.CACHE_CONTACTS);
+
+            return result.ToContactResponseDto();
+            
         }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Error al crear contacto. Tipo: {ContactType}, Orden: {Order}",
+                contactRequestDto.ContactType,
+                contactRequestDto.Order
+            );
+            throw;
+        }
+
     }
 }

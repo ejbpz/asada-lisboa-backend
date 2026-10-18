@@ -8,140 +8,137 @@ using AsadaLisboaBackend.Services.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.Statuses
+namespace AsadaLisboaBackend.Tests.Statuses;
+
+public class StatusesGetterServiceTest
 {
-    public class StatusesGetterServiceTest
+    private readonly Fixture _fixture;
+    private readonly StatusesGetterService _service;
+    private readonly Mock<ILogger<StatusesGetterService>> _loggerMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
+
+    public StatusesGetterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<ILogger<StatusesGetterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
-        private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly StatusesGetterService _service;
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public StatusesGetterServiceTest()
-        {
-            _fixture = new Fixture();
+        _loggerMock = new Mock<ILogger<StatusesGetterService>>();
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _service = new StatusesGetterService(
+            _statusesGetterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+    [Fact]
+    public async Task GetStatuses_Should_Return_Statuses_Successfully()
+    {
+        // Arrange
+        var statuses = _fixture
+            .CreateMany<StatusResponseDto>(3)
+            .ToList();
 
-            _loggerMock = new Mock<ILogger<StatusesGetterService>>();
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
-            _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                Constants.CACHE_CATEGORIES,
+                It.IsAny<Func<Task<List<StatusResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .ReturnsAsync(statuses);
 
-            _service = new StatusesGetterService(
-                _statusesGetterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        // Act
+        var result = await _service.GetStatuses();
 
-        [Fact]
-        public async Task GetStatuses_Should_Return_Statuses_Successfully()
-        {
-            // Arrange
-            var statuses = _fixture
-                .CreateMany<StatusResponseDTO>(3)
-                .ToList();
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().HaveCount(3);
+        result.Should().BeEquivalentTo(statuses);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<List<StatusResponseDTO>>(
-                    Constants.CACHE_CATEGORIES,
-                    It.IsAny<Func<Task<List<StatusResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ReturnsAsync(statuses);
+        _memoryCachesServiceMock.Verify(
+            x => x.GetOrCreateCache(
+                Constants.CACHE_CATEGORIES,
+                It.IsAny<Func<Task<List<StatusResponseDto>>>>(),
+                It.Is<TimeSpan>(t => t == TimeSpan.FromMinutes(5))),
+            Times.Once);
 
-            // Act
-            var result = await _service.GetStatuses();
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 
-            // Assert
-            result.Should().NotBeNull();
-            result.Should().HaveCount(3);
-            result.Should().BeEquivalentTo(statuses);
+    [Fact]
+    public async Task GetStatuses_Should_Throw_Exception_When_Cache_Fails()
+    {
+        // Arrange
+        var exception = new Exception("Cache error");
 
-            _memoryCachesServiceMock.Verify(
-                x => x.GetOrCreateCache<List<StatusResponseDTO>>(
-                    Constants.CACHE_CATEGORIES,
-                    It.IsAny<Func<Task<List<StatusResponseDTO>>>>(),
-                    It.Is<TimeSpan>(t => t == TimeSpan.FromMinutes(5))),
-                Times.Once);
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                It.IsAny<string>(),
+                It.IsAny<Func<Task<List<StatusResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .ThrowsAsync(exception);
 
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        // Act
+        Func<Task> act = async () => await _service.GetStatuses();
 
-        [Fact]
-        public async Task GetStatuses_Should_Throw_Exception_When_Cache_Fails()
-        {
-            // Arrange
-            var exception = new Exception("Cache error");
+        // Assert
+        await act.Should()
+            .ThrowAsync<Exception>()
+            .WithMessage("Cache error");
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<List<StatusResponseDTO>>(
-                    It.IsAny<string>(),
-                    It.IsAny<Func<Task<List<StatusResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ThrowsAsync(exception);
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                exception,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 
-            // Act
-            Func<Task> act = async () => await _service.GetStatuses();
+    [Fact]
+    public async Task GetStatuses_Should_Call_Repository_Through_Cache()
+    {
+        // Arrange
+        var statuses = _fixture
+            .CreateMany<StatusResponseDto>(2)
+            .ToList();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<Exception>()
-                .WithMessage("Cache error");
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatuses())
+            .ReturnsAsync(statuses);
 
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    exception,
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                It.IsAny<string>(),
+                It.IsAny<Func<Task<List<StatusResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .Returns<string, Func<Task<List<StatusResponseDto>>>, TimeSpan>(
+                async (_, create, _) => await create());
 
-        [Fact]
-        public async Task GetStatuses_Should_Call_Repository_Through_Cache()
-        {
-            // Arrange
-            var statuses = _fixture
-                .CreateMany<StatusResponseDTO>(2)
-                .ToList();
+        // Act
+        var result = await _service.GetStatuses();
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatuses())
-                .ReturnsAsync(statuses);
+        // Assert
+        result.Should().BeEquivalentTo(statuses);
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<List<StatusResponseDTO>>(
-                    It.IsAny<string>(),
-                    It.IsAny<Func<Task<List<StatusResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .Returns<string, Func<Task<List<StatusResponseDTO>>>, TimeSpan>(
-                    async (_, create, _) => await create());
-
-            // Act
-            var result = await _service.GetStatuses();
-
-            // Assert
-            result.Should().BeEquivalentTo(statuses);
-
-            _statusesGetterRepositoryMock.Verify(
-                x => x.GetStatuses(),
-                Times.Once);
-        }
+        _statusesGetterRepositoryMock.Verify(
+            x => x.GetStatuses(),
+            Times.Once);
     }
 }

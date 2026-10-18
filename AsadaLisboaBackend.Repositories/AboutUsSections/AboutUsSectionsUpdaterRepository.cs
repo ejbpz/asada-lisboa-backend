@@ -5,36 +5,28 @@ using AsadaLisboaBackend.Models.DTOs.AboutUs;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
-namespace AsadaLisboaBackend.Repositories.AboutUsSections
+namespace AsadaLisboaBackend.Repositories.AboutUsSections;
+
+public class AboutUsSectionsUpdaterRepository(ApplicationDbContext context) : IAboutUsSectionsUpdaterRepository
 {
-    public class AboutUsSectionsUpdaterRepository : IAboutUsSectionsUpdaterRepository
+    public async Task<AboutUsSection> UpdateAboutUsSection(Guid id, AboutUsRequestDto aboutUsRequestDto)
     {
-        private readonly ApplicationDbContext _context;
+        var affectedRows = await context.AboutUsSections
+            .Where(c => c.Id == id)
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(c => c.SectionType, aboutUsRequestDto.SectionType)
+                .SetProperty(c => c.Content, aboutUsRequestDto.Content)
+                .SetProperty(c => c.Order, aboutUsRequestDto.Order));
 
-        public AboutUsSectionsUpdaterRepository(ApplicationDbContext context)
+        if (affectedRows < 1)
+            throw new NotFoundException("Error al modificar la sección.");
+
+        return new AboutUsSection()
         {
-            _context = context;
-        }
-
-        public async Task<AboutUsSection> UpdateAboutUsSection(Guid id, AboutUsRequestDTO aboutUsRequestDTO)
-        {
-            var affectedRows = await _context.AboutUsSections
-                .Where(c => c.Id == id)
-                .ExecuteUpdateAsync(p => p
-                    .SetProperty(c => c.SectionType, aboutUsRequestDTO.SectionType)
-                    .SetProperty(c => c.Content, aboutUsRequestDTO.Content)
-                    .SetProperty(c => c.Order, aboutUsRequestDTO.Order));
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Error al modificar la sección.");
-
-            return new AboutUsSection()
-            {
-                Id = id,
-                Order = aboutUsRequestDTO.Order,
-                Content = aboutUsRequestDTO.Content,
-                SectionType = aboutUsRequestDTO.SectionType,
-            };
-        }
+            Id = id,
+            Order = aboutUsRequestDto.Order,
+            Content = aboutUsRequestDto.Content,
+            SectionType = aboutUsRequestDto.SectionType,
+        };
     }
 }

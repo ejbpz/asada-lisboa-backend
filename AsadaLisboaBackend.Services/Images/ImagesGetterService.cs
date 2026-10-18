@@ -5,44 +5,37 @@ using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.RepositoryContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Images
+namespace AsadaLisboaBackend.Services.Images;
+
+public class ImagesGetterService(
+    IImagesGetterRepository imagesGetterRepository,
+    IMemoryCachesService memoryCachesService)
+    : IImagesGetterService
 {
-    public class ImagesGetterService : IImagesGetterService
+    public async Task<PageResponseDto<ImageMinimalResponseDto>> GetImages(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IImagesGetterRepository _imagesGetterRepository;
+        return await memoryCachesService.GetOrCreateCacheList(
+            resource: Constants.CACHE_IMAGES,
+            request: searchSortRequestDto,
+            create: () => imagesGetterRepository.GetImages(searchSortRequestDto),
+            time: TimeSpan.FromMinutes(5));
+    }
 
-        public ImagesGetterService(IImagesGetterRepository imagesGetterRepository, IMemoryCachesService memoryCachesService)
-        {
-            _memoryCachesService = memoryCachesService;
-            _imagesGetterRepository = imagesGetterRepository;
-        }
-
-        public async Task<PageResponseDTO<ImageMinimalResponseDTO>> GetImages(SearchSortRequestDTO searchSortRequestDTO)
-        {
-            return await _memoryCachesService.GetOrCreateCacheList(
-                resource: Constants.CACHE_IMAGES,
-                request: searchSortRequestDTO,
-                create: () => _imagesGetterRepository.GetImages(searchSortRequestDTO),
-                time: TimeSpan.FromMinutes(5));
-        }
-
-        public async Task<ImageResponseDTO> GetImage(Guid id)
-        {
-            return (await _memoryCachesService.GetOrCreateCache(
+    public async Task<ImageResponseDto> GetImage(Guid id)
+    {
+        return (await memoryCachesService.GetOrCreateCache(
                 key: $"{Constants.CACHE_IMAGES}_{id}",
-                create: () => _imagesGetterRepository.GetImage(id),
+                create: () => imagesGetterRepository.GetImage(id),
                 time: TimeSpan.FromMinutes(5)))
-                    .ToImageResponseDTO();
-        }
+            .ToImageResponseDto();
+    }
 
-        public async Task<ImageResponseDTO> GetImageBySlug(string slug)
-        {
-            return (await _memoryCachesService.GetOrCreateCache(
+    public async Task<ImageResponseDto> GetImageBySlug(string slug)
+    {
+        return (await memoryCachesService.GetOrCreateCache(
                 key: $"{Constants.CACHE_IMAGES}_{slug}",
-                create: () => _imagesGetterRepository.GetImageBySlug(slug),
+                create: () => imagesGetterRepository.GetImageBySlug(slug),
                 time: TimeSpan.FromMinutes(5)))
-                    .ToImageResponseDTO();
-        }
+            .ToImageResponseDto();
     }
 }

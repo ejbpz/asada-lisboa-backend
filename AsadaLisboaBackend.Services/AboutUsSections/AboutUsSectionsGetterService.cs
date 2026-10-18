@@ -6,47 +6,38 @@ using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
-namespace AsadaLisboaBackend.Services.AboutUsSections
+namespace AsadaLisboaBackend.Services.AboutUsSections;
+
+public class AboutUsSectionsGetterService(
+    IAboutUsSectionsGetterRepository aboutUsSectionsGetterRepository,
+    ILogger<AboutUsSectionsGetterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IAboutUsSectionsGetterService
 {
-    public class AboutUsSectionsGetterService : IAboutUsSectionsGetterService
+    public async Task<PageResponseDto<AboutUsResponseDto>> GetAboutUsSections(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly ILogger<AboutUsSectionsGetterService> _logger;
-        private readonly IAboutUsSectionsGetterRepository _aboutUsSectionsGetterRepository;
-
-        public AboutUsSectionsGetterService(IAboutUsSectionsGetterRepository aboutUsSectionsGetterRepository, ILogger<AboutUsSectionsGetterService> logger, IMemoryCachesService memoryCachesService)
+        try
         {
-            _aboutUsSectionsGetterRepository = aboutUsSectionsGetterRepository;
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
+            var result = await memoryCachesService.GetOrCreateCacheList<PageResponseDto<AboutUsResponseDto>>(
+                resource: Constants.CACHE_ABOUT_US,
+                request: searchSortRequestDto,
+                create: () => aboutUsSectionsGetterRepository.GetAboutUsSections(searchSortRequestDto),
+                time: TimeSpan.FromMinutes(5));
+
+            logger.LogInformation(
+                "Obtención exitosa de AboutUsSections. Tamaño: {Take}",
+                searchSortRequestDto.Take
+            );
+
+            return result;
         }
-
-        public async Task<PageResponseDTO<AboutUsResponseDTO>> GetAboutUsSections(SearchSortRequestDTO searchSortRequestDTO)
+        catch (Exception ex)
         {
-            try
-            {
-                var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<AboutUsResponseDTO>>(
-
-                    resource: Constants.CACHE_ABOUT_US,
-                    request: searchSortRequestDTO,
-                    create: () => _aboutUsSectionsGetterRepository.GetAboutUsSections(searchSortRequestDTO),
-                    time: TimeSpan.FromMinutes(5));
-
-                _logger.LogInformation(
-                    "Obtención exitosa de AboutUsSections. Tamaño: {Take}",
-                    searchSortRequestDTO.Take
-                );
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Error al obtener AboutUsSections. Tamaño: {Take}",
-                    searchSortRequestDTO.Take
-                );
-                throw;
-            }
+            logger.LogError(ex,
+                "Error al obtener AboutUsSections. Tamaño: {Take}",
+                searchSortRequestDto.Take
+            );
+            throw;
         }
     }
 }

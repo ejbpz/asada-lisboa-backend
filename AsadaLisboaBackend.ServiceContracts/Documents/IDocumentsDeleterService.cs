@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.Documents
+﻿namespace AsadaLisboaBackend.ServiceContracts.Documents;
+
+public interface IDocumentsDeleterService
 {
-    public interface IDocumentsDeleterService
-    {
-        public Task DeleterDocument(Guid id);
-    }
+    public Task DeleterDocument(Guid id);
 }

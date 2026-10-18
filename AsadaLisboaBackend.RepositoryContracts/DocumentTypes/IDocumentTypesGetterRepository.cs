@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.RepositoryContracts.DocumentTypes
+﻿namespace AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
+
+public interface IDocumentTypesGetterRepository
 {
-    public interface IDocumentTypesGetterRepository
-    {
-        public Guid? GetDocumentTypeIdByExtension(string extension);
-    }
+    public Guid? GetDocumentTypeIdByExtension(string extension);
 }

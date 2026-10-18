@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Charge;
 
-namespace AsadaLisboaBackend.ServiceContracts.Charges
+namespace AsadaLisboaBackend.ServiceContracts.Charges;
+
+public interface IChargesAdderService
 {
-    public interface IChargesAdderService
-    {
-        public Task<ChargeResponseDTO> CreateCharge(string nameCharge);
-    }
+    public Task<ChargeResponseDto> CreateCharge(string nameCharge);
 }

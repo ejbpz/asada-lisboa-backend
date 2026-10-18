@@ -1,31 +1,30 @@
 ﻿using System.Linq.Expressions;
 
-namespace AsadaLisboaBackend.Models.DTOs.Category
+namespace AsadaLisboaBackend.Models.DTOs.Category;
+
+public class CategoryResponseDto
 {
-    public class CategoryResponseDTO
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+public static partial class CategoryExtensions
+{
+    public static Expression<Func<Models.Category, CategoryResponseDto>> MapCategoryResponseDto()
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        return category => new CategoryResponseDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+        };
     }
 
-    public static partial class CategoryExtensions
+    public static CategoryResponseDto ToCategoryResponseDto(this Models.Category category)
     {
-        public static Expression<Func<Models.Category, CategoryResponseDTO>> MapCategoryResponseDTO()
+        return new CategoryResponseDto()
         {
-            return category => new CategoryResponseDTO
-            {
-                Id = category.Id,
-                Name = category.Name,
-            };
-        }
-
-        public static CategoryResponseDTO ToCategoryResponseDTO(this Models.Category category)
-        {
-            return new CategoryResponseDTO()
-            {
-                Id = category.Id,
-                Name = category.Name,
-            };
-        }
+            Id = category.Id,
+            Name = category.Name,
+        };
     }
 }

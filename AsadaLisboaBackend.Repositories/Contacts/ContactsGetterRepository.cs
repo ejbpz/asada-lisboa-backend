@@ -5,49 +5,41 @@ using AsadaLisboaBackend.Models.DTOs.Contact;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 
-namespace AsadaLisboaBackend.Repositories.Contacts
+namespace AsadaLisboaBackend.Repositories.Contacts;
+
+public class ContactsGetterRepository(ApplicationDbContext context) : IContactsGetterRepository
 {
-    public class ContactsGetterRepository : IContactsGetterRepository
+    public async Task<PageResponseDto<ContactResponseDto>> GetContacts(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly ApplicationDbContext _context;
+        IQueryable<Contact> query = context.Contacts
+            .AsNoTracking();
 
-        public ContactsGetterRepository(ApplicationDbContext context)
+        // Search
+        if (!string.IsNullOrEmpty(searchSortRequestDto.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDto.Search))
         {
-            _context = context;
+            var search = searchSortRequestDto.Search.ToLower();
+
+            query = query.Where(c =>
+                EF.Functions.ILike(c.ContactType, $"%{search}%"));
         }
 
-        public async Task<PageResponseDTO<ContactResponseDTO>> GetContacts(SearchSortRequestDTO searchSortRequestDTO)
+        // Sort
+        query = (searchSortRequestDto.SortBy.ToLower(), searchSortRequestDto.SortDirection.ToLower()) switch
         {
-            IQueryable<Contact> query = _context.Contacts
-                .AsNoTracking();
+            ("name", "desc") => query.OrderByDescending(u => u.ContactType),
+            ("name", _) => query.OrderBy(u => u.ContactType),
+            (_, "desc") => query.OrderByDescending(u => (u.Order)),
+            _ => query.OrderBy(u => (u.Order)),
+        };
 
-            // Search
-            if (!string.IsNullOrEmpty(searchSortRequestDTO.Search) && !string.IsNullOrWhiteSpace(searchSortRequestDTO.Search))
-            {
-                string search = searchSortRequestDTO.Search.ToLower();
-
-                query = query.Where(c =>
-                        EF.Functions.ILike(c.ContactType, $"%{search}%"));
-            }
-
-            // Sort
-            query = (searchSortRequestDTO.SortBy.ToLower(), searchSortRequestDTO.SortDirection.ToLower()) switch
-            {
-                ("name", "desc") => query.OrderByDescending(u => u.ContactType),
-                ("name", _) => query.OrderBy(u => u.ContactType),
-                (_, "desc") => query.OrderByDescending(u => (u.Order)),
-                _ => query.OrderBy(u => (u.Order)),
-            };
-
-            return new PageResponseDTO<ContactResponseDTO>()
-            {
-                Total = await query.CountAsync(),
-                Data = await query
-                    .Skip(searchSortRequestDTO.Offset)
-                    .Take(searchSortRequestDTO.Take)
-                    .Select(ContactExtensions.MapContactResponseDTO())
-                    .ToListAsync(),
-            };
-        }
+        return new PageResponseDto<ContactResponseDto>()
+        {
+            Total = await query.CountAsync(),
+            Data = await query
+                .Skip(searchSortRequestDto.Offset)
+                .Take(searchSortRequestDto.Take)
+                .Select(ContactExtensions.MapContactResponseDto())
+                .ToListAsync(),
+        };
     }
 }

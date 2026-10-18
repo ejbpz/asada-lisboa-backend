@@ -3,233 +3,231 @@ using Moq;
 using AutoFixture;
 using FluentAssertions;
 using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Models.DTOs.Charge;
 using AsadaLisboaBackend.Services.Charges;
+using AsadaLisboaBackend.Models.DTOs.Charge;
 using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.Charges;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.Charges
+namespace AsadaLisboaBackend.Tests.Charges;
+
+public class ChargesUpdaterServiceTest
 {
-    public class ChargesUpdaterServiceTest
+    private readonly Fixture _fixture;
+    private readonly Mock<ILogger<ChargesUpdaterService>> _loggerMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<IChargesGetterService> _chargesGetterServiceMock;
+    private readonly Mock<IChargesUpdaterRepository> _chargesUpdaterRepositoryMock;
+
+    private readonly ChargesUpdaterService _service;
+
+    public ChargesUpdaterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IChargesGetterService> _chargesGetterServiceMock;
-        private readonly Mock<IChargesUpdaterRepository> _chargesUpdaterRepositoryMock;
-        private readonly Mock<ILogger<ChargesUpdaterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly ChargesUpdaterService _service;
+        _fixture.Behaviors
+            .Add(new OmitOnRecursionBehavior());
 
-        public ChargesUpdaterServiceTest()
-        {
-            _fixture = new Fixture();
+        _chargesGetterServiceMock = new Mock<IChargesGetterService>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _chargesUpdaterRepositoryMock = new Mock<IChargesUpdaterRepository>();
 
-            _fixture.Behaviors
-                .Add(new OmitOnRecursionBehavior());
+        _loggerMock = new Mock<ILogger<ChargesUpdaterService>>();
 
-            _chargesGetterServiceMock = new Mock<IChargesGetterService>();
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
 
-            _chargesUpdaterRepositoryMock = new Mock<IChargesUpdaterRepository>();
+        _service = new ChargesUpdaterService(
+            _chargesGetterServiceMock.Object,
+            _chargesUpdaterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _loggerMock = new Mock<ILogger<ChargesUpdaterService>>();
+    [Fact]
+    public async Task UpdateCharge_Should_Update_Charge_Successfully()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        var chargeName = "Administrador";
 
-            _service = new ChargesUpdaterService(
-                _chargesGetterServiceMock.Object,
-                _chargesUpdaterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        var response = _fixture.Build<ChargeResponseDto>()
+            .With(x => x.Name, chargeName)
+            .Create();
 
-        [Fact]
-        public async Task UpdateCharge_Should_Update_Charge_Successfully()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _chargesGetterServiceMock
+            .Setup(x => x.ExistsCharge(chargeName))
+            .ReturnsAsync(false);
 
-            var chargeName = "Administrador";
+        _chargesUpdaterRepositoryMock
+            .Setup(x => x.UpdateCharge(id, chargeName))
+            .ReturnsAsync(response);
 
-            var response = _fixture.Build<ChargeResponseDTO>()
-                .With(x => x.Name, chargeName)
-                .Create();
+        // Act
+        var result = await _service.UpdateCharge(id, chargeName);
 
-            _chargesGetterServiceMock
-                .Setup(x => x.ExistsCharge(chargeName))
-                .ReturnsAsync(false);
+        // Assert
+        result.Should().NotBeNull();
 
-            _chargesUpdaterRepositoryMock
-                .Setup(x => x.UpdateCharge(id, chargeName))
-                .ReturnsAsync(response);
+        result.Name.Should().Be(chargeName);
 
-            // Act
-            var result = await _service.UpdateCharge(id, chargeName);
+        _chargesUpdaterRepositoryMock.Verify(
+            x => x.UpdateCharge(id, chargeName),
+            Times.Once);
 
-            // Assert
-            result.Should().NotBeNull();
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                Constants.CACHE_CHARGES,
+                id),
+            Times.Once);
 
-            result.Name.Should().Be(chargeName);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                Constants.CACHE_CHARGES),
+            Times.Once);
+    }
 
-            _chargesUpdaterRepositoryMock.Verify(
-                x => x.UpdateCharge(id, chargeName),
-                Times.Once);
+    [Fact]
+    public async Task UpdateCharge_Should_Throw_When_Charge_Already_Exists()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    Constants.CACHE_CHARGES,
-                    id),
-                Times.Once);
+        var chargeName = "Administrador";
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    Constants.CACHE_CHARGES),
-                Times.Once);
-        }
+        _chargesGetterServiceMock
+            .Setup(x => x.ExistsCharge(chargeName))
+            .ReturnsAsync(true);
 
-        [Fact]
-        public async Task UpdateCharge_Should_Throw_When_Charge_Already_Exists()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () => await _service.UpdateCharge(id, chargeName);
 
-            var chargeName = "Administrador";
+        // Assert
+        await act.Should()
+            .ThrowAsync<ExistingValueException>()
+            .WithMessage("El nombre del cargo ya existe.");
 
-            _chargesGetterServiceMock
-                .Setup(x => x.ExistsCharge(chargeName))
-                .ReturnsAsync(true);
+        _chargesUpdaterRepositoryMock.Verify(
+            x => x.UpdateCharge(
+                It.IsAny<Guid>(),
+                It.IsAny<string>()),
+            Times.Never);
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateCharge(id, chargeName);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                It.IsAny<string>(),
+                It.IsAny<Guid>()),
+            Times.Never);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<ExistingValueException>()
-                .WithMessage("El nombre del cargo ya existe.");
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                It.IsAny<string>()),
+            Times.Never);
+    }
 
-            _chargesUpdaterRepositoryMock.Verify(
-                x => x.UpdateCharge(
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()),
-                Times.Never);
+    [Fact]
+    public async Task UpdateCharge_Should_Call_Logger_Information()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>()),
-                Times.Never);
+        var chargeName = "Administrador";
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    It.IsAny<string>()),
-                Times.Never);
-        }
+        var response = _fixture.Build<ChargeResponseDto>()
+            .With(x => x.Name, chargeName)
+            .Create();
 
-        [Fact]
-        public async Task UpdateCharge_Should_Call_Logger_Information()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _chargesGetterServiceMock
+            .Setup(x => x.ExistsCharge(chargeName))
+            .ReturnsAsync(false);
 
-            var chargeName = "Administrador";
+        _chargesUpdaterRepositoryMock
+            .Setup(x => x.UpdateCharge(id, chargeName))
+            .ReturnsAsync(response);
 
-            var response = _fixture.Build<ChargeResponseDTO>()
-                .With(x => x.Name, chargeName)
-                .Create();
+        // Act
+        await _service.UpdateCharge(id, chargeName);
 
-            _chargesGetterServiceMock
-                .Setup(x => x.ExistsCharge(chargeName))
-                .ReturnsAsync(false);
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 
-            _chargesUpdaterRepositoryMock
-                .Setup(x => x.UpdateCharge(id, chargeName))
-                .ReturnsAsync(response);
+    [Fact]
+    public async Task UpdateCharge_Should_Call_Logger_Warning_When_Name_Already_Exists()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            // Act
-            await _service.UpdateCharge(id, chargeName);
+        var chargeName = "Administrador";
 
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        _chargesGetterServiceMock
+            .Setup(x => x.ExistsCharge(chargeName))
+            .ReturnsAsync(true);
 
-        [Fact]
-        public async Task UpdateCharge_Should_Call_Logger_Warning_When_Name_Already_Exists()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () =>  await _service.UpdateCharge(id, chargeName);
 
-            var chargeName = "Administrador";
+        await act.Should()
+            .ThrowAsync<ExistingValueException>();
 
-            _chargesGetterServiceMock
-                .Setup(x => x.ExistsCharge(chargeName))
-                .ReturnsAsync(true);
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 
-            // Act
-            Func<Task> act = async () =>  await _service.UpdateCharge(id, chargeName);
+    [Fact]
+    public async Task UpdateCharge_Should_Update_Cache_When_Successful()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            await act.Should()
-                .ThrowAsync<ExistingValueException>();
+        var chargeName = "Administrador";
 
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        var response = _fixture.Build<ChargeResponseDto>()
+            .With(x => x.Name, chargeName)
+            .Create();
 
-        [Fact]
-        public async Task UpdateCharge_Should_Update_Cache_When_Successful()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        _chargesGetterServiceMock
+            .Setup(x => x.ExistsCharge(chargeName))
+            .ReturnsAsync(false);
 
-            var chargeName = "Administrador";
+        _chargesUpdaterRepositoryMock
+            .Setup(x => x.UpdateCharge(id, chargeName))
+            .ReturnsAsync(response);
 
-            var response = _fixture.Build<ChargeResponseDTO>()
-                .With(x => x.Name, chargeName)
-                .Create();
+        // Act
+        await _service.UpdateCharge(id, chargeName);
 
-            _chargesGetterServiceMock
-                .Setup(x => x.ExistsCharge(chargeName))
-                .ReturnsAsync(false);
+        // Assert
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                Constants.CACHE_CHARGES,
+                id),
+            Times.Once);
 
-            _chargesUpdaterRepositoryMock
-                .Setup(x => x.UpdateCharge(id, chargeName))
-                .ReturnsAsync(response);
-
-            // Act
-            await _service.UpdateCharge(id, chargeName);
-
-            // Assert
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    Constants.CACHE_CHARGES,
-                    id),
-                Times.Once);
-
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    Constants.CACHE_CHARGES),
-                Times.Once);
-        }
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                Constants.CACHE_CHARGES),
+            Times.Once);
     }
 }

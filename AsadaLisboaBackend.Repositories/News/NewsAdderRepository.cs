@@ -4,39 +4,31 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
 
-namespace AsadaLisboaBackend.Repositories.News
+namespace AsadaLisboaBackend.Repositories.News;
+
+public class NewsAdderRepository(ApplicationDbContext context) : INewsAdderRepository
 {
-    public class NewsAdderRepository : INewsAdderRepository
+    public async Task<New> CreateNew(New newModel)
     {
-        private readonly ApplicationDbContext _context;
+        var categoryIds = newModel.Categories
+            .Select(c => c.Id)
+            .ToList();
 
-        public NewsAdderRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        var categoriesFromDb = await context.Categories
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToListAsync();
 
-        public async Task<New> CreateNew(New newModel)
-        {
-            var categoryIds = newModel.Categories
-                .Select(c => c.Id)
-                .ToList();
+        newModel.Categories = categoriesFromDb;
 
-            var categoriesFromDb = await _context.Categories
-                .Where(c => categoryIds.Contains(c.Id))
-                .ToListAsync();
+        context.News.Add(newModel);
+        var affectedRows = await context.SaveChangesAsync();
 
-            newModel.Categories = categoriesFromDb;
+        if (affectedRows < 1)
+            throw new CreateObjectException("Error al crear la noticia.");
 
-            _context.News.Add(newModel);
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new CreateObjectException("Error al crear la noticia.");
-
-            return await _context.News
-                .Include(d => d.Status)
-                .Include(d => d.Categories)
-                .FirstAsync(n => n.Id == newModel.Id);
-        }
+        return await context.News
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .FirstAsync(n => n.Id == newModel.Id);
     }
 }

@@ -6,42 +6,33 @@ using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.Utils;
 
-namespace AsadaLisboaBackend.Services.Charges
+namespace AsadaLisboaBackend.Services.Charges;
+
+public class ChargesUpdaterService(
+    IChargesGetterService chargesGetterService,
+    IChargesUpdaterRepository chargesUpdaterRepository,
+    ILogger<ChargesUpdaterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IChargesUpdaterService
 {
-    public class ChargesUpdaterService : IChargesUpdaterService
+    public async Task<ChargeResponseDto> UpdateCharge(Guid id, string chargeRequest)
     {
-        private readonly IChargesGetterService _chargesGetterService;
-        private readonly IChargesUpdaterRepository _chargesUpdaterRepository;
-        private readonly ILogger<ChargesUpdaterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
+        var existsCharge = await chargesGetterService.ExistsCharge(chargeRequest);
 
-        public ChargesUpdaterService(IChargesGetterService chargesGetterService, IChargesUpdaterRepository chargesUpdaterRepository, ILogger<ChargesUpdaterService> logger, IMemoryCachesService memoryCachesService)
+
+        if (existsCharge)
         {
-            _chargesGetterService = chargesGetterService;
-            _chargesUpdaterRepository = chargesUpdaterRepository;
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
+            logger.LogWarning("Intento de actualización fallido: El nombre '{ChargeName}' ya existe.", chargeRequest);
+            throw new ExistingValueException("El nombre del cargo ya existe.");
         }
 
-        public async Task<ChargeResponseDTO> UpdateCharge(Guid id, string chargeRequest)
-        {
-            var existsCharge = await _chargesGetterService.ExistsCharge(chargeRequest);
+        var result = await chargesUpdaterRepository.UpdateCharge(id, chargeRequest);
 
+        logger.LogInformation("Cargo con ID: {Id} actualizado exitosamente.", id);
 
-            if (existsCharge)
-            {
-                _logger.LogWarning("Intento de actualización fallido: El nombre '{ChargeName}' ya existe.", chargeRequest);
-                throw new ExistingValueException("El nombre del cargo ya existe.");
-            }
+        memoryCachesService.RemoveById(Constants.CACHE_CHARGES, id);
+        memoryCachesService.ChangeVersion(Constants.CACHE_CHARGES);
 
-            var result = await _chargesUpdaterRepository.UpdateCharge(id, chargeRequest);
-
-            _logger.LogInformation("Cargo con ID: {Id} actualizado exitosamente.", id);
-
-            _memoryCachesService.RemoveById(Constants.CACHE_CHARGES, id);
-            _memoryCachesService.ChangeVersion(Constants.CACHE_CHARGES);
-
-            return result;
-        }
+        return result;
     }
 }

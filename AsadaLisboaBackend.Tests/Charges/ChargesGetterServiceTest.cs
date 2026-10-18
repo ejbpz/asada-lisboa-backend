@@ -10,104 +10,102 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
 
-namespace AsadaLisboaBackend.Tests.Charges
+namespace AsadaLisboaBackend.Tests.Charges;
+
+public class ChargesGetterServiceTest
 {
-    public class ChargesGetterServiceTest
+    private readonly Fixture _fixture;
+
+    private readonly Mock<ILogger<ChargesUpdaterService>> _loggerMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+
+    private readonly ChargesGetterService _service;
+
+    public ChargesGetterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IChargesGetterRepository> _chargesGetterRepositoryMock;
-        private readonly Mock<ILogger<ChargesUpdaterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly ChargesGetterService _service;
+        _fixture.Behaviors
+            .Add(new OmitOnRecursionBehavior());
 
-        public ChargesGetterServiceTest()
-        {
-            _fixture = new Fixture();
+        var chargesGetterRepositoryMock = new Mock<IChargesGetterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _loggerMock = new Mock<ILogger<ChargesUpdaterService>>();
 
-            _fixture.Behaviors
-                .Add(new OmitOnRecursionBehavior());
+        _memoryCachesServiceMock =  new Mock<IMemoryCachesService>();
 
-            _chargesGetterRepositoryMock =  new Mock<IChargesGetterRepository>();
+        _service = new ChargesGetterService(
+            chargesGetterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
+    [Fact]
+    public async Task GetCharges_Should_Return_Charges_Successfully()
+    {
+        // Arrange
+        var charges = _fixture
+            .CreateMany<ChargeResponseDto>(5)
+            .ToList();
 
-            _loggerMock = new Mock<ILogger<ChargesUpdaterService>>();
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                Constants.CACHE_CHARGES,
+                It.IsAny<Func<Task<List<ChargeResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .ReturnsAsync(charges);
 
-            _memoryCachesServiceMock =  new Mock<IMemoryCachesService>();
+        // Act
+        var result = await _service.GetCharges();
 
-            _service = new ChargesGetterService(
-                _chargesGetterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
-        [Fact]
-        public async Task GetCharges_Should_Return_Charges_Successfully()
-        {
-            // Arrange
-            var charges = _fixture
-                .CreateMany<ChargeResponseDTO>(5)
-                .ToList();
+        // Assert
+        result.Should().NotBeNull();
 
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<List<ChargeResponseDTO>>(
-                    Constants.CACHE_CHARGES,
-                    It.IsAny<Func<Task<List<ChargeResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ReturnsAsync(charges);
+        result.Should().HaveCount(5);
 
-            // Act
-            var result = await _service.GetCharges();
+        result.Should().BeEquivalentTo(charges);
 
-            // Assert
-            result.Should().NotBeNull();
+        _memoryCachesServiceMock.Verify(
+            x => x.GetOrCreateCache(
+                Constants.CACHE_CHARGES,
+                It.IsAny<Func<Task<List<ChargeResponseDto>>>>(),
+                It.Is<TimeSpan>(t =>
+                    t == TimeSpan.FromMinutes(5))),
+            Times.Once);
+    }
 
-            result.Should().HaveCount(5);
+    [Fact]
+    public async Task GetCharges_Should_Log_Error_When_Exception_Occurs()
+    {
+        // Arrange
+        _memoryCachesServiceMock
+            .Setup(x => x.GetOrCreateCache(
+                It.IsAny<string>(),
+                It.IsAny<Func<Task<List<ChargeResponseDto>>>>(),
+                It.IsAny<TimeSpan>()))
+            .ThrowsAsync(new Exception("Cache error"));
 
-            result.Should().BeEquivalentTo(charges);
+        // Act
+        Func<Task> act = async () =>
+            await _service.GetCharges();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.GetOrCreateCache<List<ChargeResponseDTO>>(
-                    Constants.CACHE_CHARGES,
-                    It.IsAny<Func<Task<List<ChargeResponseDTO>>>>(),
-                    It.Is<TimeSpan>(t =>
-                        t == TimeSpan.FromMinutes(5))),
-                Times.Once);
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<CreateObjectException>()
+            .WithMessage("Error al obtener la lista de cargos.");
 
-        [Fact]
-        public async Task GetCharges_Should_Log_Error_When_Exception_Occurs()
-        {
-            // Arrange
-            _memoryCachesServiceMock
-                .Setup(x => x.GetOrCreateCache<List<ChargeResponseDTO>>(
-                    It.IsAny<string>(),
-                    It.IsAny<Func<Task<List<ChargeResponseDTO>>>>(),
-                    It.IsAny<TimeSpan>()))
-                .ThrowsAsync(new Exception("Cache error"));
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.GetCharges();
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<CreateObjectException>()
-                .WithMessage("Error al obtener la lista de cargos.");
-
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 }

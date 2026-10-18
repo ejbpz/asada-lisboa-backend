@@ -1,13 +1,12 @@
 ﻿using AsadaLisboaBackend.Models.Enums;
 
-namespace AsadaLisboaBackend.Models.DTOs.Receipt
+namespace AsadaLisboaBackend.Models.DTOs.Receipt;
+
+public class ReceiptResponseDto
 {
-    public class ReceiptResponseDTO
-    {
-        public string? UserName { get; set; } = null;
-        public string? Chart1Url { get; set; } = null;
-        public string? Chart2Url { get; set; } = null;
-        public List<Dictionary<string, string>>? Table { get; set; }
-        public ReceiptType ReceiptType { get; set; } = ReceiptType.NotExists;
-    }
+    public string? UserName { get; set; } = null;
+    public string? Chart1Url { get; set; } = null;
+    public string? Chart2Url { get; set; } = null;
+    public List<Dictionary<string, string>>? Table { get; set; }
+    public ReceiptType ReceiptType { get; set; } = ReceiptType.NotExists;
 }

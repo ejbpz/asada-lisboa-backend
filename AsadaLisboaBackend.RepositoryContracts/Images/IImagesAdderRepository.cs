@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models;
 
-namespace AsadaLisboaBackend.RepositoryContracts.Images
+namespace AsadaLisboaBackend.RepositoryContracts.Images;
+
+public interface IImagesAdderRepository
 {
-    public interface IImagesAdderRepository
-    {
-        public Task<Image> CreateImage(Image image);
-    }
+    public Task<Image> CreateImage(Image image);
 }

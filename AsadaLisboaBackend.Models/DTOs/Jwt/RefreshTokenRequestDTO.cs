@@ -1,8 +1,7 @@
-﻿namespace AsadaLisboaBackend.Models.DTOs.Jwt
+﻿namespace AsadaLisboaBackend.Models.DTOs.Jwt;
+
+public class RefreshTokenRequestDto
 {
-    public class RefreshTokenRequestDTO
-    {
-        public string? Token { get; set; }
-        public string? RefreshToken { get; set; }
-    }
+    public string? Token { get; set; }
+    public string? RefreshToken { get; set; }
 }

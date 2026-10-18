@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.Utils.OptionsPattern
+﻿namespace AsadaLisboaBackend.Utils.OptionsPattern;
+
+public class ContactEmailOptions
 {
-    public class ContactEmailOptions
-    {
-        public string CONTACT_EMAIL { get; set; } = string.Empty;
-    }
+    public string ContactEmail { get; set; } = string.Empty;
 }

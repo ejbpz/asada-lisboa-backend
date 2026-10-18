@@ -5,62 +5,53 @@ using AsadaLisboaBackend.ServiceContracts.News;
 using AsadaLisboaBackend.ServiceContracts.Images;
 using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.Principals;
-using AsadaLisboaBackend.RepositoryContracts.Statuses;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Principals
+namespace AsadaLisboaBackend.Services.Principals;
+
+public class PrincipalsGetterService(
+    INewsGetterService newsGetterService, 
+    IImagesGetterService imagesGetterService, 
+    IDocumentsGetterService documentsGetterService, 
+    ILogger<PrincipalsGetterService> logger) 
+    : IPrincipalsGetterService
 {
-    public class PrincipalsGetterService : IPrincipalsGetterService
+    public async Task<PrincipalResponseDto> GetPrincipalInformation()
     {
-        private readonly INewsGetterService _newsGetterService;
-        private readonly ILogger<PrincipalsGetterService> _logger;
-        private readonly IImagesGetterService _imagesGetterService;
-        private readonly IDocumentsGetterService _documentsGetterService;
-
-        public PrincipalsGetterService(INewsGetterService newsGetterService, IImagesGetterService imagesGetterService, IDocumentsGetterService documentsGetterService, IStatusesGetterRepository statusesGetterRepository, ILogger<PrincipalsGetterService> logger, IMemoryCachesService memoryCachesService)
+        var searchSortRequestDto = new SearchSortRequestDto()
         {
-            _logger = logger;
-            _newsGetterService = newsGetterService;
-            _imagesGetterService = imagesGetterService;
-            _documentsGetterService = documentsGetterService;
-        }
+            Take = 6,
+            Offset = 0,
+            IsPublic = true,
+            SortDirection = "desc"
+        };
 
-        public async Task<PrincipalResponseDTO> GetPrincipalInformation()
+        logger.LogInformation("Información principal obtenida correctamente.");
+
+        return new PrincipalResponseDto()
         {
-            var searchSortRequestDTO = new SearchSortRequestDTO()
-            {
-                Take = 6,
-                Offset = 0,
-                IsPublic = true,
-            };
+            News = (await newsGetterService.GetNews(searchSortRequestDto)).Data,
+            Images = (await imagesGetterService.GetImages(searchSortRequestDto)).Data,
+            Documents = (await documentsGetterService.GetDocuments(searchSortRequestDto)).Data
+        };
+    }
 
-            _logger.LogInformation("Información principal obtenida correctamente.");
-
-            return new PrincipalResponseDTO()
-            {
-                News = (await _newsGetterService.GetNews(searchSortRequestDTO)).Data,
-                Images = (await _imagesGetterService.GetImages(searchSortRequestDTO)).Data,
-                Documents = (await _documentsGetterService.GetDocuments(searchSortRequestDTO)).Data
-            };
-        }
-
-        public async Task<PrincipalResponseDTO> GetPrincipalAdminInformation()
+    public async Task<PrincipalResponseDto> GetPrincipalAdminInformation()
+    {
+        var searchSortRequestDto = new SearchSortRequestDto()
         {
-            var searchSortRequestDTO = new SearchSortRequestDTO()
-            {
-                Take = 6,
-                Offset = 0,
-                IsPublic = false,
-            };
+            Take = 6,
+            Offset = 0,
+            IsPublic = false,
+            SortDirection = "desc"
+        };
 
-            _logger.LogInformation("Información principal administrativa obtenida correctamente.");
+        logger.LogInformation("Información principal administrativa obtenida correctamente.");
 
-            return new PrincipalResponseDTO()
-            {
-                News = (await _newsGetterService.GetNews(searchSortRequestDTO)).Data,
-                Images = (await _imagesGetterService.GetImages(searchSortRequestDTO)).Data,
-                Documents = (await _documentsGetterService.GetDocuments(searchSortRequestDTO)).Data
-            };
-        }
+        return new PrincipalResponseDto()
+        {
+            News = (await newsGetterService.GetNews(searchSortRequestDto)).Data,
+            Images = (await imagesGetterService.GetImages(searchSortRequestDto)).Data,
+            Documents = (await documentsGetterService.GetDocuments(searchSortRequestDto)).Data
+        };
     }
 }

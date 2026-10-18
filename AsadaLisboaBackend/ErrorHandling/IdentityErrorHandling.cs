@@ -2,45 +2,40 @@
 using Microsoft.AspNetCore.Diagnostics;
 using AsadaLisboaBackend.Services.Exceptions;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class IdentityErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<IdentityErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class IdentityErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<IdentityErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
+        if (exception is not IdentityErrorException identityErrorException) 
+            return false;
 
-        public IdentityErrorHandling(IProblemDetailsService problemDetailsService, ILogger<IdentityErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Error al realizar cambios de un usuario.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+        var problemDetails = new ProblemDetails
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
+            Detail = exception.Message,
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Error al hacer cambios del usuario",
+            Extensions =
+            {
+                ["errors"] = identityErrorException.Errors
+            }
+        };
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
-            if (exception is not IdentityErrorException identityErrorException) 
-                return false;
+            Exception = exception,
+            HttpContext = httpContext,
+            ProblemDetails = problemDetails
+        });
 
-            _logger.LogError(exception, "Error Global - Error al realizar cambios de un usuario.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-            var problemDetails = new ProblemDetails
-            {
-                Detail = exception.Message,
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Error al hacer cambios del usuario",
-            };
-
-            problemDetails.Extensions["errors"] = identityErrorException.Errors;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-            {
-                Exception = exception,
-                HttpContext = httpContext,
-                ProblemDetails = problemDetails
-            });
-
-            return true;
-        }
+        return true;
     }
 }

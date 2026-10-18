@@ -1,31 +1,23 @@
 ﻿using Microsoft.Extensions.Logging;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.ServiceContracts.Categories;
-using AsadaLisboaBackend.RepositoryContracts.Categories;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
+using AsadaLisboaBackend.RepositoryContracts.Categories;
 
-namespace AsadaLisboaBackend.Services.Categories
+namespace AsadaLisboaBackend.Services.Categories;
+
+public class CategoriesDeleterService(
+    ICategoriesDeleterRepository categoriesDeleterRepository,
+    ILogger<CategoriesDeleterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : ICategoriesDeleterService
 {
-    public class CategoriesDeleterService : ICategoriesDeleterService
+    public async Task DeleteCategory(Guid id)
     {
-        private readonly ILogger<CategoriesDeleterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly ICategoriesDeleterRepository _categoriesDeleterRepository;
+        await categoriesDeleterRepository.DeleteCategory(id);
+        logger.LogInformation("Categor ía con id {Id} borrado exitosamente.", id);
 
-        public CategoriesDeleterService(ICategoriesDeleterRepository categoriesDeleterRepository, ILogger<CategoriesDeleterService> logger, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _categoriesDeleterRepository = categoriesDeleterRepository;
-        }
-
-        public async Task DeleteCategory(Guid id)
-        {
-            await _categoriesDeleterRepository.DeleteCategory(id);
-            _logger.LogInformation("Categor ía con id {Id} borrado exitosamente.", id);
-
-            _memoryCachesService.RemoveById(Constants.CACHE_CATEGORIES, id);
-            _memoryCachesService.ChangeVersion(Constants.CACHE_CATEGORIES);
-        }
+        memoryCachesService.RemoveById(Constants.CACHE_CATEGORIES, id);
+        memoryCachesService.ChangeVersion(Constants.CACHE_CATEGORIES);
     }
 }

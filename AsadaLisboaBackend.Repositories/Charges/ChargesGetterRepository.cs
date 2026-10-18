@@ -4,43 +4,35 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
 
-namespace AsadaLisboaBackend.Repositories.Charges
+namespace AsadaLisboaBackend.Repositories.Charges;
+
+public class ChargesGetterRepository(ApplicationDbContext context) : IChargesGetterRepository
 {
-    public class ChargesGetterRepository : IChargesGetterRepository
+    public async Task<bool> ExistsCharge(string name)
     {
-        private readonly ApplicationDbContext _context;
+        return await context.Charges
+            .AsNoTracking()
+            .AnyAsync(c => c.Name.Trim().ToLower() == name);
+    }
 
-        public ChargesGetterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<ChargeResponseDto> GetCharge(Guid id)
+    {
+        var charge = await context.Charges
+            .AsNoTracking()
+            .Select(ChargeExtensions.MapChargeResponseDto())
+            .FirstOrDefaultAsync(c => c.Id == id);
 
-        public async Task<bool> ExistsCharge(string name)
-        {
-            return await _context.Charges
-                .AsNoTracking()
-                .AnyAsync(c => c.Name.Trim().ToLower() == name);
-        }
+        if (charge is null)
+            throw new NotFoundException("No existe el cargo seleccionado.");
 
-        public async Task<ChargeResponseDTO> GetCharge(Guid id)
-        {
-            var charge = await _context.Charges
-                .AsNoTracking()
-                .Select(ChargeExtensions.MapChargeResponseDTO())
-                .FirstOrDefaultAsync(c => c.Id == id);
+        return charge;
+    }
 
-            if (charge is null)
-                throw new NotFoundException("No existe el cargo seleccionado.");
-
-            return charge;
-        }
-
-        public async Task<List<ChargeResponseDTO>> GetCharges()
-        {
-            return await _context.Charges
-                .AsNoTracking()
-                .Select(ChargeExtensions.MapChargeResponseDTO())
-                .ToListAsync();
-        }
+    public async Task<List<ChargeResponseDto>> GetCharges()
+    {
+        return await context.Charges
+            .AsNoTracking()
+            .Select(ChargeExtensions.MapChargeResponseDto())
+            .ToListAsync();
     }
 }

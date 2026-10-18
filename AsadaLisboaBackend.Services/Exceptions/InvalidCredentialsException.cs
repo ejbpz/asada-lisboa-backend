@@ -1,9 +1,8 @@
-﻿namespace AsadaLisboaBackend.Services.Exceptions
+﻿namespace AsadaLisboaBackend.Services.Exceptions;
+
+public class InvalidCredentialsException : Exception
 {
-    public class InvalidCredentialsException : Exception
-    {
-        public InvalidCredentialsException() : base() { }
-        public InvalidCredentialsException(string message) : base(message) { }
-        public InvalidCredentialsException(string message, Exception inner) : base(message, inner) { }
-    }
+    public InvalidCredentialsException() { }
+    public InvalidCredentialsException(string message) : base(message) { }
+    public InvalidCredentialsException(string message, Exception inner) : base(message, inner) { }
 }

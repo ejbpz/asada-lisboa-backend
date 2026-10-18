@@ -4,40 +4,32 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
-namespace AsadaLisboaBackend.Repositories.Documents
+namespace AsadaLisboaBackend.Repositories.Documents;
+
+public class DocumentsAdderRepository(ApplicationDbContext context) : IDocumentsAdderRepository
 {
-    public class DocumentsAdderRepository : IDocumentsAdderRepository
+    public async Task<Document> CreateDocument(Document newDocument)
     {
-        private readonly ApplicationDbContext _context;
+        var categoryIds = newDocument.Categories
+            .Select(c => c.Id)
+            .ToList();
 
-        public DocumentsAdderRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        var categoriesFromDb = await context.Categories
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToListAsync();
 
-        public async Task<Document> CreateDocument(Document newDocument)
-        {
-            var categoryIds = newDocument.Categories
-                .Select(c => c.Id)
-                .ToList();
+        newDocument.Categories = categoriesFromDb;
 
-            var categoriesFromDb = await _context.Categories
-                .Where(c => categoryIds.Contains(c.Id))
-                .ToListAsync();
+        context.Documents.Add(newDocument);
+        var affectedRow = await context.SaveChangesAsync();
 
-            newDocument.Categories = categoriesFromDb;
+        if (affectedRow < 1)
+            throw new CreateObjectException("Error al agregrar el documento");
 
-            _context.Documents.Add(newDocument);
-            var affectedRow = await _context.SaveChangesAsync();
-
-            if (affectedRow < 1)
-                throw new CreateObjectException("Error al agregrar el documento");
-
-            return await _context.Documents
-                .Include(d => d.Status)
-                .Include(d => d.Categories)
-                .Include(d => d.DocumentType)
-                .FirstAsync(d => d.Id == newDocument.Id);
-        }
+        return await context.Documents
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .Include(d => d.DocumentType)
+            .FirstAsync(d => d.Id == newDocument.Id);
     }
 }

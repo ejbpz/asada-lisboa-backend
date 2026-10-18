@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.Editors
+﻿namespace AsadaLisboaBackend.ServiceContracts.Editors;
+
+public interface IEditorsUpdaterService
 {
-    public interface IEditorsUpdaterService
-    {
-        public Task<string> ChangeHtmlImagesFolder(string html);
-    }
+    public Task<string> ChangeHtmlImagesFolder(string html);
 }

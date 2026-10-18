@@ -1,28 +1,27 @@
-﻿namespace AsadaLisboaBackend.ServicesExtension
+﻿namespace AsadaLisboaBackend.ServicesExtension;
+
+/// <summary>
+/// Extension method to CORS.
+/// </summary>
+public static class CorsExtension
 {
     /// <summary>
-    /// Extension method to CORS.
+    /// CORS registration into services.
     /// </summary>
-    public static class CorsExtension
+    /// <param name="services">Collection of services.</param>
+    /// <returns>List of registered services.</returns>
+    public static IServiceCollection CorsRegistration(this IServiceCollection services)
     {
-        /// <summary>
-        /// CORS registration into services.
-        /// </summary>
-        /// <param name="services">Collection of services.</param>
-        /// <returns>List of registered services.</returns>
-        public static IServiceCollection CorsRegistration(this IServiceCollection services)
+        services.AddCors(options =>
         {
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(policyBuilder => {
-                    policyBuilder
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowAnyOrigin();
-                });
+            options.AddDefaultPolicy(policyBuilder => {
+                policyBuilder
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
             });
+        });
 
-            return services;
-        }
+        return services;
     }
 }

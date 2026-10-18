@@ -2,23 +2,14 @@
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 
-namespace AsadaLisboaBackend.Repositories.DocumentTypes
+namespace AsadaLisboaBackend.Repositories.DocumentTypes;
+
+public class DocumentTypesGetterRepository(ApplicationDbContext context) : IDocumentTypesGetterRepository
 {
-    public class DocumentTypesGetterRepository : IDocumentTypesGetterRepository
+    public Guid? GetDocumentTypeIdByExtension(string extension)
     {
-        private readonly ApplicationDbContext _context;
-
-        public DocumentTypesGetterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public Guid? GetDocumentTypeIdByExtension(string extension)
-        {
-            return _context.DocumentTypes
-                .AsNoTracking()
-                .Where(c => c.Extension.Equals(extension))
-                .FirstOrDefault()?.Id;
-        } 
-    }
+        return context.DocumentTypes
+            .AsNoTracking()
+            .FirstOrDefault(c => c.Extension.Equals(extension))?.Id;
+    } 
 }

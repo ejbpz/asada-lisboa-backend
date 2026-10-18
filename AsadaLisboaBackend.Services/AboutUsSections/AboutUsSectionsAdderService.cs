@@ -6,39 +6,29 @@ using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
-namespace AsadaLisboaBackend.Services.AboutUsSections
+namespace AsadaLisboaBackend.Services.AboutUsSections;
+
+public class AboutUsSectionsAdderService(
+    IAboutUsSectionsAdderRepository aboutUsSectionsAdderRepository,
+    ILogger<AboutUsSectionsAdderService> logger,
+    IMemoryCachesService memoryCachesService) 
+    : IAboutUsSectionsAdderService
 {
-    public class AboutUsSectionsAdderService : IAboutUsSectionsAdderService
+    public async Task<AboutUsResponseDto> CreateAboutUsSection(AboutUsRequestDto aboutUsRequestDto)
     {
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly ILogger<AboutUsSectionsAdderService> _logger;
-        private readonly IAboutUsSectionsAdderRepository _aboutUsSectionsAdderRepository;
-
-        public AboutUsSectionsAdderService(IAboutUsSectionsAdderRepository aboutUsSectionsAdderRepository, ILogger<AboutUsSectionsAdderService> logger, IMemoryCachesService memoryCachesService)
+        var aboutUsSection = new AboutUsSection()
         {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _aboutUsSectionsAdderRepository = aboutUsSectionsAdderRepository;
-        }
+            Order = aboutUsRequestDto.Order,
+            Content = aboutUsRequestDto.Content,
+            SectionType = aboutUsRequestDto.SectionType,
+        };
 
-        public async Task<AboutUsResponseDTO> CreateAboutUsSection(AboutUsRequestDTO aboutUsRequestDTO)
-        {
+        var aboutUsCreate = await aboutUsSectionsAdderRepository.CreateAboutUsSection(aboutUsSection);
 
-            var aboutUsSection = new AboutUsSection()
-            {
-                Order = aboutUsRequestDTO.Order,
-                Content = aboutUsRequestDTO.Content,
-                SectionType = aboutUsRequestDTO.SectionType,
-            };
+        logger.LogInformation("Sección \"sobre nosotros\" creada");
+        memoryCachesService.ChangeVersion(Constants.CACHE_ABOUT_US);
 
-            var aboutUsCreate = await _aboutUsSectionsAdderRepository.CreateAboutUsSection(aboutUsSection);
+        return aboutUsCreate.ToAboutUsResponseDto();
 
-            _logger.LogInformation("Sección \"sobre nosotros\" creada");
-
-            _memoryCachesService.ChangeVersion(Constants.CACHE_ABOUT_US);
-
-            return aboutUsCreate.ToAboutUsResponseDTO();
-
-        }
     }
 }

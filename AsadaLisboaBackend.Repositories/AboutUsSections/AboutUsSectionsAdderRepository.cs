@@ -3,26 +3,18 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
-namespace AsadaLisboaBackend.Repositories.AboutUsSections
+namespace AsadaLisboaBackend.Repositories.AboutUsSections;
+
+public class AboutUsSectionsAdderRepository(ApplicationDbContext context) : IAboutUsSectionsAdderRepository
 {
-    public class AboutUsSectionsAdderRepository : IAboutUsSectionsAdderRepository
+    public async Task<AboutUsSection> CreateAboutUsSection(AboutUsSection aboutUsSection)
     {
-        private readonly ApplicationDbContext _context;
+        context.AboutUsSections.Add(aboutUsSection);
+        var affectedRows = await context.SaveChangesAsync();
 
-        public AboutUsSectionsAdderRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        if (affectedRows < 1)
+            throw new NotFoundException("Error al crear la sección.");
 
-        public async Task<AboutUsSection> CreateAboutUsSection(AboutUsSection aboutUsSection)
-        {
-            _context.AboutUsSections.Add(aboutUsSection);
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Error al crear la sección.");
-
-            return aboutUsSection;
-        }
+        return aboutUsSection;
     }
 }

@@ -6,48 +6,37 @@ using AsadaLisboaBackend.ServiceContracts.Contacts;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Contacts
+namespace AsadaLisboaBackend.Services.Contacts;
+
+public class ContactsGetterService(
+    IContactsGetterRepository contactsGetterRepository,
+    ILogger<ContactsGetterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IContactsGetterService
 {
-    public class ContactsGetterService : IContactsGetterService
+    public async Task<PageResponseDto<ContactResponseDto>> GetContacts(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly ILogger<ContactsGetterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IContactsGetterRepository _contactsGetterRepository;
-
-        public ContactsGetterService(IContactsGetterRepository contactsGetterRepository, ILogger<ContactsGetterService> logger, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _contactsGetterRepository = contactsGetterRepository;
-        }
-
-        public async Task<PageResponseDTO<ContactResponseDTO>> GetContacts(SearchSortRequestDTO searchSortRequestDTO)
-        {
-            try {
-                  var result = await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<ContactResponseDTO>>
-                    (
-                      resource: Constants.CACHE_CONTACTS,
-                      request: searchSortRequestDTO,
-                      create: () => _contactsGetterRepository.GetContacts(searchSortRequestDTO),
-                      time: TimeSpan.FromMinutes(5));
+        try {
+            var result = await memoryCachesService.GetOrCreateCacheList(
+                resource: Constants.CACHE_CONTACTS,
+                request: searchSortRequestDto,
+                create: () => contactsGetterRepository.GetContacts(searchSortRequestDto),
+                time: TimeSpan.FromMinutes(5));
                 
+            logger.LogInformation(
+                "Obtención exitosa de configuración. Tamaño: {Take}",
+                searchSortRequestDto.Take
+            );
 
-                _logger.LogInformation(
-                    "Obtención exitosa de configuración. Tamaño: {Take}",
-                    searchSortRequestDTO.Take
-                );
-
-                return result;
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Error al obtener contacto. Tamaño: {Take}",
-                    searchSortRequestDTO.Take
-                );
-                throw;
-            }
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Error al obtener contacto. Tamaño: {Take}",
+                searchSortRequestDto.Take
+            );
+            throw;
         }
     }
 }

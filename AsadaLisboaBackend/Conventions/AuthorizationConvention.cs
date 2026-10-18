@@ -5,70 +5,69 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace AsadaLisboaBackend.Conventions
+namespace AsadaLisboaBackend.Conventions;
+
+/// <summary>
+/// Convention for adding Authorize Filters to Action Controllers.
+/// </summary>
+public class AuthorizationConvention : IApplicationModelConvention
 {
     /// <summary>
-    /// Convention for adding Authorize Filters to Action Controllers.
+    /// Apply the AuthorizeFilter into actions.
     /// </summary>
-    public class AuthorizationConvention : IApplicationModelConvention
+    /// <param name="application">Model to configure controllers.</param>
+    public void Apply(ApplicationModel application)
     {
-        /// <summary>
-        /// Apply the AuthorizeFilter into actions.
-        /// </summary>
-        /// <param name="application">Model to configure controllers.</param>
-        public void Apply(ApplicationModel application)
+        foreach (var controller in application.Controllers)
         {
-            foreach (var controller in application.Controllers)
-            {
-                var areaAttribute = controller.Attributes
-                    .OfType<AreaAttribute>()
-                    .FirstOrDefault();
+            var areaAttribute = controller.Attributes
+                .OfType<AreaAttribute>()
+                .FirstOrDefault();
 
-                if (areaAttribute?.RouteValue != "Admin")
+            if (areaAttribute?.RouteValue != "Admin")
+                continue;
+
+            foreach (var action in controller.Actions)
+            {
+                // if there's already an AuthorizeAttribute, skip this action
+                var hasAuthorize =
+                    action.Attributes.OfType<AuthorizeAttribute>().Any() ||
+                    controller.Attributes.OfType<AuthorizeAttribute>().Any();
+
+                if (hasAuthorize)
                     continue;
 
-                foreach (var action in controller.Actions)
+                var methods = action.Selectors
+                    .SelectMany(s => s.ActionConstraints)
+                    .OfType<HttpMethodActionConstraint>()
+                    .SelectMany(c => c.HttpMethods)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (!methods.Any())
+                    continue;
+
+                string? policy = null;
+
+                if (methods.Contains("DELETE", StringComparer.OrdinalIgnoreCase))
                 {
-                    // if there's already an AuthorizeAttribute, skip this action
-                    var hasAuthorize =
-                        action.Attributes.OfType<AuthorizeAttribute>().Any() ||
-                        controller.Attributes.OfType<AuthorizeAttribute>().Any();
+                    policy = Constants.ROLE_ADMINISTRADOR;
+                }
+                else if (
+                    methods.Contains("POST", StringComparer.OrdinalIgnoreCase) ||
+                    methods.Contains("PUT", StringComparer.OrdinalIgnoreCase) ||
+                    methods.Contains("PATCH", StringComparer.OrdinalIgnoreCase))
+                {
+                    policy = Constants.ROLE_ESCRITOR;
+                }
+                else if (methods.Contains("GET", StringComparer.OrdinalIgnoreCase))
+                {
+                    policy = Constants.ROLE_LECTOR;
+                }
 
-                    if (hasAuthorize)
-                        continue;
-
-                    var methods = action.Selectors
-                        .SelectMany(s => s.ActionConstraints ?? [])
-                        .OfType<HttpMethodActionConstraint>()
-                        .SelectMany(c => c.HttpMethods)
-                        .Distinct(StringComparer.OrdinalIgnoreCase)
-                        .ToList();
-
-                    if (!methods.Any())
-                        continue;
-
-                    string? policy = null;
-
-                    if (methods.Contains("DELETE", StringComparer.OrdinalIgnoreCase))
-                    {
-                        policy = Constants.ROLE_ADMINISTRADOR;
-                    }
-                    else if (
-                        methods.Contains("POST", StringComparer.OrdinalIgnoreCase) ||
-                        methods.Contains("PUT", StringComparer.OrdinalIgnoreCase) ||
-                        methods.Contains("PATCH", StringComparer.OrdinalIgnoreCase))
-                    {
-                        policy = Constants.ROLE_ESCRITOR;
-                    }
-                    else if (methods.Contains("GET", StringComparer.OrdinalIgnoreCase))
-                    {
-                        policy = Constants.ROLE_LECTOR;
-                    }
-
-                    if (policy is not null)
-                    {
-                        action.Filters.Add(new AuthorizeFilter(policy));
-                    }
+                if (policy is not null)
+                {
+                    action.Filters.Add(new AuthorizeFilter(policy));
                 }
             }
         }

@@ -1,2 +1,57 @@
 {
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "JwtOptions": {
+    "ExpirationMinutes": 20,
+    "Key": "Private-Key (256 bits)",
+    "Issuer": "http://localhost:5199",
+    "Audience": "http://localhost:4200"
+  },
+  "RefreshJwtOptions": {
+    "ExpirationMinutes": 1440
+  },
+  "ReceiptOptions": {
+    "DomainReceipts": "receipts url"
+  },
+  "ConnectionStrings": {
+    "AsadaLisboaDB": "Server=localhost;Database=AsadaLisboaDB;User Id=sa;Password=your_password;"
+  },
+  "ContactEmailOptions": {
+    "ContactEmail": "example@email.com"
+  },
+  "ReCaptchaOptions": {
+    "SecretKey": "ReCaptcha Secret Key"
+  },
+  "DefaultUserOptions": {
+    "Run": false,
+    "Password": "Password",
+    "Email": "email@example.com"
+  },
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.File" ],
+    "MinimumLevel": "Information",
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "logs/log-.txt",
+          "rollingInterval": "Day",
+          "fileSizeLimitBytes": 1048576,
+          "rollOnFileSizeLimit": true
+        }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext"
+    ],
+    "Properties": {
+      "ApplicationName": "ASADA Lisboa - Web API"
+    }
+  },
+  "RESEND_API_TOKEN": "Resend Secret Token"
 }

@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Account;
 
-namespace AsadaLisboaBackend.ServiceContracts.Accounts
+namespace AsadaLisboaBackend.ServiceContracts.Accounts;
+
+public  interface IRegisterUserService
 {
-    public  interface IRegisterUserService
-    {
-        public Task RegisterUser(RegisterRequestDTO registerRequestDTO);
-    }
+    public Task RegisterUser(RegisterRequestDto registerRequestDto);
 }

@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.Users
+﻿namespace AsadaLisboaBackend.ServiceContracts.Users;
+
+public interface IUsersDeleterService
 {
-    public interface IUsersDeleterService
-    {
-        public Task DeleteUser(Guid id);
-    }
+    public Task DeleteUser(Guid id);
 }

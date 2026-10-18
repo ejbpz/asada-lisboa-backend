@@ -7,78 +7,69 @@ using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Emails;
 using AsadaLisboaBackend.ServiceContracts.Accounts;
 
-namespace AsadaLisboaBackend.Services.Accounts
+namespace AsadaLisboaBackend.Services.Accounts;
+
+public class VerificationCodeService(
+    UserManager<ApplicationUser> userManager,
+    IEmailsSenderService emailsSenderService,
+    ILogger<VerificationCodeService> logger)
+    : IVerificationCodeService
 {
-    public class VerificationCodeService : IVerificationCodeService
+    public async Task GenerateCode(string email)
     {
-        private readonly ILogger<VerificationCodeService> _logger;
-        private readonly IEmailsSenderService _emailsSenderService;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public VerificationCodeService(UserManager<ApplicationUser> userManager, IEmailsSenderService emailsSenderService, ILogger<VerificationCodeService> logger)
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
         {
-            _logger = logger;
-            _userManager = userManager;
-            _emailsSenderService = emailsSenderService;
+            logger.LogError("Usuario no existente para generación de token de verificación.");
+            throw new NotFoundException("Usuario inexistente.");
         }
 
-        public async Task GenerateCode(string email)
+        var generateToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(generateToken));
+
+        await emailsSenderService.SendVerificationCode(user.FirstName, email, encodedToken);
+    }
+
+    public async Task ConfirmEmailAsync(string? email, string? token)
+    {
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user is null)
-            {
-                _logger.LogError("Usuario no existente para generación de token de verificación.");
-                throw new NotFoundException("Usuario inexistente.");
-            }
-
-            var generateToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(generateToken));
-
-            await _emailsSenderService.SendVerificationCode(user.FirstName, email, encodedToken);
+            logger.LogError("Email o token de verificación no proporcionado.");
+            throw new ArgumentException("Email y token son requeridos.");
         }
 
-        public async Task ConfirmEmailAsync(string? email, string? token)
+        var user = await userManager.FindByEmailAsync(email);
+
+        if (user is null)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
-            {
-                _logger.LogError("Email o token de verificación no proporcionado.");
-                throw new ArgumentException("Email y token son requeridos.");
-            }
+            logger.LogError("Usuario no existente para confirmación de email.");
+            throw new NotFoundException("Usuario inexistente.");
+        }
 
-            var user = await _userManager.FindByEmailAsync(email);
+        if(user.EmailConfirmed)
+        {
+            logger.LogError("El email del usuario ya ha sido confirmado.");
+            throw new UpdateObjectException("El email del usuario ya ha sido confirmado.");
+        }
 
-            if (user is null)
-            {
-                _logger.LogError("Usuario no existente para confirmación de email.");
-                throw new NotFoundException("Usuario inexistente.");
-            }
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+        var result = await userManager.ConfirmEmailAsync(user, decodedToken);
 
-            if(user.EmailConfirmed)
-            {
-                _logger.LogError("El email del usuario ya ha sido confirmado.");
-                throw new UpdateObjectException("El email del usuario ya ha sido confirmado.");
-            }
+        if (!result.Succeeded)
+        {
+            logger.LogError("Error al confirmar el email del usuario.");
+            throw new UpdateObjectException("Error al actualizar el usuario.");
+        }
 
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+        user.EmailConfirmed = true;
+        user.IsActive = true;
 
-            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+        await userManager.UpdateAsync(user);
 
-            if (!result.Succeeded)
-            {
-                _logger.LogError("Error al confirmar el email del usuario.");
-                throw new UpdateObjectException("Error al actualizar el usuario.");
-            }
-
-            user.EmailConfirmed = true;
-            user.IsActive = true;
-
-            await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
-            {
-                _logger.LogError("Error al confirmar el email del usuario.");
-                throw new UpdateObjectException("Error al actualizar el usuario.");
-            }
+        if (!result.Succeeded)
+        {
+            logger.LogError("Error al confirmar el email del usuario.");
+            throw new UpdateObjectException("Error al actualizar el usuario.");
         }
     }
 }

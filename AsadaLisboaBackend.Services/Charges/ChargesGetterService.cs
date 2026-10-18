@@ -6,41 +6,33 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.Utils;
 
-namespace AsadaLisboaBackend.Services.Charges
+namespace AsadaLisboaBackend.Services.Charges;
+
+public class ChargesGetterService(
+    IChargesGetterRepository chargesGetterRepository,
+    ILogger<ChargesUpdaterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IChargesGetterService
 {
-    public class ChargesGetterService : IChargesGetterService
+    public async Task<List<ChargeResponseDto>> GetCharges()
     {
-        private readonly IChargesGetterRepository _chargesGetterRepository;
-        private readonly ILogger<ChargesUpdaterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-
-        public ChargesGetterService(IChargesGetterRepository chargesGetterRepository, ILogger<ChargesUpdaterService> logger, IMemoryCachesService memoryCachesService)
+        try
         {
-            _chargesGetterRepository = chargesGetterRepository;
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-        }
+            return await memoryCachesService.GetOrCreateCache<List<ChargeResponseDto>>(
+                key: Constants.CACHE_CHARGES,
+                create: () => chargesGetterRepository.GetCharges(),
+                time: TimeSpan.FromMinutes(5));
 
-        public async Task<List<ChargeResponseDTO>> GetCharges()
+        } catch (Exception ex) 
         {
-            try
-            {
-                return await _memoryCachesService.GetOrCreateCache<List<ChargeResponseDTO>>(
-                     key: Constants.CACHE_CHARGES,
-                     create: () => _chargesGetterRepository.GetCharges(),
-                     time: TimeSpan.FromMinutes(5));
-
-            } catch (Exception ex) 
-            {
-                _logger.LogError(ex, "Ocurrió un error al intentar obtener la lista de cargos.");
-                throw new CreateObjectException("Error al obtener la lista de cargos.");
-            }
+            logger.LogError(ex, "Ocurrió un error al intentar obtener la lista de cargos.");
+            throw new CreateObjectException("Error al obtener la lista de cargos.");
         }
+    }
 
-        public async Task<bool> ExistsCharge(string name)
-        {
-            name = name.Trim().ToLower();
-            return await _chargesGetterRepository.ExistsCharge(name);
-        }
+    public async Task<bool> ExistsCharge(string name)
+    {
+        name = name.Trim().ToLower();
+        return await chargesGetterRepository.ExistsCharge(name);
     }
 }

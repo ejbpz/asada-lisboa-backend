@@ -2,41 +2,34 @@
 using Microsoft.AspNetCore.Diagnostics;
 using AsadaLisboaBackend.Services.Exceptions;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class InUsedErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<InUsedErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class InUsedErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<InUsedErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
+        if (exception is not InUsedException)
+            return false;
 
-        public InUsedErrorHandling(IProblemDetailsService problemDetailsService, ILogger<InUsedErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Elemento al eliminar una categoría en uso.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            if (exception is not InUsedException inUsedException)
-                return false;
-
-            _logger.LogError(exception, "Error Global - Elemento al eliminar una categoría en uso.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Detail = exception.Message,
-                    Title = "Error al utilizar el recurso",
-                    Status = StatusCodes.Status409Conflict,
-                }
-            });
+                Detail = exception.Message,
+                Title = "Error al utilizar el recurso",
+                Status = StatusCodes.Status409Conflict,
+            }
+        });
 
-            return true;
-        }
+        return true;
     }
 }

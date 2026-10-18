@@ -1,10 +1,9 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Status;
 
-namespace AsadaLisboaBackend.RepositoryContracts.Statuses
+namespace AsadaLisboaBackend.RepositoryContracts.Statuses;
+
+public interface IStatusesGetterRepository
 {
-    public interface IStatusesGetterRepository
-    {
-        public Task<List<StatusResponseDTO>> GetStatuses();
-        public Task<StatusResponseDTO> GetStatus(Guid id);
-    }
+    public Task<List<StatusResponseDto>> GetStatuses();
+    public Task<StatusResponseDto> GetStatus(Guid id);
 }

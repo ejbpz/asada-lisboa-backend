@@ -1,9 +1,8 @@
-﻿namespace AsadaLisboaBackend.Services.Exceptions
+﻿namespace AsadaLisboaBackend.Services.Exceptions;
+
+public class UpdateObjectException : Exception
 {
-    public class UpdateObjectException : Exception
-    {
-        public UpdateObjectException() : base() { }
-        public UpdateObjectException(string message) : base(message) { }
-        public UpdateObjectException(string message, Exception inner) : base(message, inner) { }
-    }
+    public UpdateObjectException() { }
+    public UpdateObjectException(string message) : base(message) { }
+    public UpdateObjectException(string message, Exception inner) : base(message, inner) { }
 }

@@ -2,41 +2,34 @@
 using Microsoft.AspNetCore.Diagnostics;
 using AsadaLisboaBackend.Services.Exceptions;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class NotFoundErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<NotFoundErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class NotFoundErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<NotFoundErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
+        if (exception is not NotFoundException) 
+            return false;
 
-        public NotFoundErrorHandling(IProblemDetailsService problemDetailsService, ILogger<NotFoundErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Elemento buscado no encontrado.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            if (exception is not NotFoundException notFoundException) 
-                return false;
-
-            _logger.LogError(exception, "Error Global - Elemento buscado no encontrado.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Detail = exception.Message,
-                    Title = "Error en búsqueda",
-                    Status = StatusCodes.Status404NotFound,
-                }
-            });
+                Detail = exception.Message,
+                Title = "Error en búsqueda",
+                Status = StatusCodes.Status404NotFound,
+            }
+        });
 
-            return true;
-        }
+        return true;
     }
 }

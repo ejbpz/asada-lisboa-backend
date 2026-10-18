@@ -66,7 +66,7 @@ var config = app.Services
     .GetSection("DefaultUserOptions")
     .Get<DefaultUserOptions>();
 
-if (config is not null && config.RUN)
+if (config is not null && config.Run)
 {
     await app.Services.SeedAdminUserAsync();
 }

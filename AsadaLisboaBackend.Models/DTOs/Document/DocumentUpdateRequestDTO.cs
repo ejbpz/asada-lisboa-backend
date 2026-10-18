@@ -3,25 +3,24 @@ using System.ComponentModel.DataAnnotations;
 using AsadaLisboaBackend.Models.DTOs.Category;
 using AsadaLisboaBackend.Utils.ImageAttribute;
 
-namespace AsadaLisboaBackend.Models.DTOs.Document
+namespace AsadaLisboaBackend.Models.DTOs.Document;
+
+public class DocumentUpdateRequestDto
 {
-    public class DocumentUpdateRequestDTO
-    {
-        [Required(ErrorMessage = "El titulo es requerido.")]
-        [StringLength(200)]
-        public string Title { get; set; } = string.Empty;
+    [Required(ErrorMessage = "El titulo es requerido.")]
+    [StringLength(200)]
+    public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "La descripción es requerida.")]
-        [StringLength(500)]
-        public string Description { get; set; } = string.Empty;
+    [Required(ErrorMessage = "La descripción es requerida.")]
+    [StringLength(500)]
+    public string Description { get; set; } = string.Empty;
 
-        [MaxFileSize(15, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]
-        [AllowedExtensions(new string[] { ".pdf", ".docx", ".doc", ".xlsx", ".xls", ".csv", ".txt", ".zip" }, ErrorMessage = "La extensión del documento no es válida.")]
-        public IFormFile? File { get; set; }
+    [MaxFileSize(15, ErrorMessage = "El tamaño máximo de imagen es {0} MB.")]
+    [AllowedExtensions(new string[] { ".pdf", ".docx", ".doc", ".xlsx", ".xls", ".csv", ".txt", ".zip" }, ErrorMessage = "La extensión del documento no es válida.")]
+    public IFormFile? File { get; set; }
 
-        [Required(ErrorMessage = "Debe selecionar un estado válido.")]
-        public Guid StatusId { get; set; }
+    [Required(ErrorMessage = "Debe selecionar un estado válido.")]
+    public Guid StatusId { get; set; }
 
-        public List<CategoryRequestDTO> Categories { get; set; } = new();
-    }
+    public List<CategoryRequestDto> Categories { get; set; } = new();
 }

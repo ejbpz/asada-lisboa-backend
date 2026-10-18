@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.RepositoryContracts.Documents
+﻿namespace AsadaLisboaBackend.RepositoryContracts.Documents;
+
+public interface IDocumentsDeleterRepository
 {
-    public interface IDocumentsDeleterRepository
-    {
-        public Task DeleteDocument(Guid id);
-    }
+    public Task DeleteDocument(Guid id);
 }

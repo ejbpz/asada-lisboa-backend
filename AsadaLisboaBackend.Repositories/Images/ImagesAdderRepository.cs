@@ -4,39 +4,31 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Images;
 
-namespace AsadaLisboaBackend.Repositories.Images
+namespace AsadaLisboaBackend.Repositories.Images;
+
+public class ImagesAdderRepository(ApplicationDbContext context) : IImagesAdderRepository
 {
-    public class ImagesAdderRepository : IImagesAdderRepository
+    public async Task<Image> CreateImage(Image image)
     {
-        private readonly ApplicationDbContext _context;
+        var categoryIds = image.Categories
+            .Select(c => c.Id)
+            .ToList();
 
-        public ImagesAdderRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        var categoriesFromDb = await context.Categories
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToListAsync();
 
-        public async Task<Image> CreateImage(Image image)
-        {
-            var categoryIds = image.Categories
-                .Select(c => c.Id)
-                .ToList();
+        image.Categories = categoriesFromDb;
 
-            var categoriesFromDb = await _context.Categories
-                .Where(c => categoryIds.Contains(c.Id))
-                .ToListAsync();
+        context.Images.Add(image);
+        var affectedRows = await context.SaveChangesAsync();
 
-            image.Categories = categoriesFromDb;
+        if (affectedRows < 1)
+            throw new CreateObjectException("Error al agregar la imagen.");
 
-            _context.Images.Add(image);
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new CreateObjectException("Error al agregar la imagen.");
-
-            return await _context.Images
-                .Include(i => i.Status)
-                .Include(i => i.Categories)
-                .FirstAsync(i => i.Id == image.Id);
-        }
+        return await context.Images
+            .Include(i => i.Status)
+            .Include(i => i.Categories)
+            .FirstAsync(i => i.Id == image.Id);
     }
 }

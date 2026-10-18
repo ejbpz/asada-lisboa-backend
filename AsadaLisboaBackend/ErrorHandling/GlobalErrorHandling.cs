@@ -1,41 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class GlobalErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<GlobalErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class GlobalErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<GlobalErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
-
-        public GlobalErrorHandling(IProblemDetailsService problemDetailsService, ILogger<GlobalErrorHandling> logger)
+        httpContext.Response.StatusCode = exception switch
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
+            ApplicationException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError,
+        };
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+        logger.LogError(exception, "Error Global - Error no controlado por el sistema.");
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            httpContext.Response.StatusCode = exception switch
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                ApplicationException => StatusCodes.Status400BadRequest,
-                _ => StatusCodes.Status500InternalServerError,
-            };
+                Title = "Error interno del servidor.",
+                Detail = exception.Message,
+            }
+        });
 
-            _logger.LogError(exception, "Error Global - Error no controlado por el sistema.");
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
-            {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Title = "Error interno del servidor.",
-                    Detail = exception.Message,
-                }
-            });
-
-            return true;
-        }
+        return true;
     }
 }

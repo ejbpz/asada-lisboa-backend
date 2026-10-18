@@ -3,25 +3,17 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
 
-namespace AsadaLisboaBackend.Repositories.Charges
+namespace AsadaLisboaBackend.Repositories.Charges;
+
+public class ChargesDeleterRepository(ApplicationDbContext context) : IChargesDeleterRepository
 {
-    public class ChargesDeleterRepository : IChargesDeleterRepository
+    public async Task DeleteCharge(Guid id)
     {
-        private readonly ApplicationDbContext _context;
+        var affectedRows = await context.Charges
+            .Where(c => c.Id == id)
+            .ExecuteDeleteAsync();
 
-        public ChargesDeleterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task DeleteCharge(Guid id)
-        {
-            var affectedRows = await _context.Charges
-                .Where(c => c.Id == id)
-                .ExecuteDeleteAsync();
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Error al eliminar el cargo.");
-        }
+        if (affectedRows < 1)
+            throw new NotFoundException("Error al eliminar el cargo.");
     }
 }

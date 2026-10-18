@@ -10,319 +10,314 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Emails;
 
-namespace AsadaLisboaBackend.Tests.Accounts
+namespace AsadaLisboaBackend.Tests.Accounts;
+
+public class VerificationCodeServiceTest
 {
-    public class VerificationCodeServiceTest
+    private readonly Fixture _fixture;
+    private readonly VerificationCodeService _service;
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+    private readonly Mock<IEmailsSenderService> _emailsSenderServiceMock;
+
+    public VerificationCodeServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+        _userManagerMock = CreateUserManagerMock();
 
-        private readonly Mock<IEmailsSenderService> _emailsSenderServiceMock;
-        private readonly Mock<ILogger<VerificationCodeService>> _loggerMock;
+        _emailsSenderServiceMock = new Mock<IEmailsSenderService>();
+        var loggerMock = new Mock<ILogger<VerificationCodeService>>();
 
-        private readonly VerificationCodeService _service;
+        _service = new VerificationCodeService(
+            _userManagerMock.Object,
+            _emailsSenderServiceMock.Object,
+            loggerMock.Object
+        );
+    }
 
-        public VerificationCodeServiceTest()
-        {
-            _fixture = new Fixture();
+    private Mock<UserManager<ApplicationUser>> CreateUserManagerMock()
+    {
+        var store = new Mock<IUserStore<ApplicationUser>>();
 
-            _userManagerMock = CreateUserManagerMock();
+        return new Mock<UserManager<ApplicationUser>>(
+            store.Object,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!);
+    }
 
-            _emailsSenderServiceMock = new Mock<IEmailsSenderService>();
-            _loggerMock = new Mock<ILogger<VerificationCodeService>>();
+    [Fact]
+    public async Task GenerateCode_Should_Send_Verification_Email()
+    {
+        // Arrange
+        var email = "test@test.com";
 
-            _service = new VerificationCodeService(
-                _userManagerMock.Object,
-                _emailsSenderServiceMock.Object,
-                _loggerMock.Object
-            );
-        }
+        var user = _fixture.Build<ApplicationUser>()
+            .With(x => x.Email, email)
+            .Create();
 
-        private Mock<UserManager<ApplicationUser>> CreateUserManagerMock()
-        {
-            var store = new Mock<IUserStore<ApplicationUser>>();
+        var token = "verification-token";
 
-            return new Mock<UserManager<ApplicationUser>>(
-                store.Object,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!);
-        }
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync(user);
 
-        [Fact]
-        public async Task GenerateCode_Should_Send_Verification_Email()
-        {
-            // Arrange
-            var email = "test@test.com";
+        _userManagerMock
+            .Setup(x => x.GenerateEmailConfirmationTokenAsync(user))
+            .ReturnsAsync(token);
 
-            var user = _fixture.Build<ApplicationUser>()
-                .With(x => x.Email, email)
-                .Create();
+        // Act
+        await _service.GenerateCode(email);
 
-            var token = "verification-token";
+        // Assert
+        _emailsSenderServiceMock.Verify(
+            x => x.SendVerificationCode(
+                user.FirstName,
+                email,
+                It.IsAny<string>()),
+            Times.Once);
+    }
 
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync(user);
+    [Fact]
+    public async Task GenerateCode_Should_Throw_When_User_Not_Found()
+    {
+        // Arrange
+        var email = "test@test.com";
 
-            _userManagerMock
-                .Setup(x => x.GenerateEmailConfirmationTokenAsync(user))
-                .ReturnsAsync(token);
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync((ApplicationUser?)null);
 
-            // Act
+        // Act
+        Func<Task> act = async () =>
             await _service.GenerateCode(email);
 
-            // Assert
-            _emailsSenderServiceMock.Verify(
-                x => x.SendVerificationCode(
-                    user.FirstName,
-                    email,
-                    It.IsAny<string>()),
-                Times.Once);
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Usuario inexistente.");
 
-        [Fact]
-        public async Task GenerateCode_Should_Throw_When_User_Not_Found()
-        {
-            // Arrange
-            var email = "test@test.com";
+        _emailsSenderServiceMock.Verify(
+            x => x.SendVerificationCode(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>()),
+            Times.Never);
+    }
 
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null);
+    [Fact]
+    public async Task GenerateCode_Should_Send_Encoded_Token()
+    {
+        // Arrange
+        var email = "test@test.com";
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.GenerateCode(email);
+        var user = _fixture.Create<ApplicationUser>();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("Usuario inexistente.");
+        var rawToken = "raw-token";
 
-            _emailsSenderServiceMock.Verify(
-                x => x.SendVerificationCode(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>()),
-                Times.Never);
-        }
+        string? sentToken = null;
 
-        [Fact]
-        public async Task GenerateCode_Should_Send_Encoded_Token()
-        {
-            // Arrange
-            var email = "test@test.com";
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync(user);
 
-            var user = _fixture.Create<ApplicationUser>();
+        _userManagerMock
+            .Setup(x => x.GenerateEmailConfirmationTokenAsync(user))
+            .ReturnsAsync(rawToken);
 
-            var rawToken = "raw-token";
+        _emailsSenderServiceMock
+            .Setup(x => x.SendVerificationCode(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>()))
+            .Callback<string, string, string>((_, _, token) =>
+            {
+                sentToken = token;
+            });
 
-            string? sentToken = null;
+        // Act
+        await _service.GenerateCode(email);
 
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync(user);
+        // Assert
+        sentToken.Should().NotBeNull();
+        sentToken.Should().NotBe(rawToken);
+    }
 
-            _userManagerMock
-                .Setup(x => x.GenerateEmailConfirmationTokenAsync(user))
-                .ReturnsAsync(rawToken);
+    [Fact]
+    public async Task ConfirmEmailAsync_Should_Confirm_Email()
+    {
+        // Arrange
+        var email = "test@test.com";
 
-            _emailsSenderServiceMock
-                .Setup(x => x.SendVerificationCode(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>()))
-                .Callback<string, string, string>((_, _, token) =>
-                {
-                    sentToken = token;
-                });
+        var user = _fixture.Build<ApplicationUser>()
+            .With(x => x.EmailConfirmed, false)
+            .With(x => x.IsActive, false)
+            .Create();
 
-            // Act
-            await _service.GenerateCode(email);
+        var rawToken = "confirm-token";
 
-            // Assert
-            sentToken.Should().NotBeNull();
-            sentToken.Should().NotBe(rawToken);
-        }
+        var encodedToken = WebEncoders.Base64UrlEncode(
+            Encoding.UTF8.GetBytes(rawToken));
 
-        [Fact]
-        public async Task ConfirmEmailAsync_Should_Confirm_Email()
-        {
-            // Arrange
-            var email = "test@test.com";
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync(user);
 
-            var user = _fixture.Build<ApplicationUser>()
-                .With(x => x.EmailConfirmed, false)
-                .With(x => x.IsActive, false)
-                .Create();
+        _userManagerMock
+            .Setup(x => x.ConfirmEmailAsync(user, rawToken))
+            .ReturnsAsync(IdentityResult.Success);
 
-            var rawToken = "confirm-token";
+        _userManagerMock
+            .Setup(x => x.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
 
-            var encodedToken = WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes(rawToken));
+        // Act
+        await _service.ConfirmEmailAsync(email, encodedToken);
 
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync(user);
+        // Assert
+        user.EmailConfirmed.Should().BeTrue();
 
-            _userManagerMock
-                .Setup(x => x.ConfirmEmailAsync(user, rawToken))
-                .ReturnsAsync(IdentityResult.Success);
+        user.IsActive.Should().BeTrue();
 
-            _userManagerMock
-                .Setup(x => x.UpdateAsync(user))
-                .ReturnsAsync(IdentityResult.Success);
+        _userManagerMock.Verify(
+            x => x.UpdateAsync(user),
+            Times.Once);
+    }
 
-            // Act
+    [Theory]
+    [InlineData(null, "token")]
+    [InlineData("test@test.com", null)]
+    [InlineData("", "token")]
+    [InlineData("test@test.com", "")]
+    public async Task ConfirmEmailAsync_Should_Throw_When_Email_Or_Token_Are_Invalid(string? email, string? token)
+    {
+        // Act
+        Func<Task> act = async () =>
+            await _service.ConfirmEmailAsync(email, token);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("Email y token son requeridos.");
+    }
+
+    [Fact]
+    public async Task ConfirmEmailAsync_Should_Throw_When_User_Not_Found()
+    {
+        // Arrange
+        var email = "test@test.com";
+
+        var token = WebEncoders.Base64UrlEncode(
+            Encoding.UTF8.GetBytes("token"));
+
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync((ApplicationUser?)null);
+
+        // Act
+        Func<Task> act = async () =>
+            await _service.ConfirmEmailAsync(email, token);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task ConfirmEmailAsync_Should_Throw_When_Email_Already_Confirmed()
+    {
+        // Arrange
+        var email = "test@test.com";
+
+        var token = WebEncoders.Base64UrlEncode(
+            Encoding.UTF8.GetBytes("token"));
+
+        var user = _fixture.Build<ApplicationUser>()
+            .With(x => x.EmailConfirmed, true)
+            .Create();
+
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync(user);
+
+        // Act
+        Func<Task> act = async () =>
+            await _service.ConfirmEmailAsync(email, token);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<UpdateObjectException>()
+            .WithMessage("El email del usuario ya ha sido confirmado.");
+    }
+
+    [Fact]
+    public async Task ConfirmEmailAsync_Should_Throw_When_Confirmation_Fails()
+    {
+        // Arrange
+        var email = "test@test.com";
+
+        var rawToken = "token";
+
+        var encodedToken = WebEncoders.Base64UrlEncode(
+            Encoding.UTF8.GetBytes(rawToken));
+
+        var user = _fixture.Build<ApplicationUser>()
+            .With(x => x.EmailConfirmed, false)
+            .Create();
+
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync(user);
+
+        _userManagerMock
+            .Setup(x => x.ConfirmEmailAsync(user, rawToken))
+            .ReturnsAsync(IdentityResult.Failed());
+
+        // Act
+        Func<Task> act = async () =>
             await _service.ConfirmEmailAsync(email, encodedToken);
 
-            // Assert
-            user.EmailConfirmed.Should().BeTrue();
+        // Assert
+        await act.Should()
+            .ThrowAsync<UpdateObjectException>();
+    }
 
-            user.IsActive.Should().BeTrue();
+    [Fact]
+    public async Task ConfirmEmailAsync_Should_Decode_Token()
+    {
+        // Arrange
+        var email = "test@test.com";
 
-            _userManagerMock.Verify(
-                x => x.UpdateAsync(user),
-                Times.Once);
-        }
+        var rawToken = "my-token";
 
-        [Theory]
-        [InlineData(null, "token")]
-        [InlineData("test@test.com", null)]
-        [InlineData("", "token")]
-        [InlineData("test@test.com", "")]
-        public async Task ConfirmEmailAsync_Should_Throw_When_Email_Or_Token_Are_Invalid(string? email, string? token)
-        {
-            // Act
-            Func<Task> act = async () =>
-                await _service.ConfirmEmailAsync(email, token);
+        var encodedToken = WebEncoders.Base64UrlEncode(
+            Encoding.UTF8.GetBytes(rawToken));
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<ArgumentException>()
-                .WithMessage("Email y token son requeridos.");
-        }
+        var user = _fixture.Create<ApplicationUser>();
 
-        [Fact]
-        public async Task ConfirmEmailAsync_Should_Throw_When_User_Not_Found()
-        {
-            // Arrange
-            var email = "test@test.com";
+        _userManagerMock
+            .Setup(x => x.FindByEmailAsync(email))
+            .ReturnsAsync(user);
 
-            var token = WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes("token"));
+        _userManagerMock
+            .Setup(x => x.ConfirmEmailAsync(user, rawToken))
+            .ReturnsAsync(IdentityResult.Success);
 
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null);
+        _userManagerMock
+            .Setup(x => x.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.ConfirmEmailAsync(email, token);
+        // Act
+        await _service.ConfirmEmailAsync(email, encodedToken);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>();
-        }
-
-        [Fact]
-        public async Task ConfirmEmailAsync_Should_Throw_When_Email_Already_Confirmed()
-        {
-            // Arrange
-            var email = "test@test.com";
-
-            var token = WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes("token"));
-
-            var user = _fixture.Build<ApplicationUser>()
-                .With(x => x.EmailConfirmed, true)
-                .Create();
-
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync(user);
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.ConfirmEmailAsync(email, token);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<UpdateObjectException>()
-                .WithMessage("El email del usuario ya ha sido confirmado.");
-        }
-
-        [Fact]
-        public async Task ConfirmEmailAsync_Should_Throw_When_Confirmation_Fails()
-        {
-            // Arrange
-            var email = "test@test.com";
-
-            var rawToken = "token";
-
-            var encodedToken = WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes(rawToken));
-
-            var user = _fixture.Build<ApplicationUser>()
-                .With(x => x.EmailConfirmed, false)
-                .Create();
-
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync(user);
-
-            _userManagerMock
-                .Setup(x => x.ConfirmEmailAsync(user, rawToken))
-                .ReturnsAsync(IdentityResult.Failed());
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.ConfirmEmailAsync(email, encodedToken);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<UpdateObjectException>();
-        }
-
-        [Fact]
-        public async Task ConfirmEmailAsync_Should_Decode_Token()
-        {
-            // Arrange
-            var email = "test@test.com";
-
-            var rawToken = "my-token";
-
-            var encodedToken = WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes(rawToken));
-
-            var user = _fixture.Create<ApplicationUser>();
-
-            _userManagerMock
-                .Setup(x => x.FindByEmailAsync(email))
-                .ReturnsAsync(user);
-
-            _userManagerMock
-                .Setup(x => x.ConfirmEmailAsync(user, rawToken))
-                .ReturnsAsync(IdentityResult.Success);
-
-            _userManagerMock
-                .Setup(x => x.UpdateAsync(user))
-                .ReturnsAsync(IdentityResult.Success);
-
-            // Act
-            await _service.ConfirmEmailAsync(email, encodedToken);
-
-            // Assert
-            _userManagerMock.Verify(
-                x => x.ConfirmEmailAsync(user, rawToken),
-                Times.Once);
-        }
+        // Assert
+        _userManagerMock.Verify(
+            x => x.ConfirmEmailAsync(user, rawToken),
+            Times.Once);
     }
 }

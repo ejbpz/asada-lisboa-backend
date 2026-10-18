@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models;
 
-namespace AsadaLisboaBackend.RepositoryContracts.Contacts
+namespace AsadaLisboaBackend.RepositoryContracts.Contacts;
+
+public interface IContactsAdderRepository
 {
-    public interface IContactsAdderRepository
-    {
-        public Task<Contact> CreateContact(Contact contact);
-    }
+    public Task<Contact> CreateContact(Contact contact);
 }

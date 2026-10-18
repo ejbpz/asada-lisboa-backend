@@ -1,49 +1,41 @@
 ﻿using AsadaLisboaBackend.Utils;
-using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Document;
 using AsadaLisboaBackend.ServiceContracts.Documents;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Documents
+namespace AsadaLisboaBackend.Services.Documents;
+
+public class DocumentsGetterService(
+    IDocumentsGetterRepository documentGetterRepository,
+    IMemoryCachesService memoryCachesService)
+    : IDocumentsGetterService
 {
-    public class DocumentsGetterService : IDocumentsGetterService
+    public async Task<PageResponseDto<DocumentMinimalResponseDto>> GetDocuments(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IDocumentsGetterRepository _documentGetterRepository;
+        return await memoryCachesService.GetOrCreateCacheList(
+            resource: Constants.CACHE_DOCUMENTS,
+            request: searchSortRequestDto, 
+            create: () => documentGetterRepository.GetDocuments(searchSortRequestDto),
+            time: TimeSpan.FromMinutes(5));
+    }
 
-        public DocumentsGetterService(IDocumentsGetterRepository documentGetterRepository, IMemoryCachesService memoryCachesService)
-        {
-            _memoryCachesService = memoryCachesService;
-            _documentGetterRepository = documentGetterRepository;
-        }
-
-        public async Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO)
-        {
-            return await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<DocumentMinimalResponseDTO>>(
-                resource: Constants.CACHE_DOCUMENTS,
-                request: searchSortRequestDTO, 
-                create: () => _documentGetterRepository.GetDocuments(searchSortRequestDTO),
-                time: TimeSpan.FromMinutes(5));
-        }
-
-        public async Task<DocumentResponseDTO> GetDocument(Guid id) 
-        {
-            return (await _memoryCachesService.GetOrCreateCache<Document>(
+    public async Task<DocumentResponseDto> GetDocument(Guid id) 
+    {
+        return (await memoryCachesService.GetOrCreateCache(
                 key: $"{Constants.CACHE_DOCUMENTS}_{id}",
-                create: () => _documentGetterRepository.GetDocument(id),
+                create: () => documentGetterRepository.GetDocument(id),
                 time: TimeSpan.FromMinutes(5)))
-                    .ToDocumentResponseDTO();
-        }
+            .ToDocumentResponseDto();
+    }
 
-        public async Task<DocumentResponseDTO> GetDocumentBySlug(string slug)
-        {
-            return (await _memoryCachesService.GetOrCreateCache<Document>(
+    public async Task<DocumentResponseDto> GetDocumentBySlug(string slug)
+    {
+        return (await memoryCachesService.GetOrCreateCache(
                 key: $"{Constants.CACHE_DOCUMENTS}_{slug}",
-                create: () => _documentGetterRepository.GetDocumentBySlug(slug),
+                create: () => documentGetterRepository.GetDocumentBySlug(slug),
                 time: TimeSpan.FromMinutes(5)))
-                    .ToDocumentResponseDTO();
-        }
+            .ToDocumentResponseDto();
     }
 }

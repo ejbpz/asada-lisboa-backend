@@ -1,8 +1,7 @@
-﻿namespace AsadaLisboaBackend.Models.DTOs.Category
+﻿namespace AsadaLisboaBackend.Models.DTOs.Category;
+
+public class CategoryRequestDto
 {
-    public class CategoryRequestDTO
-    {
-        public Guid? Id { get; set; }
-        public string? Name { get; set; }
-    }
+    public Guid? Id { get; set; }
+    public string? Name { get; set; }
 }

@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Contact;
 
-namespace AsadaLisboaBackend.ServiceContracts.Contacts
+namespace AsadaLisboaBackend.ServiceContracts.Contacts;
+
+public interface IContactsAdderService
 {
-    public interface IContactsAdderService
-    {
-        public Task<ContactResponseDTO> CreateContact(ContactRequestDTO contactRequestDTO);
-    }
+    public Task<ContactResponseDto> CreateContact(ContactRequestDto contactRequestDto);
 }

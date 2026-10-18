@@ -1,151 +1,147 @@
-﻿using AutoFixture;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
+using AutoFixture;
+using FluentAssertions;
 using AsadaLisboaBackend.Utils;
 using AsadaLisboaBackend.Services.Contacts;
-using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
+using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.Contacts
+namespace AsadaLisboaBackend.Tests.Contacts;
+
+public class ContactsDeleterServiceTest
 {
-    public class ContactsDeleterServiceTest
+    private readonly ContactsDeleterService _service;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<ILogger<ContactsDeleterService>> _loggerMock;
+    private readonly Mock<IContactsDeleterRepository> _contactsDeleterRepositoryMock;
+
+    public ContactsDeleterServiceTest()
     {
-        private readonly Fixture _fixture;
+        var fixture = new Fixture();
 
-        private readonly Mock<IContactsDeleterRepository> _contactsDeleterRepositoryMock;
-        private readonly Mock<ILogger<ContactsDeleterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+        fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => fixture.Behaviors.Remove(x));
 
-        private readonly ContactsDeleterService _service;
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public ContactsDeleterServiceTest()
-        {
-            _fixture = new Fixture();
+        _contactsDeleterRepositoryMock = new Mock<IContactsDeleterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _loggerMock = new Mock<ILogger<ContactsDeleterService>>();
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
 
-            _contactsDeleterRepositoryMock = new Mock<IContactsDeleterRepository>();
+        _service = new ContactsDeleterService(
+            _contactsDeleterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _loggerMock = new Mock<ILogger<ContactsDeleterService>>();
+    [Fact]
+    public async Task DeleteContact_Should_Delete_Contact_Successfully()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        _contactsDeleterRepositoryMock
+            .Setup(x => x.DeleteContact(id))
+            .Returns(Task.CompletedTask);
 
-            _service = new ContactsDeleterService(
-                _contactsDeleterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        // Act
+        await _service.DeleteContact(id);
 
-        [Fact]
-        public async Task DeleteContact_Should_Delete_Contact_Successfully()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Assert
+        _contactsDeleterRepositoryMock.Verify(
+            x => x.DeleteContact(id),
+            Times.Once);
 
-            _contactsDeleterRepositoryMock
-                .Setup(x => x.DeleteContact(id))
-                .Returns(Task.CompletedTask);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(Constants.CACHE_CONTACTS, id),
+            Times.Once);
 
-            // Act
-            await _service.DeleteContact(id);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(Constants.CACHE_CONTACTS),
+            Times.Once);
+    }
 
-            // Assert
-            _contactsDeleterRepositoryMock.Verify(
-                x => x.DeleteContact(id),
-                Times.Once);
+    [Fact]
+    public async Task DeleteContact_Should_Call_Logger_When_Success()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(Constants.CACHE_CONTACTS, id),
-                Times.Once);
+        _contactsDeleterRepositoryMock
+            .Setup(x => x.DeleteContact(id))
+            .Returns(Task.CompletedTask);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(Constants.CACHE_CONTACTS),
-                Times.Once);
-        }
+        // Act
+        await _service.DeleteContact(id);
 
-        [Fact]
-        public async Task DeleteContact_Should_Call_Logger_When_Success()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
+    }
 
-            _contactsDeleterRepositoryMock
-                .Setup(x => x.DeleteContact(id))
-                .Returns(Task.CompletedTask);
+    [Fact]
+    public async Task DeleteContact_Should_Throw_When_Delete_Fails()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            // Act
-            await _service.DeleteContact(id);
+        _contactsDeleterRepositoryMock
+            .Setup(x => x.DeleteContact(id))
+            .ThrowsAsync(new Exception("Delete error"));
 
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.AtLeastOnce);
-        }
+        // Act
+        Func<Task> act = async () => await _service.DeleteContact(id);
 
-        [Fact]
-        public async Task DeleteContact_Should_Throw_When_Delete_Fails()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Assert
+        await act.Should()
+            .ThrowAsync<Exception>()
+            .WithMessage("Delete error");
 
-            _contactsDeleterRepositoryMock
-                .Setup(x => x.DeleteContact(id))
-                .ThrowsAsync(new Exception("Delete error"));
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(It.IsAny<string>(), It.IsAny<Guid>()),
+            Times.Never);
 
-            // Act
-            Func<Task> act = async () => await _service.DeleteContact(id);
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(It.IsAny<string>()),
+            Times.Never);
+    }
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<Exception>()
-                .WithMessage("Delete error");
+    [Fact]
+    public async Task DeleteContact_Should_Call_Logger_When_Error()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(It.IsAny<string>(), It.IsAny<Guid>()),
-                Times.Never);
+        _contactsDeleterRepositoryMock
+            .Setup(x => x.DeleteContact(id))
+            .ThrowsAsync(new Exception("Internal error"));
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(It.IsAny<string>()),
-                Times.Never);
-        }
+        // Act
+        Func<Task> act = async () => await _service.DeleteContact(id);
 
-        [Fact]
-        public async Task DeleteContact_Should_Call_Logger_When_Error()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Assert
+        await act.Should()
+            .ThrowAsync<Exception>();
 
-            _contactsDeleterRepositoryMock
-                .Setup(x => x.DeleteContact(id))
-                .ThrowsAsync(new Exception("Internal error"));
-
-            // Act
-            Func<Task> act = async () => await _service.DeleteContact(id);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<Exception>();
-
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.AtLeastOnce);
-        }
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
     }
 }

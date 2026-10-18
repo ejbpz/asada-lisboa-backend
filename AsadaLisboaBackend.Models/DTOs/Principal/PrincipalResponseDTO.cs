@@ -2,12 +2,11 @@
 using AsadaLisboaBackend.Models.DTOs.Image;
 using AsadaLisboaBackend.Models.DTOs.Document;
 
-namespace AsadaLisboaBackend.Models.DTOs.Principal
+namespace AsadaLisboaBackend.Models.DTOs.Principal;
+
+public class PrincipalResponseDto
 {
-    public class PrincipalResponseDTO
-    {
-        public List<NewMinimalResponseDTO> News { get; set; } = new List<NewMinimalResponseDTO>();
-        public List<ImageMinimalResponseDTO> Images { get; set; } = new List<ImageMinimalResponseDTO>();
-        public List<DocumentMinimalResponseDTO> Documents { get; set; } = new List<DocumentMinimalResponseDTO>();
-    }
+    public List<NewMinimalResponseDto> News { get; set; } = new List<NewMinimalResponseDto>();
+    public List<ImageMinimalResponseDto> Images { get; set; } = new List<ImageMinimalResponseDto>();
+    public List<DocumentMinimalResponseDto> Documents { get; set; } = new List<DocumentMinimalResponseDto>();
 }

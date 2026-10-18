@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AsadaLisboaBackend.Models.DTOs.ReCaptcha
+namespace AsadaLisboaBackend.Models.DTOs.ReCaptcha;
+
+public class ReCaptchaRequestDto
 {
-    public class ReCaptchaRequestDTO
-    {
-        [Required(ErrorMessage = "El token de ReCAPTCHA es obligatorio.")]
-        public string ReCaptchaRequest { get; set; } = string.Empty;
-    }
+    [Required(ErrorMessage = "El token de ReCAPTCHA es obligatorio.")]
+    public string ReCaptchaRequest { get; set; } = string.Empty;
 }

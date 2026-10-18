@@ -1,9 +1,8 @@
-﻿namespace AsadaLisboaBackend.Models.Enums
+﻿namespace AsadaLisboaBackend.Models.Enums;
+
+public enum ObjectTypeEnum
 {
-    public enum ObjectTypeEnum
-    {
-        New = 1,
-        Image = 2,
-        Document = 3
-    }
+    New = 1,
+    Image = 2,
+    Document = 3
 }

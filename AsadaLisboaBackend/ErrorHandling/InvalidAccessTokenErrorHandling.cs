@@ -2,41 +2,34 @@
 using Microsoft.AspNetCore.Diagnostics;
 using AsadaLisboaBackend.Services.Exceptions;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class InvalidAccessTokenErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<InvalidAccessTokenErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class InvalidAccessTokenErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly IProblemDetailsService _problemDetailsService;
-        private readonly ILogger<InvalidAccessTokenErrorHandling> _logger;
+        if (exception is not InvalidAccessTokenException) 
+            return false;
 
-        public InvalidAccessTokenErrorHandling(IProblemDetailsService problemDetailsService, ILogger<InvalidAccessTokenErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Error en autenticación de token.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            if (exception is not InvalidAccessTokenException invalidAccessTokenException) 
-                return false;
-
-            _logger.LogError(exception, "Error Global - Error en autenticación de token.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Detail = exception.Message,
-                    Title = "Error en autenticación de token",
-                    Status = StatusCodes.Status401Unauthorized,
-                }
-            });
+                Detail = exception.Message,
+                Title = "Error en autenticación de token",
+                Status = StatusCodes.Status401Unauthorized,
+            }
+        });
 
-            return true;
-        }
+        return true;
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.RepositoryContracts.Contacts
+﻿namespace AsadaLisboaBackend.RepositoryContracts.Contacts;
+
+public interface IContactsDeleterRepository
 {
-    public interface IContactsDeleterRepository
-    {
-        public Task DeleteContact(Guid id);
-    }
+    public Task DeleteContact(Guid id);
 }

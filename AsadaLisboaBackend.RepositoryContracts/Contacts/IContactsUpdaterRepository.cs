@@ -1,10 +1,9 @@
 ﻿using AsadaLisboaBackend.Models;
 using AsadaLisboaBackend.Models.DTOs.Contact;
 
-namespace AsadaLisboaBackend.RepositoryContracts.Contacts
+namespace AsadaLisboaBackend.RepositoryContracts.Contacts;
+
+public interface IContactsUpdaterRepository
 {
-    public interface IContactsUpdaterRepository
-    {
-        public Task<Contact> UpdateContact(Guid id, ContactRequestDTO contactRequestDTO);
-    }
+    public Task<Contact> UpdateContact(Guid id, ContactRequestDto contactRequestDto);
 }

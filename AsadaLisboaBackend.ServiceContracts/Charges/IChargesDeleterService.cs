@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.Charges
+﻿namespace AsadaLisboaBackend.ServiceContracts.Charges;
+
+public interface IChargesDeleterService
 {
-    public interface IChargesDeleterService
-    {
-        public Task DeleteCharge(Guid id);
-    }
+    public Task DeleteCharge(Guid id);
 }

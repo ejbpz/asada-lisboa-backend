@@ -4,37 +4,36 @@ using AsadaLisboaBackend.Models.DTOs.User;
 using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.ServiceContracts.Users;
 
-namespace AsadaLisboaBackend.Areas.Cliente.Controllers
+namespace AsadaLisboaBackend.Areas.Cliente.Controllers;
+
+/// <summary>
+/// Controller for users, public access.
+/// </summary>
+[ApiController]
+[Area("Cliente")]
+[ApiVersion("1.0")]
+[Route("api/[area]/[controller]")]
+public class UsuariosController : ControllerBase
 {
+    private readonly IUsersGetterService _usersGetterService;
+
     /// <summary>
-    /// Controller for users, public access.
+    /// Constructor for UsuariosController.
     /// </summary>
-    [ApiController]
-    [Area("Cliente")]
-    [ApiVersion("1.0")]
-    [Route("api/[area]/[controller]")]
-    public class UsuariosController : ControllerBase
+    /// <param name="usersGetterService">Service for getting users.</param>
+    public UsuariosController(IUsersGetterService usersGetterService)
     {
-        private readonly IUsersGetterService _usersGetterService;
+        _usersGetterService = usersGetterService;
+    }
 
-        /// <summary>
-        /// Constructor for UsuariosController.
-        /// </summary>
-        /// <param name="usersGetterService">Service for getting users.</param>
-        public UsuariosController(IUsersGetterService usersGetterService)
-        {
-            _usersGetterService = usersGetterService;
-        }
-
-        /// <summary>
-        /// Get a paginated list of users based on the provided search and sort criteria.
-        /// </summary>
-        /// <returns>ActionResult containing a PageResponseDTO of UserResponseDTO objects that match with SearchSortRequestDTO.</returns>
-        [HttpGet("")]
-        public async Task<ActionResult<List<UserResponseDTO>>> GetUsers()
-        {
-            var searchSortRequestDTO = new SearchSortRequestDTO() { Take = 100, IsPublic = true };
-            return Ok((await _usersGetterService.GetUsers(searchSortRequestDTO)).Data);
-        }
+    /// <summary>
+    /// Get a paginated list of users based on the provided search and sort criteria.
+    /// </summary>
+    /// <returns>ActionResult containing a PageResponseDTO of UserResponseDTO objects that match with SearchSortRequestDTO.</returns>
+    [HttpGet("")]
+    public async Task<ActionResult<List<UserResponseDto>>> GetUsers()
+    {
+        var searchSortRequestDto = new SearchSortRequestDto() { Take = 100, IsPublic = true };
+        return Ok((await _usersGetterService.GetUsers(searchSortRequestDto)).Data);
     }
 }

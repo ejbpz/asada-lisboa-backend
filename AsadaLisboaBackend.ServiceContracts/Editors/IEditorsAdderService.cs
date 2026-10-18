@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Editor;
 
-namespace AsadaLisboaBackend.ServiceContracts.Editors
+namespace AsadaLisboaBackend.ServiceContracts.Editors;
+
+public interface IEditorsAdderService
 {
-    public interface IEditorsAdderService
-    {
-        public Task<EditorResponseDTO> CreateTemporalImage(EditorRequestDTO editorRequestDTO);
-    }
+    public Task<EditorResponseDto> CreateTemporalImage(EditorRequestDto editorRequestDto);
 }

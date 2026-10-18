@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models;
 
-namespace AsadaLisboaBackend.RepositoryContracts.AboutUsSections
+namespace AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
+
+public interface IAboutUsSectionsAdderRepository
 {
-    public interface IAboutUsSectionsAdderRepository
-    {
-        public Task<AboutUsSection> CreateAboutUsSection(AboutUsSection aboutUsSection);
-    }
+    public Task<AboutUsSection> CreateAboutUsSection(AboutUsSection aboutUsSection);
 }

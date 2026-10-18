@@ -3,52 +3,51 @@ using System.Text;
 using Moq;
 using Moq.Protected;
 
-namespace AsadaLisboaBackend.Tests.Receipts.Helpers
+namespace AsadaLisboaBackend.Tests.Helpers;
+
+public static class HttpClientMockHelper
 {
-    public static class HttpClientMockHelper
+    public static HttpClient Create(params string[] htmlResponses)
     {
-        public static HttpClient Create(params string[] htmlResponses)
+        var handlerMock = new Mock<HttpMessageHandler>();
+
+        var setupSequence = handlerMock
+            .Protected()
+            .SetupSequence<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+
+        foreach (var html in htmlResponses)
         {
-            var handlerMock = new Mock<HttpMessageHandler>();
-
-            var setupSequence = handlerMock
-                .Protected()
-                .SetupSequence<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>());
-
-            foreach (var html in htmlResponses)
+            setupSequence.ReturnsAsync(new HttpResponseMessage
             {
-                setupSequence.ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(
-                        html,
-                        Encoding.UTF8,
-                        "text/html")
-                });
-            }
-
-            return new HttpClient(handlerMock.Object);
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(
+                    html,
+                    Encoding.UTF8,
+                    "text/html")
+            });
         }
 
-        public static HttpClient CreateError(HttpStatusCode statusCode)
-        {
-            var handlerMock = new Mock<HttpMessageHandler>();
+        return new HttpClient(handlerMock.Object);
+    }
 
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = statusCode
-                });
+    public static HttpClient CreateError(HttpStatusCode statusCode)
+    {
+        var handlerMock = new Mock<HttpMessageHandler>();
 
-            return new HttpClient(handlerMock.Object);
-        }
+        handlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = statusCode
+            });
+
+        return new HttpClient(handlerMock.Object);
     }
 }

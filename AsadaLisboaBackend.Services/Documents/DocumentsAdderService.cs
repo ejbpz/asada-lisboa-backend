@@ -11,108 +11,90 @@ using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 
-namespace AsadaLisboaBackend.Services.Documents
-{
-    public class DocumentsAdderService: IDocumentsAdderService
-    {
-        private readonly IFileSystemsManager _fileSystems;
-        private readonly ILogger<DocumentsAdderService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly ICategoriesGetterService _categoriesGetterService;
-        private readonly IDocumentsAdderRepository _documentAdderRepository;
-        private readonly IStatusesGetterRepository _statusesGetterRepository;
-        private readonly IDocumentTypesGetterRepository _documentTypesGetterRepository;
+namespace AsadaLisboaBackend.Services.Documents;
 
-        public DocumentsAdderService(ICategoriesGetterService categoriesGetterService, IDocumentsAdderRepository documentAdderRepository, IStatusesGetterRepository statusesGetterRepository, IDocumentTypesGetterRepository documentTypesGetterRepository, IFileSystemsManager fileSystems, ILogger<DocumentsAdderService> logger, IMemoryCachesService memoryCachesService)
+public class DocumentsAdderService(
+    ICategoriesGetterService categoriesGetterService,
+    IDocumentsAdderRepository documentAdderRepository,
+    IStatusesGetterRepository statusesGetterRepository,
+    IDocumentTypesGetterRepository documentTypesGetterRepository,
+    IFileSystemsManager fileSystems,
+    ILogger<DocumentsAdderService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IDocumentsAdderService
+{
+    public async Task<DocumentResponseDto> CreateDocument(DocumentRequestDto documentRequestDto)
+    {
+        if (documentRequestDto.File is null || documentRequestDto.File.Length == 0)
         {
-            _logger = logger;
-            _fileSystems = fileSystems;
-            _memoryCachesService = memoryCachesService;
-            _categoriesGetterService = categoriesGetterService;
-            _documentAdderRepository = documentAdderRepository;
-            _statusesGetterRepository = statusesGetterRepository;
-            _documentTypesGetterRepository = documentTypesGetterRepository;
+            logger.LogError("Archivo nulo o inválido a ser agregado.");
+            throw new ArgumentException("Archivo inválido.");
         }
 
-        public async Task<DocumentResponseDTO> CreateDocument(DocumentRequestDTO documentRequestDTO)
+        var documentId = Guid.NewGuid();
+
+        var url = string.Empty;
+
+        try
         {
-            if (documentRequestDTO.File is null || documentRequestDTO.File.Length == 0)
+            var slug = GenerateSlug.New(documentRequestDto.Title, documentId);
+            url = await fileSystems.SaveAsync(documentRequestDto.File, "documentos", slug);
+
+            var fileName = Path.GetFileName(url);
+            var filePath = $"documentos/{fileName}";
+
+            if(documentRequestDto.StatusId == Guid.Empty)
             {
-                _logger.LogError("Archivo nulo o inválido a ser agregado.");
-                throw new ArgumentException("Archivo inválido.");
+                logger.LogError("StatusId no puede ser vacío.");
+                throw new ArgumentException("StatusId inválido.");
             }
 
-            var documentId = Guid.NewGuid();
+            var status = await statusesGetterRepository.GetStatus(documentRequestDto.StatusId);
 
-            string? url = string.Empty;
+            var categories = await categoriesGetterService.ToCreateCategories(documentRequestDto.Categories);
 
-            try
+            var extension = Path.GetExtension(url);
+            var documentTypeId = documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
+
+            if (documentTypeId is null || documentTypeId == Guid.Empty)
             {
-                var slug = GenerateSlug.New(documentRequestDTO.Title, documentId);
-                url = await _fileSystems.SaveAsync(documentRequestDTO.File, "documentos", slug);
+                logger.LogError("Tipo de documento no encontrado con id: {Id}.", documentTypeId);
+                throw new NotFoundException("Tipo de documento no soportado.");
+            }
 
+            var document = new Models.Document()
+            {
+                Id = documentId,
+                Url = url,
+                Slug = slug,
+                FileName = fileName,
+                FilePath = filePath,
+                StatusId = status.Id,
+                Categories = categories,
+                Title = documentRequestDto.Title,
+                PublicationDate = DateTime.UtcNow,
+                DocumentTypeId = documentTypeId.Value,
+                FileSize = documentRequestDto.File.Length,
+                Description = documentRequestDto.Description,
+            };
+
+            var documentCreated = await documentAdderRepository.CreateDocument(document);
+            logger.LogInformation("Documento creado exitosamente con id: {DocumentId}", documentCreated.Id);
+
+            memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
+
+            return documentCreated.ToDocumentResponseDto();
+        }
+        catch
+        {
+            if (!string.IsNullOrEmpty(url) && !string.IsNullOrWhiteSpace(url))
+            {
                 var fileName = Path.GetFileName(url);
-                var filePath = $"documentos/{fileName}";
-
-                if(documentRequestDTO.StatusId == Guid.Empty)
-                {
-                    _logger.LogError("StatusId no puede ser vacío.");
-                    throw new ArgumentException("StatusId inválido.");
-                }
-
-                var status = await _statusesGetterRepository.GetStatus(documentRequestDTO.StatusId);
-
-                if (status is null)
-                {
-                    _logger.LogError("Status no encontrado con id: {Id}.", documentRequestDTO.StatusId);
-                    throw new NotFoundException("Status no encontrado.");
-                }
-
-                var categories = await _categoriesGetterService.ToCreateCategories(documentRequestDTO.Categories);
-
-                var extension = Path.GetExtension(url);
-                var documentTypeId = _documentTypesGetterRepository.GetDocumentTypeIdByExtension(extension);
-
-                if (documentTypeId is null || !documentTypeId.HasValue)
-                {
-                    _logger.LogError("Tipo de documento no encontrado con id: {Id}.", documentTypeId);
-                    throw new NotFoundException("Tipo de documento no soportado.");
-                }
-
-                var document = new Models.Document()
-                {
-                    Id = documentId,
-                    Url = url,
-                    Slug = slug,
-                    FileName = fileName,
-                    FilePath = filePath,
-                    StatusId = status.Id,
-                    Categories = categories,
-                    Title = documentRequestDTO.Title,
-                    PublicationDate = DateTime.UtcNow,
-                    DocumentTypeId = documentTypeId.Value,
-                    FileSize = documentRequestDTO.File.Length,
-                    Description = documentRequestDTO.Description,
-                };
-
-                var documentCreated = await _documentAdderRepository.CreateDocument(document);
-                _logger.LogInformation("Documento creado exitosamente con id: {DocumentId}", documentCreated.Id);
-
-                _memoryCachesService.ChangeVersion(Constants.CACHE_DOCUMENTS);
-
-                return documentCreated.ToDocumentResponseDTO();
+                await fileSystems.DeleteAsync(fileName, "documentos");
             }
-            catch
-            {
-                if (!string.IsNullOrEmpty(url) && !string.IsNullOrWhiteSpace(url))
-                {
-                    var fileName = Path.GetFileName(url);
-                    await _fileSystems.DeleteAsync(fileName, "documentos");
-                }
 
-                _logger.LogError("Error al crear el documento. Se eliminó el archivo subido con éxito.");
-                throw new CreateObjectException("Error al crear el documento.");
-            }
+            logger.LogError("Error al crear el documento. Se eliminó el archivo subido con éxito.");
+            throw new CreateObjectException("Error al crear el documento.");
         }
     }
 }

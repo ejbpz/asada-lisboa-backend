@@ -4,26 +4,18 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Charges;
 
-namespace AsadaLisboaBackend.Repositories.Charges
+namespace AsadaLisboaBackend.Repositories.Charges;
+
+public class ChargesAdderRepository(ApplicationDbContext context) : IChargesAdderRepository
 {
-    public class ChargesAdderRepository : IChargesAdderRepository
+    public async Task<ChargeResponseDto> CreateCharge(Charge charge)
     {
-        private readonly ApplicationDbContext _context;
+        context.Charges.Add(charge);
+        var affectedRows = await context.SaveChangesAsync();
 
-        public ChargesAdderRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        if (affectedRows < 1)
+            throw new CreateObjectException("Error al crear el cargo.");
 
-        public async Task<ChargeResponseDTO> CreateCharge(Charge charge)
-        {
-            _context.Charges.Add(charge);
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new CreateObjectException("Error al crear el cargo.");
-
-            return charge.ToChargeResponseDTO();
-        }
+        return charge.ToChargeResponseDto();
     }
 }

@@ -17,350 +17,347 @@ using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 using AsadaLisboaBackend.RepositoryContracts.DocumentTypes;
 
-namespace AsadaLisboaBackend.Tests.Services.Documents
+namespace AsadaLisboaBackend.Tests.Documents;
+
+public class DocumentsUpdaterServiceTests
 {
-    public class DocumentsUpdaterServiceTests
+    private readonly Fixture _fixture = new();
+    private readonly DocumentsUpdaterService _service;
+    private readonly Mock<IFileSystemsManager> _fileSystemsMock = new Mock<IFileSystemsManager>();
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+    private readonly Mock<ILogger<DocumentsUpdaterService>> _loggerMock = new Mock<ILogger<DocumentsUpdaterService>>();
+    private readonly Mock<ICategoriesGetterService> _categoriesGetterServiceMock = new Mock<ICategoriesGetterService>();
+    private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
+    private readonly Mock<IDocumentsGetterRepository> _documentsGetterRepositoryMock = new Mock<IDocumentsGetterRepository>();
+    private readonly Mock<IDocumentsUpdaterRepository> _documentsUpdaterRepositoryMock = new Mock<IDocumentsUpdaterRepository>();
+    private readonly Mock<IDocumentTypesGetterRepository> _documentTypesGetterRepositoryMock = new Mock<IDocumentTypesGetterRepository>();
+
+    public DocumentsUpdaterServiceTests()
     {
-        private readonly Fixture _fixture = new();
+        _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
+            .ForEach(b => _fixture.Behaviors.Remove(b));
 
-        private readonly Mock<IFileSystemsManager> _fileSystemsMock = new Mock<IFileSystemsManager>();
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
-        private readonly Mock<ILogger<DocumentsUpdaterService>> _loggerMock = new Mock<ILogger<DocumentsUpdaterService>>();
-        private readonly Mock<ICategoriesGetterService> _categoriesGetterServiceMock = new Mock<ICategoriesGetterService>();
-        private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
-        private readonly Mock<IDocumentsGetterRepository> _documentsGetterRepositoryMock = new Mock<IDocumentsGetterRepository>();
-        private readonly Mock<IDocumentsUpdaterRepository> _documentsUpdaterRepositoryMock = new Mock<IDocumentsUpdaterRepository>();
-        private readonly Mock<IDocumentTypesGetterRepository> _documentTypesGetterRepositoryMock = new Mock<IDocumentTypesGetterRepository>();
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        private readonly DocumentsUpdaterService _service;
+        _service = new DocumentsUpdaterService(
+            _fileSystemsMock.Object,
+            _documentsGetterRepositoryMock.Object,
+            _documentsUpdaterRepositoryMock.Object,
+            _categoriesGetterServiceMock.Object,
+            _documentTypesGetterRepositoryMock.Object,
+            _statusesGetterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-        public DocumentsUpdaterServiceTests()
-        {
-            _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
-                .ForEach(b => _fixture.Behaviors.Remove(b));
+    [Fact]
+    public async Task UpdateDocument_ShouldThrowNotFoundException_WhenDocumentDoesNotExist()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .Without(x => x.File)
+            .Create();
 
-            _service = new DocumentsUpdaterService(
-                _fileSystemsMock.Object,
-                _documentsGetterRepositoryMock.Object,
-                _documentsUpdaterRepositoryMock.Object,
-                _categoriesGetterServiceMock.Object,
-                _documentTypesGetterRepositoryMock.Object,
-                _statusesGetterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(id))!
+            .ReturnsAsync((Document?)null);
 
-        [Fact]
-        public async Task UpdateDocument_ShouldThrowNotFoundException_WhenDocumentDoesNotExist()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
+        // Act
+        Func<Task> act = async () => await _service.UpdateDocument(id, request);
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .Without(x => x.File)
-                .Create();
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Documento no encontrado.");
+    }
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(id))!
-                .ReturnsAsync((Document?)null);
+    [Fact]
+    public async Task UpdateDocument_ShouldThrowArgumentException_WhenStatusIdIsEmpty()
+    {
+        // Arrange
+        var document = _fixture.Create<Document>();
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateDocument(id, request);
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .With(x => x.StatusId, Guid.Empty)
+            .Without(x => x.File)
+            .Create();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("Documento no encontrado.");
-        }
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-        [Fact]
-        public async Task UpdateDocument_ShouldThrowArgumentException_WhenStatusIdIsEmpty()
-        {
-            // Arrange
-            var document = _fixture.Create<Document>();
+        // Act
+        Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .With(x => x.StatusId, Guid.Empty)
-                .Without(x => x.File)
-                .Create();
+        // Assert
+        await act.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("StatusId inválido.");
+    }
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+    [Fact]
+    public async Task UpdateDocument_ShouldThrowNotFoundException_WhenStatusDoesNotExist()
+    {
+        // Arrange
+        var document = _fixture.Create<Document>();
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .Without(x => x.File)
+            .Create();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<ArgumentException>()
-                .WithMessage("StatusId inválido.");
-        }
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-        [Fact]
-        public async Task UpdateDocument_ShouldThrowNotFoundException_WhenStatusDoesNotExist()
-        {
-            // Arrange
-            var document = _fixture.Create<Document>();
+        _statusesGetterRepositoryMock.Setup(x =>
+                x.GetStatus(request.StatusId))!
+            .ReturnsAsync((StatusResponseDto?)null);
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .Without(x => x.File)
-                .Create();
+        // Act
+        Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Status no encontrado.");
+    }
 
-            _statusesGetterRepositoryMock.Setup(x =>
-                    x.GetStatus(request.StatusId))!
-                .ReturnsAsync((StatusResponseDTO?)null);
+    [Fact]
+    public async Task UpdateDocument_ShouldUpdateSuccessfully_WithoutFile()
+    {
+        // Arrange
+        var document = _fixture.Create<Document>();
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
+        var status = _fixture.Build<Status>()
+            .With(x => x.Name, "Borrador")
+            .Create();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("Status no encontrado.");
-        }
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .With(x => x.File, (IFormFile?)null)
+            .Create();
 
-        [Fact]
-        public async Task UpdateDocument_ShouldUpdateSuccessfully_WithoutFile()
-        {
-            // Arrange
-            var document = _fixture.Create<Document>();
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-            var status = _fixture.Build<Status>()
-                .With(x => x.Name, "Borrador")
-                .Create();
+        _statusesGetterRepositoryMock.Setup(x =>
+                x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .With(x => x.File, (IFormFile?)null)
-                .Create();
+        _categoriesGetterServiceMock.Setup(x =>
+                x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+        _documentsUpdaterRepositoryMock.Setup(x =>
+                x.UpdateDocument(It.IsAny<Document>()))
+            .ReturnsAsync(document);
 
-            _statusesGetterRepositoryMock.Setup(x =>
-                    x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        // Act
+        var result = await _service.UpdateDocument(document.Id, request);
 
-            _categoriesGetterServiceMock.Setup(x =>
-                    x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        // Assert
+        result.Should().NotBeNull();
 
-            _documentsUpdaterRepositoryMock.Setup(x =>
-                    x.UpdateDocument(It.IsAny<Document>()))
-                .ReturnsAsync(document);
-
-            // Act
-            var result = await _service.UpdateDocument(document.Id, request);
-
-            // Assert
-            result.Should().NotBeNull();
-
-            _documentsUpdaterRepositoryMock.Verify(x =>
+        _documentsUpdaterRepositoryMock.Verify(x =>
                 x.UpdateDocument(It.IsAny<Document>()),
-                Times.Once);
+            Times.Once);
 
-            _memoryCachesServiceMock.Verify(x =>
+        _memoryCachesServiceMock.Verify(x =>
                 x.RemoveById(Constants.CACHE_DOCUMENTS, document.Id),
-                Times.Once);
+            Times.Once);
 
-            _memoryCachesServiceMock.Verify(x =>
+        _memoryCachesServiceMock.Verify(x =>
                 x.ChangeVersion(Constants.CACHE_DOCUMENTS),
-                Times.Once);
-        }
+            Times.Once);
+    }
 
-        [Fact]
-        public async Task UpdateDocument_ShouldUpdateSuccessfully_WithFile()
-        {
-            // Arrange
-            var fileMock = new Mock<IFormFile>();
+    [Fact]
+    public async Task UpdateDocument_ShouldUpdateSuccessfully_WithFile()
+    {
+        // Arrange
+        var fileMock = new Mock<IFormFile>();
 
-            fileMock.Setup(x => x.Length)
-                .Returns(500);
+        fileMock.Setup(x => x.Length)
+            .Returns(500);
 
-            var document = _fixture.Build<Document>()
-                .With(x => x.FilePath, "documentos/old.pdf")
-                .With(x => x.FileName, "old.pdf")
-                .Create();
+        var document = _fixture.Build<Document>()
+            .With(x => x.FilePath, "documentos/old.pdf")
+            .With(x => x.FileName, "old.pdf")
+            .Create();
 
-            var status = _fixture.Build<Status>()
-                .With(x => x.Name, "Borrador")
-                .Create();
+        var status = _fixture.Build<Status>()
+            .With(x => x.Name, "Borrador")
+            .Create();
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .With(x => x.File, fileMock.Object)
-                .Create();
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .With(x => x.File, fileMock.Object)
+            .Create();
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-            _statusesGetterRepositoryMock.Setup(x =>
-                    x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _statusesGetterRepositoryMock.Setup(x =>
+                x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            _categoriesGetterServiceMock.Setup(x =>
-                    x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        _categoriesGetterServiceMock.Setup(x =>
+                x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            _fileSystemsMock.Setup(x =>
-                    x.SaveAsync(fileMock.Object, "documentos", It.IsAny<string>()))
-                .ReturnsAsync("documentos/new.pdf");
+        _fileSystemsMock.Setup(x =>
+                x.SaveAsync(fileMock.Object, "documentos", It.IsAny<string>()))
+            .ReturnsAsync("documentos/new.pdf");
 
-            _documentTypesGetterRepositoryMock.Setup(x =>
-                    x.GetDocumentTypeIdByExtension(".pdf"))
-                .Returns(Guid.NewGuid());
+        _documentTypesGetterRepositoryMock.Setup(x =>
+                x.GetDocumentTypeIdByExtension(".pdf"))
+            .Returns(Guid.NewGuid());
 
-            _documentsUpdaterRepositoryMock.Setup(x =>
-                    x.UpdateDocument(It.IsAny<Document>()))
-                .ReturnsAsync(document);
+        _documentsUpdaterRepositoryMock.Setup(x =>
+                x.UpdateDocument(It.IsAny<Document>()))
+            .ReturnsAsync(document);
 
-            // Act
-            var result = await _service.UpdateDocument(document.Id, request);
+        // Act
+        var result = await _service.UpdateDocument(document.Id, request);
 
-            // Assert
-            result.Should().NotBeNull();
+        // Assert
+        result.Should().NotBeNull();
 
-            document.Url.Should().Be("documentos/new.pdf");
-            document.FileName.Should().Be("new.pdf");
+        document.Url.Should().Be("documentos/new.pdf");
+        document.FileName.Should().Be("new.pdf");
 
-            _documentsUpdaterRepositoryMock.Verify(x =>
+        _documentsUpdaterRepositoryMock.Verify(x =>
                 x.UpdateDocument(It.IsAny<Document>()),
-                Times.Once);
-        }
+            Times.Once);
+    }
 
-        [Fact]
-        public async Task UpdateDocument_ShouldThrowCreateObjectException_WhenSaveFileFails()
-        {
-            // Arrange
-            var fileMock = new Mock<IFormFile>();
+    [Fact]
+    public async Task UpdateDocument_ShouldThrowCreateObjectException_WhenSaveFileFails()
+    {
+        // Arrange
+        var fileMock = new Mock<IFormFile>();
 
-            fileMock.Setup(x => x.Length)
-                .Returns(200);
+        fileMock.Setup(x => x.Length)
+            .Returns(200);
 
-            var document = _fixture.Create<Document>();
+        var document = _fixture.Create<Document>();
 
-            var status = _fixture.Create<Status>();
+        var status = _fixture.Create<Status>();
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .With(x => x.File, fileMock.Object)
-                .Create();
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .With(x => x.File, fileMock.Object)
+            .Create();
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-            _statusesGetterRepositoryMock.Setup(x =>
-                    x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _statusesGetterRepositoryMock.Setup(x =>
+                x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            _categoriesGetterServiceMock.Setup(x =>
-                    x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        _categoriesGetterServiceMock.Setup(x =>
+                x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            _fileSystemsMock.Setup(x =>
-                    x.SaveAsync(It.IsAny<IFormFile>(), "documentos", It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
+        _fileSystemsMock.Setup(x =>
+                x.SaveAsync(It.IsAny<IFormFile>(), "documentos", It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
+        // Act
+        Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<CreateObjectException>()
-                .WithMessage("Error al actualizar el documento.");
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<CreateObjectException>()
+            .WithMessage("Error al actualizar el documento.");
+    }
 
-        [Fact]
-        public async Task UpdateDocument_ShouldThrowNotFoundException_WhenDocumentTypeIsInvalid()
-        {
-            // Arrange
-            var fileMock = new Mock<IFormFile>();
+    [Fact]
+    public async Task UpdateDocument_ShouldThrowNotFoundException_WhenDocumentTypeIsInvalid()
+    {
+        // Arrange
+        var fileMock = new Mock<IFormFile>();
 
-            fileMock.Setup(x => x.Length)
-                .Returns(500);
+        fileMock.Setup(x => x.Length)
+            .Returns(500);
 
-            var document = _fixture.Create<Document>();
+        var document = _fixture.Create<Document>();
 
-            var status = _fixture.Create<Status>();
+        var status = _fixture.Create<Status>();
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .With(x => x.File, fileMock.Object)
-                .Create();
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .With(x => x.File, fileMock.Object)
+            .Create();
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-            _statusesGetterRepositoryMock.Setup(x =>
-                    x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _statusesGetterRepositoryMock.Setup(x =>
+                x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            _categoriesGetterServiceMock.Setup(x =>
-                    x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        _categoriesGetterServiceMock.Setup(x =>
+                x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            _fileSystemsMock.Setup(x =>
-                    x.SaveAsync(It.IsAny<IFormFile>(), "documentos", It.IsAny<string>()))
-                .ReturnsAsync("documentos/file.xyz");
+        _fileSystemsMock.Setup(x =>
+                x.SaveAsync(It.IsAny<IFormFile>(), "documentos", It.IsAny<string>()))
+            .ReturnsAsync("documentos/file.xyz");
 
-            _documentTypesGetterRepositoryMock.Setup(x =>
-                    x.GetDocumentTypeIdByExtension(".xyz"))
-                .Returns((Guid?)null);
+        _documentTypesGetterRepositoryMock.Setup(x =>
+                x.GetDocumentTypeIdByExtension(".xyz"))
+            .Returns((Guid?)null);
 
-            // Act
-            Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
+        // Act
+        Func<Task> act = async () => await _service.UpdateDocument(document.Id, request);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("Tipo de documento no soportado.");
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Tipo de documento no soportado.");
+    }
 
-        [Fact]
-        public async Task UpdateDocument_ShouldIndexElastic_WhenStatusIsPublicado()
-        {
-            // Arrange
-            var document = _fixture.Create<Document>();
+    [Fact]
+    public async Task UpdateDocument_ShouldIndexElastic_WhenStatusIsPublicado()
+    {
+        // Arrange
+        var document = _fixture.Create<Document>();
 
-            var status = _fixture.Build<Status>()
-                .With(x => x.Name, "Publicado")
-                .Create();
+        var status = _fixture.Build<Status>()
+            .With(x => x.Name, "Publicado")
+            .Create();
 
-            var request = _fixture.Build<DocumentUpdateRequestDTO>()
-                .With(x => x.File, (IFormFile?)null)
-                .Create();
+        var request = _fixture.Build<DocumentUpdateRequestDto>()
+            .With(x => x.File, (IFormFile?)null)
+            .Create();
 
-            _documentsGetterRepositoryMock.Setup(x =>
-                    x.GetDocument(document.Id))
-                .ReturnsAsync(document);
+        _documentsGetterRepositoryMock.Setup(x =>
+                x.GetDocument(document.Id))
+            .ReturnsAsync(document);
 
-            _statusesGetterRepositoryMock.Setup(x =>
-                    x.GetStatus(request.StatusId))
-                .ReturnsAsync(status.ToStatusResponseDTO());
+        _statusesGetterRepositoryMock.Setup(x =>
+                x.GetStatus(request.StatusId))
+            .ReturnsAsync(status.ToStatusResponseDto());
 
-            _categoriesGetterServiceMock.Setup(x =>
-                    x.ToCreateCategories(It.IsAny<List<CategoryRequestDTO>>()))
-                .ReturnsAsync(new HashSet<Category>());
+        _categoriesGetterServiceMock.Setup(x =>
+                x.ToCreateCategories(It.IsAny<List<CategoryRequestDto>>()))
+            .ReturnsAsync(new HashSet<Category>());
 
-            _documentsUpdaterRepositoryMock.Setup(x =>
-                    x.UpdateDocument(It.IsAny<Document>()))
-                .ReturnsAsync(document);
+        _documentsUpdaterRepositoryMock.Setup(x =>
+                x.UpdateDocument(It.IsAny<Document>()))
+            .ReturnsAsync(document);
 
-            // Act
-            await _service.UpdateDocument(document.Id, request);
+        // Act
+        await _service.UpdateDocument(document.Id, request);
 
-            // Assert
-            _documentsUpdaterRepositoryMock.Verify(x =>
+        // Assert
+        _documentsUpdaterRepositoryMock.Verify(x =>
                 x.UpdateDocument(It.IsAny<Document>()),
-                Times.Once);
-        }
+            Times.Once);
     }
 }

@@ -7,44 +7,35 @@ using AsadaLisboaBackend.ServiceContracts.Users;
 using AsadaLisboaBackend.RepositoryContracts.Users;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Users
+namespace AsadaLisboaBackend.Services.Users;
+
+public class UsersGetterService(
+    IUsersGetterRepository usersGetterRepository, 
+    ILogger<UsersGetterService> logger, 
+    IMemoryCachesService memoryCachesService) : IUsersGetterService
 {
-    public class UsersGetterService : IUsersGetterService
+    public async Task<PageResponseDto<UserResponseDto>> GetUsers(SearchSortRequestDto searchSortRequestDto)
     {
-        private readonly ILogger<UsersGetterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IUsersGetterRepository _usersGetterRepository;
+        return await memoryCachesService.GetOrCreateCacheList(
+            resource: Constants.CACHE_USERS,
+            request: searchSortRequestDto,
+            create: () => usersGetterRepository.GetUsers(searchSortRequestDto),
+            time: TimeSpan.FromMinutes(5));
+    }
 
-        public UsersGetterService(IUsersGetterRepository usersGetterRepository, ILogger<UsersGetterService> logger, IMemoryCachesService memoryCachesService)
+    public async Task<UserDetailResponseDto?> GetUser(Guid id)
+    {
+        var user = await memoryCachesService.GetOrCreateCache(
+            key: $"{Constants.CACHE_USERS}_{id}",
+            create: () => usersGetterRepository.GetUser(id),
+            time: TimeSpan.FromMinutes(5));
+
+        if (user is null)
         {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _usersGetterRepository = usersGetterRepository;
+            logger.LogWarning("Usuario con id {UserId} no encontrado.", id);
+            throw new NotFoundException("Usuario inexistente.");
         }
 
-        public async Task<PageResponseDTO<UserResponseDTO>> GetUsers(SearchSortRequestDTO searchSortRequestDTO)
-        {
-            return await _memoryCachesService.GetOrCreateCacheList<PageResponseDTO<UserResponseDTO>>(
-                resource: Constants.CACHE_USERS,
-                request: searchSortRequestDTO,
-                create: () => _usersGetterRepository.GetUsers(searchSortRequestDTO),
-                time: TimeSpan.FromMinutes(5));
-        }
-
-        public async Task<UserDetailResponseDTO?> GetUser(Guid id)
-        {
-            var user = await _memoryCachesService.GetOrCreateCache<UserDetailResponseDTO?>(
-                key: $"{Constants.CACHE_USERS}_{id}",
-                create: () => _usersGetterRepository.GetUser(id),
-                time: TimeSpan.FromMinutes(5));
-
-            if (user is null)
-            {
-                _logger.LogWarning("Usuario con id {UserId} no encontrado.", id);
-                throw new NotFoundException("Usuario inexistente.");
-            }
-
-            return user;
-        }
+        return user;
     }
 }

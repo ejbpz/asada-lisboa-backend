@@ -5,31 +5,23 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Categories;
 
-namespace AsadaLisboaBackend.Repositories.Categories
+namespace AsadaLisboaBackend.Repositories.Categories;
+
+public class CategoriesDeleterRepository(ApplicationDbContext context) : ICategoriesDeleterRepository
 {
-    public class CategoriesDeleterRepository : ICategoriesDeleterRepository
+    public async Task DeleteCategory(Guid id)
     {
-        private readonly ApplicationDbContext _context;
-
-        public CategoriesDeleterRepository(ApplicationDbContext context)
+        try
         {
-            _context = context;
+            context.Categories.Remove(new Category { Id = id });
+            await context.SaveChangesAsync();
         }
-
-        public async Task DeleteCategory(Guid id)
+        catch (DbUpdateException ex)
         {
-            try
-            {
-                _context.Categories.Remove(new Category { Id = id });
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                if (ex.InnerException is PostgresException postgresException && postgresException.SqlState == PostgresErrorCodes.ForeignKeyViolation)
-                    throw new InUsedException("Esta categoría está siendo usada por otro elemento.");
+            if (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation })
+                throw new InUsedException("Esta categoría está siendo usada por otro elemento.");
 
-                throw;
-            }
+            throw;
         }
     }
 }

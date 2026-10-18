@@ -4,37 +4,29 @@ using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.ServiceContracts.AboutUsSections;
 using AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
 
-namespace AsadaLisboaBackend.Services.AboutUsSections
+namespace AsadaLisboaBackend.Services.AboutUsSections;
+
+public class AboutUsSectionsDeleterService(
+    IAboutUsSectionsDeleterRepository aboutUsSectionsDeleterRepository,
+    ILogger<AboutUsSectionsDeleterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IAboutUsSectionsDeleterService
 {
-    public class AboutUsSectionsDeleterService : IAboutUsSectionsDeleterService
+    public async Task DeleteAboutUsSection(Guid id)
     {
-        private readonly ILogger<AboutUsSectionsDeleterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IAboutUsSectionsDeleterRepository _aboutUsSectionsDeleterRepository;
-
-        public AboutUsSectionsDeleterService(IAboutUsSectionsDeleterRepository aboutUsSectionsDeleterRepository, ILogger<AboutUsSectionsDeleterService> logger, IMemoryCachesService memoryCachesService)
+        try
         {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _aboutUsSectionsDeleterRepository = aboutUsSectionsDeleterRepository;
+            await aboutUsSectionsDeleterRepository.DeleteAboutUsSection(id);
+
+            memoryCachesService.RemoveById(Constants.CACHE_ABOUT_US, id);
+            memoryCachesService.ChangeVersion(Constants.CACHE_ABOUT_US);
+
+            logger.LogInformation("Sobre nosotros con Id: {Id} eliminado exitosamente.", id);
         }
-
-        public async Task DeleteAboutUsSection(Guid id)
+        catch (Exception ex)
         {
-            try
-            {
-                await _aboutUsSectionsDeleterRepository.DeleteAboutUsSection(id);
-
-                _memoryCachesService.RemoveById(Constants.CACHE_ABOUT_US, id);
-                _memoryCachesService.ChangeVersion(Constants.CACHE_ABOUT_US);
-
-                _logger.LogInformation("Sobre nosotros con Id: {Id} eliminado exitosamente.", id);
-            }
-            catch (Exception ex)
-    {
-                _logger.LogError(ex, "Error eliminar  sobre nosotros con Id: {Id}", id);
-                throw;
-            }
+            logger.LogError(ex, "Error eliminar  sobre nosotros con Id: {Id}", id);
+            throw;
         }
     }
 }

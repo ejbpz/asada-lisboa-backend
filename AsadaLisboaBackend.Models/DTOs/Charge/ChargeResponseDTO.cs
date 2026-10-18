@@ -1,31 +1,30 @@
 ﻿using System.Linq.Expressions;
 
-namespace AsadaLisboaBackend.Models.DTOs.Charge
+namespace AsadaLisboaBackend.Models.DTOs.Charge;
+
+public class ChargeResponseDto
 {
-    public class ChargeResponseDTO
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+public static partial class ChargeExtensions
+{
+    public static Expression<Func<Models.Charge, ChargeResponseDto>> MapChargeResponseDto()
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        return charge => new ChargeResponseDto
+        {
+            Id = charge.Id,
+            Name = charge.Name ?? string.Empty,
+        };
     }
 
-    public static partial class ChargeExtensions
+    public static ChargeResponseDto ToChargeResponseDto(this Models.Charge charge)
     {
-        public static Expression<Func<Models.Charge, ChargeResponseDTO>> MapChargeResponseDTO()
+        return new ChargeResponseDto()
         {
-            return charge => new ChargeResponseDTO
-            {
-                Id = charge.Id,
-                Name = charge.Name ?? string.Empty,
-            };
-        }
-
-        public static ChargeResponseDTO ToChargeResponseDTO(this Models.Charge charge)
-        {
-            return new ChargeResponseDTO()
-            {
-                Id = charge.Id,
-                Name = charge.Name ?? string.Empty,
-            };
-        }
+            Id = charge.Id,
+            Name = charge.Name ?? string.Empty,
+        };
     }
 }

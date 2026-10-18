@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.New;
 
-namespace AsadaLisboaBackend.ServiceContracts.News
+namespace AsadaLisboaBackend.ServiceContracts.News;
+
+public interface INewsAdderService
 {
-    public interface INewsAdderService
-    {
-        public Task<NewResponseDTO> CreateNew(NewRequestDTO newRequestDTO);
-    }
+    public Task<NewResponseDto> CreateNew(NewRequestDto newRequestDto);
 }

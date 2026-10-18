@@ -3,25 +3,17 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Documents;
 
-namespace AsadaLisboaBackend.Repositories.Documents
+namespace AsadaLisboaBackend.Repositories.Documents;
+
+public class DocumentsDeleterRepository(ApplicationDbContext context) : IDocumentsDeleterRepository
 {
-    public class DocumentsDeleterRepository : IDocumentsDeleterRepository
+    public async Task DeleteDocument(Guid id)
     {
-        private readonly ApplicationDbContext _context;
+        var affectedRows = await context.Documents
+            .Where(v => v.Id == id)
+            .ExecuteDeleteAsync();
 
-        public DocumentsDeleterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task DeleteDocument(Guid id)
-        {
-            var affectedRows = await _context.Documents
-                .Where(v => v.Id == id)
-                .ExecuteDeleteAsync();
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Error al eliminar el documento");
-        }
+        if (affectedRows < 1)
+            throw new NotFoundException("Error al eliminar el documento");
     }
 }

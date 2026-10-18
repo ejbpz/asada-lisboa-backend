@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.Models.DTOs.Editor
+﻿namespace AsadaLisboaBackend.Models.DTOs.Editor;
+
+public class EditorResponseDto
 {
-    public class EditorResponseDTO
-    {
-        public string Url { get; set; } = string.Empty;
-    }
+    public string Url { get; set; } = string.Empty;
 }

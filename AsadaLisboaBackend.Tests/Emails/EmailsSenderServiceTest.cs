@@ -10,291 +10,288 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Utils.OptionsPattern;
 using AsadaLisboaBackend.Models.DTOs.InformationMessage;
 
-namespace AsadaLisboaBackend.Tests.Emails
+namespace AsadaLisboaBackend.Tests.Emails;
+
+public class EmailsSenderServiceTest
 {
-    public class EmailsSenderServiceTest
+    private readonly Mock<IResend> _resendMock;
+    private readonly EmailsSenderService _service;
+
+    public EmailsSenderServiceTest()
     {
-        private readonly Mock<IResend> _resendMock;
-        private readonly Mock<ILogger<EmailsSenderService>> _loggerMock;
+        _resendMock = new Mock<IResend>();
 
-        private readonly EmailsSenderService _service;
+        var loggerMock = new Mock<ILogger<EmailsSenderService>>();
 
-        public EmailsSenderServiceTest()
+        var options = Options.Create(new ContactEmailOptions
         {
-            _resendMock = new Mock<IResend>();
+            ContactEmail = "contact@test.com"
+        });
 
-            _loggerMock = new Mock<ILogger<EmailsSenderService>>();
+        _service = new EmailsSenderService(
+            _resendMock.Object,
+            options,
+            loggerMock.Object
+        );
+    }
 
-            var options = Options.Create(new ContactEmailOptions
+    private ResendResponse<Guid> SuccessResponse()
+    {
+        return new ResendResponse<Guid>(
+            Guid.NewGuid(),
+            null
+        );
+    }
+
+    private ResendResponse<Guid> FailResponse()
+    {
+        return new ResendResponse<Guid>(
+            new ResendException(
+                HttpStatusCode.BadRequest,
+                ErrorType.ApplicationError,
+                "Error sending email"
+            ),
+            null
+        );
+    }
+
+    [Fact]
+    public async Task SendResetPasswordToken_Should_Send_Email()
+    {
+        // Arrange
+        var name = "Eduardo";
+        var email = "test@test.com";
+        var token = "abc123";
+
+        EmailMessage? sentMessage = null;
+
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<EmailMessage, CancellationToken>((message, _) =>
             {
-                CONTACT_EMAIL = "contact@test.com"
-            });
+                sentMessage = message;
+            })
+            .ReturnsAsync(SuccessResponse());
 
-            _service = new EmailsSenderService(
-                _resendMock.Object,
-                options,
-                _loggerMock.Object
-            );
-        }
+        // Act
+        await _service.SendResetPasswordToken(name, email, token);
 
-        private ResendResponse<Guid> SuccessResponse()
+        // Assert
+        sentMessage.Should().NotBeNull();
+
+        sentMessage!.To.Should().Contain(email);
+
+        sentMessage.Subject.Should()
+            .Be("Token restaurar contraseña");
+
+        sentMessage.Template.Should().NotBeNull();
+
+        sentMessage.Template!.Variables.Should()
+            .ContainKey("USER_NAME");
+
+        sentMessage.Template!.Variables["USER_NAME"]
+            .Should().Be(name);
+
+        sentMessage.Template!.Variables["USER_EMAIL"]
+            .Should().Be(email);
+
+        sentMessage.Template!.Variables["RESET_LINK"]
+            .Should().Be(
+                $"{Constants.CLIENT_HOST}/cuenta/restaurar-contrasena/?token={token}&email={email}");
+    }
+
+    [Fact]
+    public async Task SendResetPasswordToken_Should_Throw_When_Send_Fails()
+    {
+        // Arrange
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(FailResponse());
+
+        // Act
+        Func<Task> act = async () =>
+            await _service.SendResetPasswordToken(
+                "Eduardo",
+                "test@test.com",
+                "token");
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<SendEmailException>()
+            .WithMessage("Error al enviar el token.");
+    }
+
+    [Fact]
+    public async Task SendContactMessage_Should_Send_Email()
+    {
+        // Arrange
+        var request = new SendEmailRequestDto
         {
-            return new ResendResponse<Guid>(
-                Guid.NewGuid(),
-                null
-            );
-        }
+            FullName = "Eduardo",
+            Email = "edu@test.com",
+            Subject = "Consulta",
+            Message = "Hola mundo"
+        };
 
-        private ResendResponse<Guid> FailResponse()
-        {
-            return new ResendResponse<Guid>(
-                new ResendException(
-                    HttpStatusCode.BadRequest,
-                    ErrorType.ApplicationError,
-                    "Error sending email"
-                ),
-                null
-            );
-        }
+        EmailMessage? sentMessage = null;
 
-        [Fact]
-        public async Task SendResetPasswordToken_Should_Send_Email()
-        {
-            // Arrange
-            var name = "Eduardo";
-            var email = "test@test.com";
-            var token = "abc123";
-
-            EmailMessage? sentMessage = null;
-
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .Callback<EmailMessage, CancellationToken>((message, _) =>
-                {
-                    sentMessage = message;
-                })
-                .ReturnsAsync(SuccessResponse());
-
-            // Act
-            await _service.SendResetPasswordToken(name, email, token);
-
-            // Assert
-            sentMessage.Should().NotBeNull();
-
-            sentMessage!.To.Should().Contain(email);
-
-            sentMessage.Subject.Should()
-                .Be("Token restaurar contraseña");
-
-            sentMessage.Template.Should().NotBeNull();
-
-            sentMessage.Template!.Variables.Should()
-                .ContainKey("USER_NAME");
-
-            sentMessage.Template!.Variables["USER_NAME"]
-                .Should().Be(name);
-
-            sentMessage.Template!.Variables["USER_EMAIL"]
-                .Should().Be(email);
-
-            sentMessage.Template!.Variables["RESET_LINK"]
-                .Should().Be(
-                    $"{Constants.CLIENT_HOST}/cuenta/restaurar-contrasena/?token={token}&email={email}");
-        }
-
-        [Fact]
-        public async Task SendResetPasswordToken_Should_Throw_When_Send_Fails()
-        {
-            // Arrange
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(FailResponse());
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.SendResetPasswordToken(
-                    "Eduardo",
-                    "test@test.com",
-                    "token");
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<SendEmailException>()
-                .WithMessage("Error al enviar el token.");
-        }
-
-        [Fact]
-        public async Task SendContactMessage_Should_Send_Email()
-        {
-            // Arrange
-            var request = new SendEmailRequestDTO
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<EmailMessage, CancellationToken>((message, _) =>
             {
-                FullName = "Eduardo",
-                Email = "edu@test.com",
-                Subject = "Consulta",
-                Message = "Hola mundo"
-            };
+                sentMessage = message;
+            })
+            .ReturnsAsync(SuccessResponse());
 
-            EmailMessage? sentMessage = null;
+        // Act
+        await _service.SendContactMessage(request);
 
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .Callback<EmailMessage, CancellationToken>((message, _) =>
-                {
-                    sentMessage = message;
-                })
-                .ReturnsAsync(SuccessResponse());
+        // Assert
+        sentMessage.Should().NotBeNull();
 
-            // Act
+        sentMessage!.To.Should()
+            .Contain("contact@test.com");
+
+        sentMessage.ReplyTo.Should()
+            .Contain(x => x.Email == request.Email);
+
+        sentMessage.Subject.Should()
+            .Be(request.Subject);
+
+        sentMessage.Template.Should().NotBeNull();
+        sentMessage.Template!.Variables.Should().NotBeNull();
+
+        sentMessage.Template!.Variables["CONTACT_MESSAGE"]
+            .Should().Be(request.Message);
+    }
+
+    [Fact]
+    public async Task SendContactMessage_Should_Throw_When_Send_Fails()
+    {
+        // Arrange
+        var request = new SendEmailRequestDto
+        {
+            FullName = "Eduardo",
+            Email = "edu@test.com",
+            Subject = "Consulta",
+            Message = "Hola"
+        };
+
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(FailResponse());
+
+        // Act
+        Func<Task> act = async () =>
             await _service.SendContactMessage(request);
 
-            // Assert
-            sentMessage.Should().NotBeNull();
+        // Assert
+        await act.Should()
+            .ThrowAsync<SendEmailException>()
+            .WithMessage("Error al enviar el mensaje de contacto.");
+    }
 
-            sentMessage!.To.Should()
-                .Contain("contact@test.com");
+    [Fact]
+    public async Task SendVerificationCode_Should_Send_Email()
+    {
+        // Arrange
+        var name = "Eduardo";
+        var email = "test@test.com";
+        var token = "verification-token";
 
-            sentMessage.ReplyTo.Should()
-                .Contain(x => x.Email == request.Email);
+        EmailMessage? sentMessage = null;
 
-            sentMessage.Subject.Should()
-                .Be(request.Subject);
-
-            sentMessage.Template.Should().NotBeNull();
-            sentMessage.Template!.Variables.Should().NotBeNull();
-
-            sentMessage.Template!.Variables["CONTACT_MESSAGE"]
-                .Should().Be(request.Message);
-        }
-
-        [Fact]
-        public async Task SendContactMessage_Should_Throw_When_Send_Fails()
-        {
-            // Arrange
-            var request = new SendEmailRequestDTO
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<EmailMessage, CancellationToken>((message, _) =>
             {
-                FullName = "Eduardo",
-                Email = "edu@test.com",
-                Subject = "Consulta",
-                Message = "Hola"
-            };
+                sentMessage = message;
+            })
+            .ReturnsAsync(SuccessResponse());
 
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(FailResponse());
+        // Act
+        await _service.SendVerificationCode(name, email, token);
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.SendContactMessage(request);
+        // Assert
+        sentMessage.Should().NotBeNull();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<SendEmailException>()
-                .WithMessage("Error al enviar el mensaje de contacto.");
-        }
+        sentMessage!.To.Should().Contain(email);
 
-        [Fact]
-        public async Task SendVerificationCode_Should_Send_Email()
-        {
-            // Arrange
-            var name = "Eduardo";
-            var email = "test@test.com";
-            var token = "verification-token";
+        sentMessage.Subject.Should()
+            .Be("Token confirmación correo electrónico");
 
-            EmailMessage? sentMessage = null;
+        sentMessage.Template.Should().NotBeNull();
 
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .Callback<EmailMessage, CancellationToken>((message, _) =>
-                {
-                    sentMessage = message;
-                })
-                .ReturnsAsync(SuccessResponse());
+        sentMessage.Template!.Variables.Should().NotBeNull();
 
-            // Act
-            await _service.SendVerificationCode(name, email, token);
+        sentMessage.Template!.Variables["USER_NAME"]
+            .Should().Be(name);
 
-            // Assert
-            sentMessage.Should().NotBeNull();
+        sentMessage.Template!.Variables["USER_EMAIL"]
+            .Should().Be(email);
 
-            sentMessage!.To.Should().Contain(email);
+        sentMessage.Template!.Variables["RESET_LINK"]
+            .Should().Be(
+                $"{Constants.CLIENT_HOST}/cuenta/confirmar-correo/?token={token}&email={email}");
+    }
 
-            sentMessage.Subject.Should()
-                .Be("Token confirmación correo electrónico");
+    [Fact]
+    public async Task SendVerificationCode_Should_Throw_When_Send_Fails()
+    {
+        // Arrange
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(FailResponse());
 
-            sentMessage.Template.Should().NotBeNull();
-
-            sentMessage.Template!.Variables.Should().NotBeNull();
-
-            sentMessage.Template!.Variables["USER_NAME"]
-                .Should().Be(name);
-
-            sentMessage.Template!.Variables["USER_EMAIL"]
-                .Should().Be(email);
-
-            sentMessage.Template!.Variables["RESET_LINK"]
-                .Should().Be(
-                    $"{Constants.CLIENT_HOST}/cuenta/confirmar-correo/?token={token}&email={email}");
-        }
-
-        [Fact]
-        public async Task SendVerificationCode_Should_Throw_When_Send_Fails()
-        {
-            // Arrange
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(FailResponse());
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.SendVerificationCode(
-                    "Eduardo",
-                    "test@test.com",
-                    "token");
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<SendEmailException>()
-                .WithMessage("Error al enviar el mensaje de contacto.");
-        }
-
-        [Fact]
-        public async Task SendVerificationCode_Should_Use_Correct_TemplateId()
-        {
-            // Arrange
-            EmailMessage? sentMessage = null;
-
-            _resendMock
-                .Setup(x => x.EmailSendAsync(
-                    It.IsAny<EmailMessage>(),
-                    It.IsAny<CancellationToken>()))
-                .Callback<EmailMessage, CancellationToken>((message, _) =>
-                {
-                    sentMessage = message;
-                })
-                .ReturnsAsync(SuccessResponse());
-
-            // Act
+        // Act
+        Func<Task> act = async () =>
             await _service.SendVerificationCode(
                 "Eduardo",
                 "test@test.com",
                 "token");
 
-            // Assert
-            sentMessage!.Template!.TemplateId.Should()
-                .Be(new Guid("a807f333-12ae-4b12-9e00-e5e3ecb02f2b"));
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<SendEmailException>()
+            .WithMessage("Error al enviar el mensaje de contacto.");
+    }
+
+    [Fact]
+    public async Task SendVerificationCode_Should_Use_Correct_TemplateId()
+    {
+        // Arrange
+        EmailMessage? sentMessage = null;
+
+        _resendMock
+            .Setup(x => x.EmailSendAsync(
+                It.IsAny<EmailMessage>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<EmailMessage, CancellationToken>((message, _) =>
+            {
+                sentMessage = message;
+            })
+            .ReturnsAsync(SuccessResponse());
+
+        // Act
+        await _service.SendVerificationCode(
+            "Eduardo",
+            "test@test.com",
+            "token");
+
+        // Assert
+        sentMessage!.Template!.TemplateId.Should()
+            .Be(new Guid("a807f333-12ae-4b12-9e00-e5e3ecb02f2b"));
     }
 }

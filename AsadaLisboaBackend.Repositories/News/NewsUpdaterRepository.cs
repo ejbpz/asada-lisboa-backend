@@ -4,50 +4,39 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.News;
 
-namespace AsadaLisboaBackend.Repositories.News
+namespace AsadaLisboaBackend.Repositories.News;
+
+public class NewsUpdaterRepository(ApplicationDbContext context) : INewsUpdaterRepository
 {
-    public class NewsUpdaterRepository : INewsUpdaterRepository
+    public async Task<New> UpdateNew(Guid id, New newModel)
     {
-        private readonly ApplicationDbContext _context;
+        var existingNew = await context.News
+            .Include(d => d.Status)
+            .Include(d => d.Categories)
+            .FirstAsync(d => d.Id == id);
 
-        public NewsUpdaterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        existingNew.Slug = newModel.Slug;
+        existingNew.Title = newModel.Title;
+        existingNew.StatusId = newModel.StatusId;
+        existingNew.ImageUrl = newModel.ImageUrl;
+        existingNew.FileName = newModel.FileName;
+        existingNew.FilePath = newModel.FilePath;
+        existingNew.Description = newModel.Description;
+        existingNew.LastEditionDate = newModel.LastEditionDate;
 
-        public async Task<New> UpdateNew(Guid id, New newModel)
-        {
-            var existingNew = await _context.News
-                .Include(d => d.Status)
-                .Include(d => d.Categories)
-                .FirstAsync(d => d.Id == id);
+        var categoryIds = newModel.Categories
+            .Select(c => c.Id)
+            .ToList();
 
-            existingNew.Slug = newModel.Slug;
-            existingNew.Title = newModel.Title;
-            existingNew.StatusId = newModel.StatusId;
-            existingNew.ImageUrl = newModel.ImageUrl;
-            existingNew.FileName = newModel.FileName;
-            existingNew.FilePath = newModel.FilePath;
-            existingNew.Description = newModel.Description;
-            existingNew.LastEditionDate = newModel.LastEditionDate;
+        var categoriesFromDb = await context.Categories
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToListAsync();
 
-            var categoryIds = newModel.Categories
-                .Select(c => c.Id)
-                .ToList();
+        existingNew.Categories.Clear();
+        existingNew.Categories = categoriesFromDb;
 
-            var categoriesFromDb = await _context.Categories
-                .Where(c => categoryIds.Contains(c.Id))
-                .ToListAsync();
+        var affectedRows = await context.SaveChangesAsync();
 
-            existingNew.Categories.Clear();
-            existingNew.Categories = categoriesFromDb;
-
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new UpdateObjectException("Error al modificar la noticia.");
-
-            return existingNew;
-        }
+        return affectedRows < 1 ? throw new UpdateObjectException("Error al modificar la noticia.") : existingNew;
     }
 }

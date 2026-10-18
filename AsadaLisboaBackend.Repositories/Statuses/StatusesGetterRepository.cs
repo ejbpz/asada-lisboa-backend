@@ -4,36 +4,25 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 
-namespace AsadaLisboaBackend.Repositories.Statuses
+namespace AsadaLisboaBackend.Repositories.Statuses;
+
+public class StatusesGetterRepository(ApplicationDbContext context) : IStatusesGetterRepository
 {
-    public class StatusesGetterRepository : IStatusesGetterRepository
+    public async Task<List<StatusResponseDto>> GetStatuses()
     {
-        private readonly ApplicationDbContext _context;
+        return await context.Statuses
+            .AsNoTracking()
+            .Select(StatusExtensions.MapStatusResponseDto())
+            .ToListAsync();
+    }
 
-        public StatusesGetterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<StatusResponseDto> GetStatus(Guid id)
+    {
+        var status = await context.Statuses
+            .AsNoTracking()
+            .Select(StatusExtensions.MapStatusResponseDto())
+            .FirstOrDefaultAsync(s => s.Id == id);
 
-        public async Task<List<StatusResponseDTO>> GetStatuses()
-        {
-            return await _context.Statuses
-                .AsNoTracking()
-                .Select(StatusExtensions.MapStatusResponseDTO())
-                .ToListAsync();
-        }
-
-        public async Task<StatusResponseDTO> GetStatus(Guid id)
-        {
-            var status = await _context.Statuses
-                .AsNoTracking()
-                .Select(StatusExtensions.MapStatusResponseDTO())
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            if (status is null)
-                throw new NotFoundException("No existe el estado seleccionado.");
-
-            return status;
-        }
+        return status ?? throw new NotFoundException("No existe el estado seleccionado.");
     }
 }

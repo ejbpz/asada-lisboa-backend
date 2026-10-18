@@ -1,24 +1,23 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
-namespace AsadaLisboaBackend.Utils.DocumentAtribute
+namespace AsadaLisboaBackend.Utils.DocumentAttribute;
+
+public class MaxFileSizeAttribute(int maxFileSizeMb) : ValidationAttribute
 {
-    public class MaxFileSizeAttribute(int maxFileSizeMb) : ValidationAttribute
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        if (value is IFormFile file)
         {
-            if (value is IFormFile file)
+            // Convertir MB a Bytes
+            var maxBytes = maxFileSizeMb * 1024 * 1024;
+
+            if (file.Length > maxBytes)
             {
-                // Convertir MB a Bytes
-                var maxBytes = maxFileSizeMb * 1024 * 1024;
-
-                if (file.Length > maxBytes)
-                {
-                    return new ValidationResult($"El archivo no puede pesar más de {maxFileSizeMb} MB.");
-                }
+                return new ValidationResult($"El archivo no puede pesar más de {maxFileSizeMb} MB.");
             }
-
-            return ValidationResult.Success;
         }
+
+        return ValidationResult.Success;
     }
 }

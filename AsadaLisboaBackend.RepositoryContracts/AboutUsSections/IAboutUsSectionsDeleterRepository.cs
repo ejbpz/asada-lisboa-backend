@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.RepositoryContracts.AboutUsSections
+﻿namespace AsadaLisboaBackend.RepositoryContracts.AboutUsSections;
+
+public interface IAboutUsSectionsDeleterRepository
 {
-    public interface IAboutUsSectionsDeleterRepository
-    {
-        public Task DeleteAboutUsSection(Guid id);
-    }
+    public Task DeleteAboutUsSection(Guid id);
 }

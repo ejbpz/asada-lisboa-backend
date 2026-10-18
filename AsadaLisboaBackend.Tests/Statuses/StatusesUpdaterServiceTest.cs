@@ -9,181 +9,178 @@ using AsadaLisboaBackend.Services.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.Statuses
+namespace AsadaLisboaBackend.Tests.Statuses;
+
+public class StatusesUpdaterServiceTest
 {
-    public class StatusesUpdaterServiceTest
+    private readonly Fixture _fixture;
+    private readonly StatusesUpdaterService _service;
+    private readonly Mock<ILogger<StatusesUpdaterService>> _loggerMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+    private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
+    private readonly Mock<IStatusesUpdaterRepository> _statusesUpdaterRepositoryMock;
+
+    public StatusesUpdaterServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<ILogger<StatusesUpdaterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
-        private readonly Mock<IStatusesGetterRepository> _statusesGetterRepositoryMock;
-        private readonly Mock<IStatusesUpdaterRepository> _statusesUpdaterRepositoryMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly StatusesUpdaterService _service;
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public StatusesUpdaterServiceTest()
-        {
-            _fixture = new Fixture();
+        _loggerMock = new Mock<ILogger<StatusesUpdaterService>>();
+        _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
+        _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
+        _statusesUpdaterRepositoryMock = new Mock<IStatusesUpdaterRepository>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _service = new StatusesUpdaterService(
+            _statusesGetterRepositoryMock.Object,
+            _statusesUpdaterRepositoryMock.Object,
+            _loggerMock.Object,
+            _memoryCachesServiceMock.Object
+        );
+    }
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+    [Fact]
+    public async Task ChangeStatus_Should_Change_Status_Successfully()
+    {
+        // Arrange
+        var objectId = Guid.NewGuid();
+        var statusId = Guid.NewGuid();
+        var objectType = ObjectTypeEnum.New;
 
-            _loggerMock = new Mock<ILogger<StatusesUpdaterService>>();
-            _memoryCachesServiceMock = new Mock<IMemoryCachesService>();
-            _statusesGetterRepositoryMock = new Mock<IStatusesGetterRepository>();
-            _statusesUpdaterRepositoryMock = new Mock<IStatusesUpdaterRepository>();
+        var status = _fixture.Build<StatusResponseDto>()
+            .With(x => x.Id, statusId)
+            .Create();
 
-            _service = new StatusesUpdaterService(
-                _statusesGetterRepositoryMock.Object,
-                _statusesUpdaterRepositoryMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object
-            );
-        }
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(statusId))
+            .ReturnsAsync(status);
 
-        [Fact]
-        public async Task ChangeStatus_Should_Change_Status_Successfully()
-        {
-            // Arrange
-            var objectId = Guid.NewGuid();
-            var statusId = Guid.NewGuid();
-            var objectType = ObjectTypeEnum.New;
+        _statusesUpdaterRepositoryMock
+            .Setup(x => x.ChangeStatus(objectId, statusId, objectType))
+            .Returns(Task.CompletedTask);
 
-            var status = _fixture.Build<StatusResponseDTO>()
-                .With(x => x.Id, statusId)
-                .Create();
+        // Act
+        await _service.ChangeStatus(objectId, statusId, objectType);
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(statusId))
-                .ReturnsAsync(status);
+        // Assert
+        _statusesGetterRepositoryMock.Verify(
+            x => x.GetStatus(statusId),
+            Times.Once);
 
-            _statusesUpdaterRepositoryMock
-                .Setup(x => x.ChangeStatus(objectId, statusId, objectType))
-                .Returns(Task.CompletedTask);
+        _statusesUpdaterRepositoryMock.Verify(
+            x => x.ChangeStatus(objectId, statusId, objectType),
+            Times.Once);
 
-            // Act
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(Constants.CACHE_STATUSES, objectId),
+            Times.Once);
+
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(Constants.CACHE_STATUSES),
+            Times.Once);
+
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ChangeStatus_Should_Throw_When_Status_Not_Exists()
+    {
+        // Arrange
+        var objectId = Guid.NewGuid();
+        var statusId = Guid.NewGuid();
+        var objectType = ObjectTypeEnum.New;
+
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(statusId))
+            .ReturnsAsync((StatusResponseDto)null!);
+
+        // Act
+        Func<Task> act = async () =>
             await _service.ChangeStatus(objectId, statusId, objectType);
 
-            // Assert
-            _statusesGetterRepositoryMock.Verify(
-                x => x.GetStatus(statusId),
-                Times.Once);
+        // Assert
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("El estado no existe");
 
-            _statusesUpdaterRepositoryMock.Verify(
-                x => x.ChangeStatus(objectId, statusId, objectType),
-                Times.Once);
+        _statusesUpdaterRepositoryMock.Verify(
+            x => x.ChangeStatus(
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
+                It.IsAny<ObjectTypeEnum>()),
+            Times.Never);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(Constants.CACHE_STATUSES, objectId),
-                Times.Once);
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(Constants.CACHE_STATUSES),
-                Times.Once);
+    [Fact]
+    public async Task ChangeStatus_Should_Throw_When_Repository_Fails()
+    {
+        // Arrange
+        var objectId = Guid.NewGuid();
+        var statusId = Guid.NewGuid();
+        var objectType = ObjectTypeEnum.New;
 
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        var status = _fixture.Build<StatusResponseDto>()
+            .With(x => x.Id, statusId)
+            .Create();
 
-        [Fact]
-        public async Task ChangeStatus_Should_Throw_When_Status_Not_Exists()
-        {
-            // Arrange
-            var objectId = Guid.NewGuid();
-            var statusId = Guid.NewGuid();
-            var objectType = ObjectTypeEnum.New;
+        var exception = new Exception("Database error");
 
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(statusId))
-                .ReturnsAsync((StatusResponseDTO)null!);
+        _statusesGetterRepositoryMock
+            .Setup(x => x.GetStatus(statusId))
+            .ReturnsAsync(status);
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.ChangeStatus(objectId, statusId, objectType);
+        _statusesUpdaterRepositoryMock
+            .Setup(x => x.ChangeStatus(objectId, statusId, objectType))
+            .ThrowsAsync(exception);
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<InvalidOperationException>()
-                .WithMessage("El estado no existe");
+        // Act
+        Func<Task> act = async () =>
+            await _service.ChangeStatus(objectId, statusId, objectType);
 
-            _statusesUpdaterRepositoryMock.Verify(
-                x => x.ChangeStatus(
-                    It.IsAny<Guid>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<ObjectTypeEnum>()),
-                Times.Never);
+        // Assert
+        await act.Should()
+            .ThrowAsync<Exception>()
+            .WithMessage("Database error");
 
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                It.IsAny<string>(),
+                It.IsAny<Guid>()),
+            Times.Never);
 
-        [Fact]
-        public async Task ChangeStatus_Should_Throw_When_Repository_Fails()
-        {
-            // Arrange
-            var objectId = Guid.NewGuid();
-            var statusId = Guid.NewGuid();
-            var objectType = ObjectTypeEnum.New;
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                It.IsAny<string>()),
+            Times.Never);
 
-            var status = _fixture.Build<StatusResponseDTO>()
-                .With(x => x.Id, statusId)
-                .Create();
-
-            var exception = new Exception("Database error");
-
-            _statusesGetterRepositoryMock
-                .Setup(x => x.GetStatus(statusId))
-                .ReturnsAsync(status);
-
-            _statusesUpdaterRepositoryMock
-                .Setup(x => x.ChangeStatus(objectId, statusId, objectType))
-                .ThrowsAsync(exception);
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.ChangeStatus(objectId, statusId, objectType);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<Exception>()
-                .WithMessage("Database error");
-
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>()),
-                Times.Never);
-
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    It.IsAny<string>()),
-                Times.Never);
-
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    exception,
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                exception,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 }

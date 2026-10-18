@@ -8,206 +8,202 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Tests.Users
+namespace AsadaLisboaBackend.Tests.Users;
+
+public class UsersDeleterServiceTest
 {
-    public class UsersDeleterServiceTest
+    private readonly UsersDeleterService _service;
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+    private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+
+    public UsersDeleterServiceTest()
     {
-        private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
-        private readonly Mock<ILogger<UsersDeleterService>> _loggerMock;
-        private readonly Mock<IMemoryCachesService> _memoryCachesServiceMock;
+        _userManagerMock = CreateUserManagerMock();
+        var loggerMock = new Mock<ILogger<UsersDeleterService>>();
+        _memoryCachesServiceMock =
+            new Mock<IMemoryCachesService>();
 
-        private readonly UsersDeleterService _service;
+        _service = new UsersDeleterService(
+            _userManagerMock.Object,
+            loggerMock.Object,
+            _memoryCachesServiceMock.Object);
+    }
 
-        public UsersDeleterServiceTest()
+    private Mock<UserManager<ApplicationUser>> CreateUserManagerMock()
+    {
+        var store = new Mock<IUserStore<ApplicationUser>>();
+
+        return new Mock<UserManager<ApplicationUser>>(
+            store.Object,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!);
+    }
+
+    [Fact]
+    public async Task DeleteUser_Should_Delete_User_And_Clear_Cache()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new ApplicationUser
         {
-            _userManagerMock = CreateUserManagerMock();
-            _loggerMock =
-                new Mock<ILogger<UsersDeleterService>>();
-            _memoryCachesServiceMock =
-                new Mock<IMemoryCachesService>();
+            Id = userId,
+            Email = "test@test.com"
+        };
 
-            _service = new UsersDeleterService(
-                _userManagerMock.Object,
-                _loggerMock.Object,
-                _memoryCachesServiceMock.Object);
-        }
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync(user);
 
-        private Mock<UserManager<ApplicationUser>> CreateUserManagerMock()
-        {
-            var store = new Mock<IUserStore<ApplicationUser>>();
+        _userManagerMock
+            .Setup(x => x.DeleteAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
 
-            return new Mock<UserManager<ApplicationUser>>(
-                store.Object,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!,
-                null!);
-        }
+        // Act
+        await _service.DeleteUser(userId);
 
-        [Fact]
-        public async Task DeleteUser_Should_Delete_User_And_Clear_Cache()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var user = new ApplicationUser
-            {
-                Id = userId,
-                Email = "test@test.com"
-            };
+        // Assert
+        _userManagerMock.Verify(
+            x => x.FindByIdAsync(userId.ToString()),
+            Times.Once);
 
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(userId.ToString()))
-                .ReturnsAsync(user);
+        _userManagerMock.Verify(
+            x => x.DeleteAsync(user),
+            Times.Once);
 
-            _userManagerMock
-                .Setup(x => x.DeleteAsync(user))
-                .ReturnsAsync(IdentityResult.Success);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                Constants.CACHE_USERS,
+                user.Id),
+            Times.Once);
 
-            // Act
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                Constants.CACHE_USERS),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteUser_Should_Throw_When_User_Not_Found()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync((ApplicationUser?)null);
+
+        // Act
+        Func<Task> act = async () =>
             await _service.DeleteUser(userId);
 
-            // Assert
-            _userManagerMock.Verify(
-                x => x.FindByIdAsync(userId.ToString()),
-                Times.Once);
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Usuario inexistente.");
 
-            _userManagerMock.Verify(
-                x => x.DeleteAsync(user),
-                Times.Once);
+        _userManagerMock.Verify(
+            x => x.DeleteAsync(It.IsAny<ApplicationUser>()),
+            Times.Never);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    Constants.CACHE_USERS,
-                    user.Id),
-                Times.Once);
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                It.IsAny<string>(),
+                It.IsAny<Guid>()),
+            Times.Never);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    Constants.CACHE_USERS),
-                Times.Once);
-        }
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                It.IsAny<string>()),
+            Times.Never);
+    }
 
-        [Fact]
-        public async Task DeleteUser_Should_Throw_When_User_Not_Found()
+    [Fact]
+    public async Task DeleteUser_Should_Clear_Cache_After_Delete()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new ApplicationUser
         {
-            // Arrange
-            var userId = Guid.NewGuid();
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(userId.ToString()))
-                .ReturnsAsync((ApplicationUser?)null);
+            Id = userId
+        };
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.DeleteUser(userId);
+        var sequence = new MockSequence();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<NotFoundException>()
-                .WithMessage("Usuario inexistente.");
+        _userManagerMock
+            .InSequence(sequence)
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync(user);
 
-            _userManagerMock.Verify(
-                x => x.DeleteAsync(It.IsAny<ApplicationUser>()),
-                Times.Never);
+        _userManagerMock
+            .InSequence(sequence)
+            .Setup(x => x.DeleteAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
 
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>()),
-                Times.Never);
+        _memoryCachesServiceMock
+            .InSequence(sequence)
+            .Setup(x => x.RemoveById(
+                Constants.CACHE_USERS,
+                user.Id));
 
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    It.IsAny<string>()),
-                Times.Never);
-        }
+        _memoryCachesServiceMock
+            .InSequence(sequence)
+            .Setup(x => x.ChangeVersion(
+                Constants.CACHE_USERS));
 
-        [Fact]
-        public async Task DeleteUser_Should_Clear_Cache_After_Delete()
+        // Act
+        await _service.DeleteUser(userId);
+
+        // Assert
+        _userManagerMock.VerifyAll();
+        _memoryCachesServiceMock.VerifyAll();
+    }
+
+    [Fact]
+    public async Task DeleteUser_Should_Not_Clear_Cache_When_Delete_Fails()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new ApplicationUser
         {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var user = new ApplicationUser
-            {
-                Id = userId
-            };
+            Id = userId
+        };
 
-            var sequence = new MockSequence();
+        _userManagerMock
+            .Setup(x => x.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync(user);
 
-            _userManagerMock
-                .InSequence(sequence)
-                .Setup(x => x.FindByIdAsync(userId.ToString()))
-                .ReturnsAsync(user);
+        _userManagerMock
+            .Setup(x => x.DeleteAsync(user))
+            .ReturnsAsync(
+                IdentityResult.Failed(
+                    new IdentityError
+                    {
+                        Description = "Delete failed"
+                    }));
 
-            _userManagerMock
-                .InSequence(sequence)
-                .Setup(x => x.DeleteAsync(user))
-                .ReturnsAsync(IdentityResult.Success);
-
-            _memoryCachesServiceMock
-                .InSequence(sequence)
-                .Setup(x => x.RemoveById(
-                    Constants.CACHE_USERS,
-                    user.Id));
-
-            _memoryCachesServiceMock
-                .InSequence(sequence)
-                .Setup(x => x.ChangeVersion(
-                    Constants.CACHE_USERS));
-
-            // Act
+        // Act
+        Func<Task> act = async () =>
             await _service.DeleteUser(userId);
 
-            // Assert
-            _userManagerMock.VerifyAll();
-            _memoryCachesServiceMock.VerifyAll();
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Error al eliminar el usuario.");
 
-        [Fact]
-        public async Task DeleteUser_Should_Not_Clear_Cache_When_Delete_Fails()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var user = new ApplicationUser
-            {
-                Id = userId
-            };
+        _memoryCachesServiceMock.Verify(
+            x => x.RemoveById(
+                It.IsAny<string>(),
+                It.IsAny<Guid>()),
+            Times.Never);
 
-            _userManagerMock
-                .Setup(x => x.FindByIdAsync(userId.ToString()))
-                .ReturnsAsync(user);
-
-            _userManagerMock
-                .Setup(x => x.DeleteAsync(user))
-                .ReturnsAsync(
-                    IdentityResult.Failed(
-                        new IdentityError
-                        {
-                            Description = "Delete failed"
-                        }));
-
-            // Act
-            Func<Task> act = async () =>
-                await _service.DeleteUser(userId);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<InvalidOperationException>()
-                .WithMessage("Error al eliminar el usuario.");
-
-            _memoryCachesServiceMock.Verify(
-                x => x.RemoveById(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>()),
-                Times.Never);
-
-            _memoryCachesServiceMock.Verify(
-                x => x.ChangeVersion(
-                    It.IsAny<string>()),
-                Times.Never);
-        }
+        _memoryCachesServiceMock.Verify(
+            x => x.ChangeVersion(
+                It.IsAny<string>()),
+            Times.Never);
     }
 }

@@ -7,55 +7,54 @@ using AsadaLisboaBackend.ServiceContracts.Jwts;
 using AsadaLisboaBackend.Models.IdentityModels;
 using AsadaLisboaBackend.ServiceContracts.Accounts;
 
-namespace AsadaLisboaBackend.Services.Accounts
+namespace AsadaLisboaBackend.Services.Accounts;
+
+public class LoginService : ILoginService
 {
-    public class LoginService : ILoginService
+    private readonly IJwtsService _jwtsService;
+    private readonly ILogger<LoginService> _logger;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+
+    public LoginService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtsService jwtsService, ILogger<LoginService> logger)
     {
-        private readonly IJwtsService _jwtsService;
-        private readonly ILogger<LoginService> _logger;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        _logger = logger;
+        _jwtsService = jwtsService;
+        _userManager = userManager;
+        _signInManager = signInManager;
+    }
 
-        public LoginService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtsService jwtsService, ILogger<LoginService> logger)
+    public async Task<AuthenticationResponseDto> Login(LoginRequestDto loginRequestDto)
+    {
+        var user = await _userManager.FindByEmailAsync(loginRequestDto.Email);
+
+        if (user is null)
         {
-            _logger = logger;
-            _jwtsService = jwtsService;
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _logger.LogError("Error al iniciar sesión: No existe un usuario con el correo {Email}.", loginRequestDto.Email);
+            throw new NotFoundException("No existe un usuario con este correo electrónico.");
         }
 
-        public async Task<AuthenticationResponseDTO> Login(LoginRequestDTO loginRequestDTO)
+        var result = await _signInManager.PasswordSignInAsync(user, loginRequestDto.Password, isPersistent: true, lockoutOnFailure: false);
+
+        if (!result.Succeeded)
         {
-            var user = await _userManager.FindByEmailAsync(loginRequestDTO.Email);
-
-            if (user is null)
-            {
-                _logger.LogError("Error al iniciar sesión: No existe un usuario con el correo {Email}.", loginRequestDTO.Email);
-                throw new NotFoundException("No existe un usuario con este correo electrónico.");
-            }
-
-            var result = await _signInManager.PasswordSignInAsync(user, loginRequestDTO.Password, isPersistent: true, lockoutOnFailure: false);
-
-            if (!result.Succeeded)
-            {
-                _logger.LogError("Error al iniciar sesión: Credenciales incorrectas para el correo {Email}.", loginRequestDTO.Email);
-                throw new InvalidCredentialsException("Correo electrónico y/o contraseña incorrectos.");
-            }
-
-            var autenticationResponse = await _jwtsService.GenerateToken(user);
-
-            user.RefreshToken = autenticationResponse.RefreshToken;
-            user.RefreshTokenExpiration = autenticationResponse.RefreshTokenExpiration;
-
-            var updateResult = await _userManager.UpdateAsync(user);
-
-            if (!updateResult.Succeeded)
-            {
-                _logger.LogError("Error al actualizar el usuario con el correo {Email}.", loginRequestDTO.Email);
-                throw new UpdateObjectException("Error al actualizar el usuario.");
-            }
-
-            return autenticationResponse;
+            _logger.LogError("Error al iniciar sesión: Credenciales incorrectas para el correo {Email}.", loginRequestDto.Email);
+            throw new InvalidCredentialsException("Correo electrónico y/o contraseña incorrectos.");
         }
+
+        var autenticationResponse = await _jwtsService.GenerateToken(user);
+
+        user.RefreshToken = autenticationResponse.RefreshToken;
+        user.RefreshTokenExpiration = autenticationResponse.RefreshTokenExpiration;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+
+        if (!updateResult.Succeeded)
+        {
+            _logger.LogError("Error al actualizar el usuario con el correo {Email}.", loginRequestDto.Email);
+            throw new UpdateObjectException("Error al actualizar el usuario.");
+        }
+
+        return autenticationResponse;
     }
 }

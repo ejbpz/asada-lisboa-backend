@@ -2,41 +2,34 @@
 using Microsoft.AspNetCore.Diagnostics;
 using AsadaLisboaBackend.Services.Exceptions;
 
-namespace AsadaLisboaBackend.ErrorHandling
+namespace AsadaLisboaBackend.ErrorHandling;
+
+internal sealed class SendEmailErrorHandling(
+    IProblemDetailsService problemDetailsService,
+    ILogger<SendEmailErrorHandling> logger)
+    : IExceptionHandler
 {
-    internal sealed class SendEmailErrorHandling : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        private readonly ILogger<SendEmailErrorHandling> _logger;
-        private readonly IProblemDetailsService _problemDetailsService;
+        if (exception is not SendEmailException)
+            return false;
 
-        public SendEmailErrorHandling(IProblemDetailsService problemDetailsService, ILogger<SendEmailErrorHandling> logger)
+        logger.LogError(exception, "Error Global - Error al enviar un correo electrónico.");
+
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+        await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
         {
-            _logger = logger;
-            _problemDetailsService = problemDetailsService;
-        }
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            if (exception is not SendEmailException sendEmailException)
-                return false;
-
-            _logger.LogError(exception, "Error Global - Error al enviar un correo electrónico.");
-
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-            await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails()
             {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails()
-                {
-                    Detail = exception.Message,
-                    Title = "Error al enviar correo electrónico",
-                    Status = StatusCodes.Status400BadRequest,
-                }
-            });
+                Detail = exception.Message,
+                Title = "Error al enviar correo electrónico",
+                Status = StatusCodes.Status400BadRequest,
+            }
+        });
 
-            return true;
-        }
+        return true;
     }
 }

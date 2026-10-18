@@ -7,48 +7,39 @@ using AsadaLisboaBackend.RepositoryContracts.Charges;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 using AsadaLisboaBackend.Utils;
 
-namespace AsadaLisboaBackend.Services.Charges
+namespace AsadaLisboaBackend.Services.Charges;
+
+public class ChargesAdderService(
+    IChargesGetterService chargesGetterService,
+    IChargesAdderRepository chargesAdderRepository,
+    ILogger<ChargesAdderService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IChargesAdderService
 {
-    public class ChargesAdderService : IChargesAdderService
+    public async Task<ChargeResponseDto> CreateCharge(string nameCharge)
     {
-        private readonly IChargesGetterService _chargesGetterService;
-        private readonly IChargesAdderRepository _chargesAdderRepository;
-        private readonly ILogger<ChargesAdderService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
 
-        public ChargesAdderService(IChargesGetterService chargesGetterService, IChargesAdderRepository chargesAdderRepository, ILogger<ChargesAdderService> logger, IMemoryCachesService memoryCachesService)
+        try 
         {
-            _chargesGetterService = chargesGetterService;
-            _chargesAdderRepository = chargesAdderRepository;
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-        }
+            var existsCharge = await chargesGetterService.ExistsCharge(nameCharge);
 
-        public async Task<ChargeResponseDTO> CreateCharge(string nameCharge)
-        {
+            if (existsCharge){
 
-            try 
-            {
-                var existsCharge = await _chargesGetterService.ExistsCharge(nameCharge);
-
-                if (existsCharge){
-
-                    _logger.LogWarning("No se pudo crear el cargo '{ChargeName}' porque ya existe.", nameCharge);
-                    throw new ExistingValueException("El nombre del cargo ya existe.");
-                }
-                var charge = new Charge { Name = nameCharge };
+                logger.LogWarning("No se pudo crear el cargo '{ChargeName}' porque ya existe.", nameCharge);
+                throw new ExistingValueException("El nombre del cargo ya existe.");
+            }
+            var charge = new Charge { Name = nameCharge };
 
                
-                var result = await _chargesAdderRepository.CreateCharge(charge);
+            var result = await chargesAdderRepository.CreateCharge(charge);
 
-                _memoryCachesService.ChangeVersion(Constants.CACHE_CHARGES);
+            memoryCachesService.ChangeVersion(Constants.CACHE_CHARGES);
 
-                return result;
+            return result;
 
-            } catch (Exception ex) {
-                _logger.LogError(ex, "Error al crear el cargo '{ChargeName}'", nameCharge);
-                throw new CreateObjectException("Error al crear el cargo.");
-            }
+        } catch (Exception ex) {
+            logger.LogError(ex, "Error al crear el cargo '{ChargeName}'", nameCharge);
+            throw new CreateObjectException("Error al crear el cargo.");
         }
     }
 }

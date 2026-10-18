@@ -1,10 +1,9 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.AboutUs;
 
-namespace AsadaLisboaBackend.ServiceContracts.AboutUsSections
+namespace AsadaLisboaBackend.ServiceContracts.AboutUsSections;
+
+public interface IAboutUsSectionsGetterService
 {
-    public interface IAboutUsSectionsGetterService
-    {
-        public Task<PageResponseDTO<AboutUsResponseDTO>> GetAboutUsSections(SearchSortRequestDTO searchSortRequestDTO);
-    }
+    public Task<PageResponseDto<AboutUsResponseDto>> GetAboutUsSections(SearchSortRequestDto searchSortRequestDto);
 }

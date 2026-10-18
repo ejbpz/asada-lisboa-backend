@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Role;
 
-namespace AsadaLisboaBackend.ServiceContracts.Roles
+namespace AsadaLisboaBackend.ServiceContracts.Roles;
+
+public interface IRolesGetterService
 {
-    public interface IRolesGetterService
-    {
-        public Task<List<RoleResponseDTO>> GetRoles();
-    }
+    public Task<List<RoleResponseDto>> GetRoles();
 }

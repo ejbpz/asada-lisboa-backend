@@ -1,8 +1,7 @@
 ﻿
-namespace AsadaLisboaBackend.RepositoryContracts.Documents
+namespace AsadaLisboaBackend.RepositoryContracts.Documents;
+
+public interface IDocumentsUpdaterRepository
 {
-    public interface IDocumentsUpdaterRepository
-    {
-        public Task<Models.Document> UpdateDocument(Models.Document document);
-    }
+    public Task<Models.Document> UpdateDocument(Models.Document document);
 }

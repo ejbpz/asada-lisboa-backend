@@ -1,10 +1,9 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Principal;
 
-namespace AsadaLisboaBackend.ServiceContracts.Principals
+namespace AsadaLisboaBackend.ServiceContracts.Principals;
+
+public interface IPrincipalsGetterService
 {
-    public interface IPrincipalsGetterService
-    {
-        public Task<PrincipalResponseDTO> GetPrincipalInformation();
-        public Task<PrincipalResponseDTO> GetPrincipalAdminInformation();
-    }
+    public Task<PrincipalResponseDto> GetPrincipalInformation();
+    public Task<PrincipalResponseDto> GetPrincipalAdminInformation();
 }

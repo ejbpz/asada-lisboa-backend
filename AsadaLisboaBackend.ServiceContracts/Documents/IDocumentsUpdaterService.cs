@@ -1,9 +1,8 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Document;
 
-namespace AsadaLisboaBackend.ServiceContracts.Documents
+namespace AsadaLisboaBackend.ServiceContracts.Documents;
+
+public interface IDocumentsUpdaterService
 {
-    public interface IDocumentsUpdaterService
-    {
-        public Task<DocumentResponseDTO> UpdateDocument(Guid id, DocumentUpdateRequestDTO documentUpdateRequestDTO); 
-    }
+    public Task<DocumentResponseDto> UpdateDocument(Guid id, DocumentUpdateRequestDto documentUpdateRequestDto); 
 }

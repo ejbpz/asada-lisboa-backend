@@ -1,160 +1,157 @@
-﻿using AutoFixture;
-using FluentAssertions;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
+using AutoFixture;
+using FluentAssertions;
 using AsadaLisboaBackend.Services.Editors;
 using AsadaLisboaBackend.Models.DTOs.Editor;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 
-namespace AsadaLisboaBackend.Tests.Editors
+namespace AsadaLisboaBackend.Tests.Editors;
+
+public class EditorsAdderServiceTest
 {
-    public class EditorsAdderServiceTest
+    private readonly Fixture _fixture;
+    private readonly EditorsAdderService _service;
+    private readonly Mock<ILogger<EditorsAdderService>> _loggerMock;
+    private readonly Mock<IFileSystemsManager> _fileSystemsManagerMock;
+
+    public EditorsAdderServiceTest()
     {
-        private readonly Fixture _fixture;
+        _fixture = new Fixture();
 
-        private readonly Mock<IFileSystemsManager> _fileSystemsManagerMock;
-        private readonly Mock<ILogger<EditorsAdderService>> _loggerMock;
+        _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(x => _fixture.Behaviors.Remove(x));
 
-        private readonly EditorsAdderService _service;
+        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        public EditorsAdderServiceTest()
-        {
-            _fixture = new Fixture();
+        _fileSystemsManagerMock = new Mock<IFileSystemsManager>();
 
-            _fixture.Behaviors
-                .OfType<ThrowingRecursionBehavior>()
-                .ToList()
-                .ForEach(x => _fixture.Behaviors.Remove(x));
+        _loggerMock = new Mock<ILogger<EditorsAdderService>>();
 
-            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        _service = new EditorsAdderService(
+            _fileSystemsManagerMock.Object,
+            _loggerMock.Object
+        );
+    }
 
-            _fileSystemsManagerMock = new Mock<IFileSystemsManager>();
+    [Fact]
+    public async Task CreateTemporalImage_Should_Create_Image_Successfully()
+    {
+        // Arrange
+        var fileMock = new Mock<IFormFile>();
 
-            _loggerMock = new Mock<ILogger<EditorsAdderService>>();
+        fileMock.Setup(x => x.Length)
+            .Returns(100);
 
-            _service = new EditorsAdderService(
-                _fileSystemsManagerMock.Object,
-                _loggerMock.Object
-            );
-        }
+        var request = _fixture.Build<EditorRequestDto>()
+            .With(x => x.File, fileMock.Object)
+            .Create();
 
-        [Fact]
-        public async Task CreateTemporalImage_Should_Create_Image_Successfully()
-        {
-            // Arrange
-            var fileMock = new Mock<IFormFile>();
+        var expectedUrl = "https://server/temp/image.jpg";
 
-            fileMock.Setup(x => x.Length)
-                .Returns(100);
+        _fileSystemsManagerMock
+            .Setup(x => x.SaveAsync(
+                fileMock.Object,
+                "temp",
+                null))
+            .ReturnsAsync(expectedUrl);
 
-            var request = _fixture.Build<EditorRequestDTO>()
-                .With(x => x.File, fileMock.Object)
-                .Create();
+        // Act
+        var result = await _service.CreateTemporalImage(request);
 
-            var expectedUrl = "https://server/temp/image.jpg";
+        // Assert
+        result.Should().NotBeNull();
 
-            _fileSystemsManagerMock
-                .Setup(x => x.SaveAsync(
-                    fileMock.Object,
-                    "temp",
-                    null))
-                .ReturnsAsync(expectedUrl);
+        result.Url.Should().Be(expectedUrl);
 
-            // Act
-            var result = await _service.CreateTemporalImage(request);
+        _fileSystemsManagerMock.Verify(
+            x => x.SaveAsync(
+                fileMock.Object,
+                "temp",
+                null),
+            Times.Once);
+    }
 
-            // Assert
-            result.Should().NotBeNull();
+    [Fact]
+    public async Task CreateTemporalImage_Should_Throw_When_File_Is_Null()
+    {
+        // Arrange
+        var request = _fixture.Build<EditorRequestDto>()
+            .With(x => x.File, (IFormFile?)null)
+            .Create();
 
-            result.Url.Should().Be(expectedUrl);
+        // Act
+        Func<Task> act = async () => await _service.CreateTemporalImage(request);
 
-            _fileSystemsManagerMock.Verify(
-                x => x.SaveAsync(
-                    fileMock.Object,
-                    "temp",
-                    null),
-                Times.Once);
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("El archivo no puede ser nulo.*");
 
-        [Fact]
-        public async Task CreateTemporalImage_Should_Throw_When_File_Is_Null()
-        {
-            // Arrange
-            var request = _fixture.Build<EditorRequestDTO>()
-                .With(x => x.File, (IFormFile?)null)
-                .Create();
+        _fileSystemsManagerMock.Verify(
+            x => x.SaveAsync(
+                It.IsAny<IFormFile>(),
+                It.IsAny<string>(),
+                It.IsAny<string?>()),
+            Times.Never);
+    }
 
-            // Act
-            Func<Task> act = async () => await _service.CreateTemporalImage(request);
+    [Fact]
+    public async Task CreateTemporalImage_Should_Call_Logger_When_Success()
+    {
+        // Arrange
+        var fileMock = new Mock<IFormFile>();
 
-            // Assert
-            await act.Should()
-                .ThrowAsync<ArgumentException>()
-                .WithMessage("El archivo no puede ser nulo.*");
+        var request = _fixture.Build<EditorRequestDto>()
+            .With(x => x.File, fileMock.Object)
+            .Create();
 
-            _fileSystemsManagerMock.Verify(
-                x => x.SaveAsync(
-                    It.IsAny<IFormFile>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>()),
-                Times.Never);
-        }
+        _fileSystemsManagerMock
+            .Setup(x => x.SaveAsync(
+                It.IsAny<IFormFile>(),
+                "temp",
+                null))
+            .ReturnsAsync("https://server/temp/image.jpg");
 
-        [Fact]
-        public async Task CreateTemporalImage_Should_Call_Logger_When_Success()
-        {
-            // Arrange
-            var fileMock = new Mock<IFormFile>();
+        // Act
+        await _service.CreateTemporalImage(request);
 
-            var request = _fixture.Build<EditorRequestDTO>()
-                .With(x => x.File, fileMock.Object)
-                .Create();
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
+    }
 
-            _fileSystemsManagerMock
-                .Setup(x => x.SaveAsync(
-                    It.IsAny<IFormFile>(),
-                    "temp",
-                    null))
-                .ReturnsAsync("https://server/temp/image.jpg");
+    [Fact]
+    public async Task CreateTemporalImage_Should_Call_Logger_When_File_Is_Null()
+    {
+        // Arrange
+        var request = _fixture.Build<EditorRequestDto>()
+            .With(x => x.File, (IFormFile?)null)
+            .Create();
 
-            // Act
-            await _service.CreateTemporalImage(request);
+        // Act
+        Func<Task> act = async () => await _service.CreateTemporalImage(request);
 
-            // Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.AtLeastOnce);
-        }
+        // Assert
+        await act.Should()
+            .ThrowAsync<ArgumentException>();
 
-        [Fact]
-        public async Task CreateTemporalImage_Should_Call_Logger_When_File_Is_Null()
-        {
-            // Arrange
-            var request = _fixture.Build<EditorRequestDTO>()
-                .With(x => x.File, (IFormFile?)null)
-                .Create();
-
-            // Act
-            Func<Task> act = async () => await _service.CreateTemporalImage(request);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<ArgumentException>();
-
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.AtLeastOnce);
-        }
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.AtLeastOnce);
     }
 }

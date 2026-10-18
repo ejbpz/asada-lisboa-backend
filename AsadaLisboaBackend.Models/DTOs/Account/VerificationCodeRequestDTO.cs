@@ -1,8 +1,7 @@
-﻿namespace AsadaLisboaBackend.Models.DTOs.Account
+﻿namespace AsadaLisboaBackend.Models.DTOs.Account;
+
+public class VerificationCodeRequestDto
 {
-    public class VerificationCodeRequestDTO
-    {
-        public string? Email { get; set; }
-        public string? Token { get; set; }
-    }
+    public string? Email { get; set; }
+    public string? Token { get; set; }
 }

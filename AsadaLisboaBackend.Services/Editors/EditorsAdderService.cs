@@ -3,32 +3,25 @@ using AsadaLisboaBackend.Models.DTOs.Editor;
 using AsadaLisboaBackend.ServiceContracts.Editors;
 using AsadaLisboaBackend.ServiceContracts.FileSystems;
 
-namespace AsadaLisboaBackend.Services.Editors
+namespace AsadaLisboaBackend.Services.Editors;
+
+public class EditorsAdderService(
+    IFileSystemsManager fileSystemsManager,
+    ILogger<EditorsAdderService> logger)
+    : IEditorsAdderService
 {
-    public class EditorsAdderService : IEditorsAdderService
+    public async Task<EditorResponseDto> CreateTemporalImage(EditorRequestDto editorRequestDto)
     {
-        private IFileSystemsManager _fileSystemsManager;
-        private readonly ILogger<EditorsAdderService> _logger;
-
-        public EditorsAdderService(IFileSystemsManager fileSystemsManager, ILogger<EditorsAdderService> logger)
+        if(editorRequestDto.File == null)
         {
-            _logger = logger;
-            _fileSystemsManager = fileSystemsManager;
+            logger.LogWarning("No se ha proporcionado ningún archivo para crear la imagen temporal.");
+            throw new ArgumentException("El archivo no puede ser nulo.");
         }
 
-        public async Task<EditorResponseDTO> CreateTemporalImage(EditorRequestDTO editorRequestDTO)
-        {
-            if(editorRequestDTO.File == null)
-            {
-                _logger.LogWarning("No se ha proporcionado ningún archivo para crear la imagen temporal.");
-                throw new ArgumentException("El archivo no puede ser nulo.", nameof(editorRequestDTO.File));
-            }
+        var url = await fileSystemsManager.SaveAsync(editorRequestDto.File, "temp");
 
-            var url = await _fileSystemsManager.SaveAsync(editorRequestDTO.File, "temp");
+        logger.LogInformation("Imagen temporal agregada en esta URL: {Url}", url);
 
-            _logger.LogInformation("Imagen temporal agregada en esta URL: {Url}", url);
-
-            return new EditorResponseDTO() { Url = url };
-        }
+        return new EditorResponseDto() { Url = url };
     }
 }

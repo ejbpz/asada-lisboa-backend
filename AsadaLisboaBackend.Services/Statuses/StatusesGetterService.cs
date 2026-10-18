@@ -5,38 +5,31 @@ using AsadaLisboaBackend.ServiceContracts.Statuses;
 using AsadaLisboaBackend.RepositoryContracts.Statuses;
 using AsadaLisboaBackend.ServiceContracts.MemoryCaches;
 
-namespace AsadaLisboaBackend.Services.Statuses
-{
-    public class StatusesGetterService : IStatusesGetterService
-    {
-        private readonly ILogger<StatusesGetterService> _logger;
-        private readonly IMemoryCachesService _memoryCachesService;
-        private readonly IStatusesGetterRepository _statusesGetterRepository;
-        public StatusesGetterService(IStatusesGetterRepository statusesGetterRepository, ILogger<StatusesGetterService> logger, IMemoryCachesService memoryCachesService)
-        {
-            _logger = logger;
-            _memoryCachesService = memoryCachesService;
-            _statusesGetterRepository = statusesGetterRepository;
-        }
+namespace AsadaLisboaBackend.Services.Statuses;
 
-        public async Task<List<StatusResponseDTO>> GetStatuses()
+public class StatusesGetterService(
+    IStatusesGetterRepository statusesGetterRepository,
+    ILogger<StatusesGetterService> logger,
+    IMemoryCachesService memoryCachesService)
+    : IStatusesGetterService
+{
+    public async Task<List<StatusResponseDto>> GetStatuses()
+    {
+        try
         {
-            try
-            {
-                var result = await _memoryCachesService.GetOrCreateCache<List<StatusResponseDTO>>(
+            var result = await memoryCachesService.GetOrCreateCache(
                 key: Constants.CACHE_CATEGORIES,
-                create: () => _statusesGetterRepository.GetStatuses(),
+                create: statusesGetterRepository.GetStatuses,
                 time: TimeSpan.FromMinutes(5));
 
-                _logger.LogInformation("Obtención exitosa de estados.");
+            logger.LogInformation("Obtención exitosa de estados.");
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener los estados");
-                throw;
-            }
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al obtener los estados");
+            throw;
         }
     }
 }

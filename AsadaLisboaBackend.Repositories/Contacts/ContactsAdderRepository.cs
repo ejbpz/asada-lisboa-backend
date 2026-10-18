@@ -3,26 +3,15 @@ using AsadaLisboaBackend.Services.Exceptions;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Contacts;
 
-namespace AsadaLisboaBackend.Repositories.Contacts
+namespace AsadaLisboaBackend.Repositories.Contacts;
+
+public class ContactsAdderRepository(ApplicationDbContext context) : IContactsAdderRepository
 {
-    public class ContactsAdderRepository : IContactsAdderRepository
+    public async Task<Contact> CreateContact(Contact contact)
     {
-        private readonly ApplicationDbContext _context;
+        context.Contacts.Add(contact);
+        var affectedRows = await context.SaveChangesAsync();
 
-        public ContactsAdderRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<Contact> CreateContact(Contact contact)
-        {
-            _context.Contacts.Add(contact);
-            var affectedRows = await _context.SaveChangesAsync();
-
-            if (affectedRows < 1)
-                throw new NotFoundException("Error al crear el contacto.");
-
-            return contact;
-        }
+        return affectedRows < 1 ? throw new NotFoundException("Error al crear el contacto.") : contact;
     }
 }

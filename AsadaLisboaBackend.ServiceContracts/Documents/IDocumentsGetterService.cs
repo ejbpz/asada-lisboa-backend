@@ -1,12 +1,11 @@
 ﻿using AsadaLisboaBackend.Models.DTOs.Shared;
 using AsadaLisboaBackend.Models.DTOs.Document;
 
-namespace AsadaLisboaBackend.ServiceContracts.Documents
+namespace AsadaLisboaBackend.ServiceContracts.Documents;
+
+public interface IDocumentsGetterService
 {
-    public interface IDocumentsGetterService
-    {
-        public Task<PageResponseDTO<DocumentMinimalResponseDTO>> GetDocuments(SearchSortRequestDTO searchSortRequestDTO);
-        public Task<DocumentResponseDTO> GetDocumentBySlug(string slug);
-        public Task<DocumentResponseDTO> GetDocument(Guid id);
-    }
+    public Task<PageResponseDto<DocumentMinimalResponseDto>> GetDocuments(SearchSortRequestDto searchSortRequestDto);
+    public Task<DocumentResponseDto> GetDocumentBySlug(string slug);
+    public Task<DocumentResponseDto> GetDocument(Guid id);
 }

@@ -3,22 +3,14 @@ using AsadaLisboaBackend.Models.DTOs.Role;
 using AsadaLisboaBackend.Models.DatabaseContext;
 using AsadaLisboaBackend.RepositoryContracts.Roles;
 
-namespace AsadaLisboaBackend.Repositories.Roles
+namespace AsadaLisboaBackend.Repositories.Roles;
+
+public class RolesGetterRepository(ApplicationDbContext context) : IRolesGetterRepository
 {
-    public class RolesGetterRepository : IRolesGetterRepository
+    public async Task<List<RoleResponseDto>> GetRoles()
     {
-        private readonly ApplicationDbContext _context;
-
-        public RolesGetterRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<List<RoleResponseDTO>> GetRoles()
-        {
-            return await _context.Roles
-                .Select(RoleExtensions.MapRoleResponseDTO())
-                .ToListAsync();
-        }
+        return await context.Roles
+            .Select(RoleExtensions.MapRoleResponseDto())
+            .ToListAsync();
     }
 }

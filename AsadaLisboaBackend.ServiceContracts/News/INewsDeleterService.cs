@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.ServiceContracts.News
+﻿namespace AsadaLisboaBackend.ServiceContracts.News;
+
+public interface INewsDeleterService
 {
-    public interface INewsDeleterService
-    {
-        public Task DeleteNew(Guid id);
-    }
+    public Task DeleteNew(Guid id);
 }

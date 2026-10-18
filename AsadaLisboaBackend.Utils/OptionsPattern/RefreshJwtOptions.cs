@@ -1,7 +1,6 @@
-﻿namespace AsadaLisboaBackend.Utils.OptionsPattern
+﻿namespace AsadaLisboaBackend.Utils.OptionsPattern;
+
+public class RefreshJwtOptions
 {
-    public class RefreshJwtOptions
-    {
-        public int EXPIRATION_MINUTES { get; set; } = 0;
-    }
+    public int ExpirationMinutes { get; set; } = 0;
 }
